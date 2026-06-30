@@ -1,0 +1,6 @@
+@UM_Agriculture_HostAddress = http://localhost:5219
+
+GET {{UM_Agriculture_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
