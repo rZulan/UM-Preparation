@@ -33,7 +33,7 @@ namespace Infrastructure
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IUomRepository, UomRepository>();
-            services.AddScoped<IDispatchRepository, DispatchRepository>();
+            services.AddScoped<IMiscellaneousReceiptRepository, MiscellaneousReceiptRepository>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {

@@ -1,6 +1,6 @@
-namespace Application.DTO.Dispatch
+namespace Application.DTO.MiscellaneousReceipt
 {
-    public class AddDispatchDTO
+    public class AddMiscellaneousReceiptDTO
     {
         public required string BatchNumber { get; set; }
         public required int ProductId { get; set; }

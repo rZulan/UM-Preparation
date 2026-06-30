@@ -16,7 +16,7 @@ namespace Infrastructure.Data
         public DbSet<RolePermissions> RolePermissions { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Uom> Uoms { get; set; }
-        public DbSet<Dispatch> Dispatches { get; set; }
+        public DbSet<MiscellaneousReceipt> MiscellaneousReceipt { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -137,40 +137,22 @@ namespace Infrastructure.Data
                 .HasForeignKey(p => p.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Dispatch>()
+            modelBuilder.Entity<MiscellaneousReceipt>()
                 .HasOne(d => d.CreatedBy)
                 .WithMany()
                 .HasForeignKey(d => d.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Dispatch>()
+            modelBuilder.Entity<MiscellaneousReceipt>()
                 .HasOne(d => d.UpdatedBy)
                 .WithMany()
                 .HasForeignKey(d => d.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Dispatch>()
+            modelBuilder.Entity<MiscellaneousReceipt>()
                 .HasOne(d => d.Product)
                 .WithMany()
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Dispatch>()
-                .HasOne(d => d.PreparedBy)
-                .WithMany()
-                .HasForeignKey(d => d.PreparedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Dispatch>()
-                .HasOne(d => d.CheckedBy)
-                .WithMany()
-                .HasForeignKey(d => d.CheckedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Dispatch>()
-                .HasOne(d => d.ReturnedBy)
-                .WithMany()
-                .HasForeignKey(d => d.ReturnedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Role>().HasData(

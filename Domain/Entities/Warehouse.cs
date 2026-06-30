@@ -10,9 +10,9 @@ namespace Domain.Entities
 
         public required int ProductId { get; set; }
         public required int FarmId { get; set; }
-        public int? DispatchId { get; set; }
+        public int? MiscellaneousReceiptId { get; set; }
 
         public Product Product { get; set; } = null!;
-        public Dispatch? Dispatch { get; set; }
+        public MiscellaneousReceipt? MiscellaneousReceipt { get; set; }
     }
 }
