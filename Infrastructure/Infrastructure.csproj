@@ -29,10 +29,15 @@
   <ItemGroup>
     <None Include="C:\Users\analuz\source\repos\UM Agriculture\Infrastructure\.editorconfig" />
     <None Include="C:\Users\analuz\source\repos\UM Agriculture\Infrastructure\Migrations\.editorconfig" />
+    <None Include="C:\Users\analuz\source\repos\UM Preparation\Infrastructure\Migrations\.editorconfig" />
   </ItemGroup>
 
   <ItemGroup>
     <EditorConfigFiles Remove="C:\Users\analuz\source\repos\UM Agriculture\Infrastructure\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\Users\analuz\source\repos\UM Preparation\Infrastructure\Migrations\.editorconfig" />
   </ItemGroup>
 
 </Project>
