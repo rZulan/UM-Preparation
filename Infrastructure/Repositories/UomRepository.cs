@@ -38,6 +38,10 @@ namespace Infrastructure.Repositories
                     "id" when isDsc => query.OrderByDescending(u => u.Id),
                     "name" when isAsc => query.OrderBy(u => u.Name),
                     "name" when isDsc => query.OrderByDescending(u => u.Name),
+                    "shortname" when isAsc => query.OrderBy(u => u.ShortName),
+                    "shortname" when isDsc => query.OrderByDescending(u => u.ShortName),
+                    "isinteger" when isAsc => query.OrderBy(u => u.IsInteger),
+                    "isinteger" when isDsc => query.OrderByDescending(u => u.IsInteger),
                     _ => query
                 };
             }

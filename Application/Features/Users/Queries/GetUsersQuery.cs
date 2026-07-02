@@ -51,7 +51,7 @@ namespace Application.Features.Users.Queries
 
             var sortInfo = new SortInfo
             {
-                SortColumns = ["id", "username", "firstname", "lastname"],
+                SortColumns = ["id", "username", "firstname", "middlename", "lastname", "suffix", "idprefix", "idnumber"],
                 CurrentSort = request.Sort != null ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,

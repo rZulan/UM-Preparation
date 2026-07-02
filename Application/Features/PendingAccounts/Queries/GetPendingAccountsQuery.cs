@@ -46,7 +46,7 @@ namespace Application.Features.PendingAccounts.Queries
 
             var sortInfo = new SortInfo
             {
-                SortColumns = ["id"],
+                SortColumns = ["id", "employeeprefix", "employeeid", "username", "firstname", "middlename", "lastname", "suffix"],
                 CurrentSort = request.Sort != null ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,

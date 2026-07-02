@@ -42,7 +42,7 @@ namespace Application.Features.Uoms.Queries
 
             var sortInfo = new SortInfo
             {
-                SortColumns = ["id", "name"],
+                SortColumns = ["id", "name", "shortname", "isinteger"],
                 CurrentSort = request.Sort != null ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,

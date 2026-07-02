@@ -43,7 +43,7 @@ namespace Application.Features.MiscellaneousReceipts.Queries
 
             var sortInfo = new SortInfo
             {
-                SortColumns = ["id"],
+                SortColumns = ["id", "itemcode", "description", "uom", "quantity"],
                 CurrentSort = request.Sort != null ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,

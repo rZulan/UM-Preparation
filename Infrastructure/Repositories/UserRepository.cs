@@ -50,8 +50,16 @@ namespace Infrastructure.Repositories
                     "username" when isDsc => query.OrderByDescending(u => u.Username),
                     "firstname" when isAsc => query.OrderBy(u => u.FirstName),
                     "firstname" when isDsc => query.OrderByDescending(u => u.FirstName),
+                    "middlename" when isAsc => query.OrderBy(u => u.MiddleName),
+                    "middlename" when isDsc => query.OrderByDescending(u => u.MiddleName),
                     "lastname" when isAsc => query.OrderBy(u => u.LastName),
                     "lastname" when isDsc => query.OrderByDescending(u => u.LastName),
+                    "suffix" when isAsc => query.OrderBy(u => u.Suffix),
+                    "suffix" when isDsc => query.OrderByDescending(u => u.Suffix),
+                    "idprefix" when isAsc => query.OrderBy(u => u.IDPrefix),
+                    "idprefix" when isDsc => query.OrderByDescending(u => u.IDPrefix),
+                    "idnumber" when isAsc => query.OrderBy(u => u.IDNumber),
+                    "idnumber" when isDsc => query.OrderByDescending(u => u.IDNumber),
                     _ => query
                 };
             }

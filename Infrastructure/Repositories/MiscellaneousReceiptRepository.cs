@@ -31,6 +31,14 @@ namespace Infrastructure.Repositories
                 {
                     "id" when isAsc => query.OrderBy(d => d.Id),
                     "id" when isDsc => query.OrderByDescending(d => d.Id),
+                    "itemcode" when isAsc => query.OrderBy(d => d.Product.ItemCode),
+                    "itemcode" when isDsc => query.OrderByDescending(d => d.Product.ItemCode),
+                    "description" when isAsc => query.OrderBy(d => d.Product.Description),
+                    "description" when isDsc => query.OrderByDescending(d => d.Product.Description),
+                    "uom" when isAsc => query.OrderBy(d => d.Product.Uom.ShortName),
+                    "uom" when isDsc => query.OrderByDescending(d => d.Product.Uom.ShortName),
+                    "quantity" when isAsc => query.OrderBy(d => d.Quantity),
+                    "quantity" when isDsc => query.OrderByDescending(d => d.Quantity),
                     _ => query
                 };
             }
