@@ -31,6 +31,7 @@ namespace Application.Features.Users.Queries
                 IDPrefix = u.IDPrefix,
                 IDNumber = u.IDNumber,
                 Role = u.UserRoles.FirstOrDefault()?.Role?.Name ?? "N/A",
+                Warehouse = u.Warehouse?.Name ?? "N/A",
                 Permissions = [.. u.UserRoles
                     .SelectMany(ur => ur.Role!.RolePermissions)
                     .Select(rp => rp.Permission!.Name)
@@ -51,7 +52,7 @@ namespace Application.Features.Users.Queries
 
             var sortInfo = new SortInfo
             {
-                SortColumns = ["id", "username", "firstname", "middlename", "lastname", "suffix", "idprefix", "idnumber"],
+                SortColumns = ["id", "username", "firstname", "middlename", "lastname", "suffix", "idprefix", "idnumber", "warehouseid", "warehouse"],
                 CurrentSort = request.Sort != null ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,

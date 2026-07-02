@@ -11,11 +11,12 @@ namespace Application.Features.Users.Commands
     /// <summary>Command to register a new user account.</summary>
     /// <param name="RegisterDTO">The registration data (employee info, credentials, and role).</param>
     public record RegisterUserCommand(RegisterUserDTO RegisterDTO) : IRequest<Result<object>>;
-    public class RegisterUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasher, IRoleRepository roleRepository) : IRequestHandler<RegisterUserCommand, Result<object>>
+    public class RegisterUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasher, IRoleRepository roleRepository, IWarehouseRepository warehouseRepository) : IRequestHandler<RegisterUserCommand, Result<object>>
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IPasswordHasherService _paswordHasher = passwordHasher;
         private readonly IRoleRepository _roleRepository = roleRepository;
+        private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
 
         public async Task<Result<object>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
@@ -35,6 +36,13 @@ namespace Application.Features.Users.Commands
                 return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
             }
 
+            var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.RegisterDTO.WarehouseId, cancellationToken);
+
+            if (existingWarehouse == null)
+            {
+                return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+            }
+
             var user = new User
             {
                 CreatedAt = DateTime.UtcNow,
@@ -46,6 +54,7 @@ namespace Application.Features.Users.Commands
                 Suffix = request.RegisterDTO.Suffix,
                 IDPrefix = request.RegisterDTO.IDPrefix,
                 IDNumber = request.RegisterDTO.IDNumber,
+                WarehouseId = request.RegisterDTO.WarehouseId,
             };
 
             user.UserRoles.Add(new UserRoles

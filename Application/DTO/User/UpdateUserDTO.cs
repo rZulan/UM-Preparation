@@ -11,5 +11,6 @@
         public string? IDPrefix { get; set; }
         public string? IDNumber { get; set; }
         public int? RoleId { get; set; }
+        public int? WarehouseId { get; set; }
     }
 }

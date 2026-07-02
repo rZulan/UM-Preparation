@@ -22,6 +22,8 @@ namespace Application.Features.WarehouseReceivings.Queries
             var result = warehouseReceivings.Select(x => new GetWarehouseReceivingDTO
             {
                 Id = x.Id,
+                WarehouseId = x.WarehouseId,
+                Warehouse = x.Warehouse.Name,
                 Quantity = x.Quantity,
                 ProductId = x.ProductId,
                 ProductCode = x.Product.ItemCode,
@@ -43,7 +45,7 @@ namespace Application.Features.WarehouseReceivings.Queries
 
             var sortInfo = new SortInfo
             {
-                SortColumns = ["id", "quantity", "productid", "productcode", "productdescription"],
+                SortColumns = ["id", "warehouseid", "warehouse", "quantity", "productid", "productcode", "productdescription"],
                 CurrentSort = request.Sort != null ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,

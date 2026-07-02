@@ -33,6 +33,7 @@ namespace Infrastructure
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IUomRepository, UomRepository>();
+            services.AddScoped<IWarehouseRepository, WarehouseRepository>();
             services.AddScoped<IMiscellaneousReceiptRepository, MiscellaneousReceiptRepository>();
             services.AddScoped<IWarehouseReceivingRepository, WarehouseReceivingRepository>();
 

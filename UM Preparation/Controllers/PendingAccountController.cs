@@ -45,9 +45,9 @@ namespace UM_Preparation.Controllers
 
         [HttpPost("import")]
         [Authorize]
-        public async Task<IActionResult> ImportPendingAccount(int id, [FromQuery] int roleId)
+        public async Task<IActionResult> ImportPendingAccount(int id, [FromQuery] ImportPendingAccountDTO importPendingAccountDTO)
         {
-            var result = await _mediator.Send(new ImportPendingAccountCommand(id, roleId));
+            var result = await _mediator.Send(new ImportPendingAccountCommand(id, importPendingAccountDTO));
 
             if (result.IsFailure)
             {

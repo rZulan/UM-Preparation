@@ -33,6 +33,10 @@ namespace Infrastructure.Repositories
                 {
                     "id" when isAsc => query.OrderBy(w => w.Id),
                     "id" when isDsc => query.OrderByDescending(w => w.Id),
+                    "warehouseid" when isAsc => query.OrderBy(w => w.WarehouseId),
+                    "warehouseid" when isDsc => query.OrderByDescending(w => w.WarehouseId),
+                    "warehouse" when isAsc => query.OrderBy(w => w.Warehouse.Name),
+                    "warehouse" when isDsc => query.OrderByDescending(w => w.Warehouse.Name),
                     "quantity" when isAsc => query.OrderBy(w => w.Quantity),
                     "quantity" when isDsc => query.OrderByDescending(w => w.Quantity),
                     "productid" when isAsc => query.OrderBy(w => w.ProductId),

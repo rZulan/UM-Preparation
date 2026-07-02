@@ -16,6 +16,7 @@ namespace Infrastructure.Data
         public DbSet<RolePermissions> RolePermissions { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Uom> Uoms { get; set; }
+        public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<MiscellaneousReceipt> MiscellaneousReceipt { get; set; }
         public DbSet<WarehouseReceiving> WarehouseReceivings { get; set; }
 
@@ -138,6 +139,18 @@ namespace Infrastructure.Data
                 .HasForeignKey(p => p.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Warehouse>()
+                .HasOne(w => w.CreatedBy)
+                .WithMany()
+                .HasForeignKey(w => w.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Warehouse>()
+                .HasOne(w => w.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(w => w.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<MiscellaneousReceipt>()
                 .HasOne(d => d.CreatedBy)
                 .WithMany()
@@ -155,6 +168,30 @@ namespace Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WarehouseReceiving>()
+                .HasOne(wr => wr.CreatedBy)
+                .WithMany()
+                .HasForeignKey(wr => wr.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WarehouseReceiving>()
+                .HasOne(wr => wr.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(wr => wr.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WarehouseReceiving>()
+                .HasOne(wr => wr.Product)
+                .WithMany()
+                .HasForeignKey(wr => wr.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WarehouseReceiving>()
+                .HasOne(wr => wr.MiscellaneousReceipt)
+                .WithMany()
+                .HasForeignKey(wr => wr.MiscellaneousReceiptId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Role>().HasData(
                 new Role

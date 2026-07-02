@@ -11,11 +11,12 @@ namespace Application.Features.Users.Commands
     /// <param name="Id">The ID of the user to update.</param>
     /// <param name="UpdateDTO">The updated user data.</param>
     public record UpdateUserCommand(int Id, UpdateUserDTO UpdateDTO) : IRequest<Result<object>>;
-    public class UpdateUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasher, IRoleRepository roleRepository) : IRequestHandler<UpdateUserCommand, Result<object>>
+    public class UpdateUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasher, IRoleRepository roleRepository, IWarehouseRepository warehouseRepository) : IRequestHandler<UpdateUserCommand, Result<object>>
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IPasswordHasherService _paswordHasher = passwordHasher;
         private readonly IRoleRepository _roleRepository = roleRepository;
+        private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
 
         public async Task<Result<object>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
@@ -89,6 +90,18 @@ namespace Application.Features.Users.Commands
                     RoleId = existingRole.Id,
                     UserId = existingUser.Id
                 });
+            }
+
+            if (request.UpdateDTO.WarehouseId.HasValue)
+            {
+                var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.UpdateDTO.WarehouseId.Value, cancellationToken);
+
+                if (existingWarehouse == null)
+                {
+                    return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+                }
+
+                existingUser.WarehouseId = request.UpdateDTO.WarehouseId.Value;
             }
 
             await _userRepository.UpdateAsync(existingUser, cancellationToken);

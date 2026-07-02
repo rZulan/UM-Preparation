@@ -88,6 +88,7 @@ namespace Application.Features.Users.Commands
                 Role = existingUser.UserRoles?
                     .Select(ur => ur.Role!.Name)
                     .FirstOrDefault() ?? "N/A",
+                Warehouse = existingUser.Warehouse?.Name ?? "N/A",
                 Permissions = existingUser.UserRoles?
                     .SelectMany(ur => ur.Role!.RolePermissions)
                     .Select(rp => rp.Permission!.Name)

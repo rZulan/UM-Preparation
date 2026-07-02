@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Junction;
+using Domain.Entities.Masterlist;
 
 namespace Domain.Entities
 {
@@ -13,6 +14,9 @@ namespace Domain.Entities
         public required string IDPrefix { get; set; }
         public required string IDNumber { get; set; }
 
+        public int? WarehouseId { get; set; }
+
         public List<UserRoles> UserRoles { get; set; } = [];
+        public Warehouse Warehouse { get; set; } = null!;
     }
 }

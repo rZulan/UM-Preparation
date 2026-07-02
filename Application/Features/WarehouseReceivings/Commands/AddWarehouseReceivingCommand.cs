@@ -51,6 +51,7 @@ namespace Application.Features.WarehouseReceivings.Commands
 
             var warehouseReceiving = new WarehouseReceiving
             {
+                WarehouseId = request.AddWarehouseReceivingDTO.WarehouseId,
                 Quantity = request.AddWarehouseReceivingDTO.Quantity,
                 ProductId = request.AddWarehouseReceivingDTO.ProductId,
                 MiscellaneousReceiptId = request.AddWarehouseReceivingDTO.MiscellaneousReceiptId,

@@ -25,6 +25,8 @@ namespace Application.Features.WarehouseReceivings.Queries
             var result = new GetWarehouseReceivingDTO
             {
                 Id = warehouseReceiving.Id,
+                WarehouseId = warehouseReceiving.WarehouseId,
+                Warehouse = warehouseReceiving.Warehouse.Name,
                 Quantity = warehouseReceiving.Quantity,
                 ProductId = warehouseReceiving.ProductId,
                 ProductCode = warehouseReceiving.Product.ItemCode,

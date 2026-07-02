@@ -34,6 +34,7 @@ namespace Application.Features.Users.Queries
                 IDPrefix = user.IDPrefix,
                 IDNumber = user.IDNumber,
                 Role = user.UserRoles.FirstOrDefault()?.Role?.Name ?? "N/A",
+                Warehouse = user.Warehouse?.Name ?? "N/A",
                 Permissions = [.. user.UserRoles
                     .SelectMany(x => x.Role!.RolePermissions.Select(rp => rp.Permission!.Name))
                     .Distinct()]

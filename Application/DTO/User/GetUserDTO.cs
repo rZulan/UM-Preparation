@@ -12,6 +12,7 @@
         public required string IDPrefix { get; set; }
         public required string IDNumber { get; set; }
         public required string Role { get; set; }
+        public required string Warehouse { get; set; }
         public required List<string> Permissions { get; set; }
     }
 }

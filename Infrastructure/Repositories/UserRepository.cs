@@ -17,7 +17,8 @@ namespace Infrastructure.Repositories
                 .Include(ur => ur.UserRoles)
                     .ThenInclude(r => r.Role!)
                         .ThenInclude(rp => rp.RolePermissions)
-                            .ThenInclude(p => p.Permission);
+                            .ThenInclude(p => p.Permission)
+                .Include(w => w.Warehouse);
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -60,6 +61,10 @@ namespace Infrastructure.Repositories
                     "idprefix" when isDsc => query.OrderByDescending(u => u.IDPrefix),
                     "idnumber" when isAsc => query.OrderBy(u => u.IDNumber),
                     "idnumber" when isDsc => query.OrderByDescending(u => u.IDNumber),
+                    "warehouseid" when isAsc => query.OrderBy(u => u.WarehouseId),
+                    "warehouseid" when isDsc => query.OrderByDescending(u => u.WarehouseId),
+                    "warehouse" when isAsc => query.OrderBy(u => u.Warehouse!.Name),
+                    "warehouse" when isDsc => query.OrderByDescending(u => u.Warehouse!.Name),
                     _ => query
                 };
             }
@@ -104,6 +109,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(r => r.Role!)
                         .ThenInclude(rp => rp.RolePermissions)
                             .ThenInclude(p => p.Permission)
+                .Include(w => w.Warehouse)
                 .Where(u => u.Username.ToLower() == username.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -116,6 +122,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(r => r.Role!)
                         .ThenInclude(rp => rp.RolePermissions)
                             .ThenInclude(p => p.Permission)
+                .Include(w => w.Warehouse)
                 .Where(u => u.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -128,6 +135,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(r => r.Role!)
                         .ThenInclude(rp => rp.RolePermissions)
                             .ThenInclude(p => p.Permission)
+                .Include(w => w.Warehouse)
                 .Where(u => u.IDPrefix == employeePrefix && u.IDNumber == employeeId);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
