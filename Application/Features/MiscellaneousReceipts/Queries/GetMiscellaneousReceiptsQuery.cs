@@ -23,10 +23,14 @@ namespace Application.Features.MiscellaneousReceipts.Queries
             {
                 Id = d.Id,
                 IsActive = d.IsActive,
+                WarehouseId = d.WarehouseId,
+                Warehouse = d.Warehouse.Name,
+                ProductId = d.ProductId,
                 ItemCode = d.Product.ItemCode,
                 Description = d.Product.Description,
                 Uom = d.Product.Uom.ShortName,
                 Quantity = d.Quantity,
+                Reason = d.Reason,
             }).ToList();
 
             PaginationInfo? paginationInfo = null;

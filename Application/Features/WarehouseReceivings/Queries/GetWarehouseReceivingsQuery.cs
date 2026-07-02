@@ -28,7 +28,6 @@ namespace Application.Features.WarehouseReceivings.Queries
                 ProductId = x.ProductId,
                 ProductCode = x.Product.ItemCode,
                 ProductDescription = x.Product.Description,
-                MiscellaneousReceiptId = x.MiscellaneousReceiptId
             }).ToList();
 
             PaginationInfo? paginationInfo = null;

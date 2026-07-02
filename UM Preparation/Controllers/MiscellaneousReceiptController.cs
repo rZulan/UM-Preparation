@@ -41,38 +41,5 @@ namespace UM_Preparation.Controllers
             var result = await _mediator.Send(new AddMiscellaneousReceiptCommand(userId, addMiscellaneousReceiptDTO));
             return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
         }
-
-        [HttpPatch("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateMiscellaneousReceipt(int id, [FromBody] UpdateMiscellaneousReceiptDTO updateMiscellaneousReceiptDTO)
-        {
-            var userId = this.GetCurrentUserId();
-
-            var result = await _mediator.Send(new UpdateMiscellaneousReceiptCommand(userId, id, updateMiscellaneousReceiptDTO));
-
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
-        }
-
-        [HttpPatch("{id}/archive")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ArchiveMiscellaneousReceipt(int id)
-        {
-            var userId = this.GetCurrentUserId();
-
-            var result = await _mediator.Send(new ToggleMiscellaneousReceiptActiveCommand(userId, id, false));
-
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
-        }
-
-        [HttpPatch("{id}/restore")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RestoreMiscellaneousReceipt(int id)
-        {
-            var userId = this.GetCurrentUserId();
-
-            var result = await _mediator.Send(new ToggleMiscellaneousReceiptActiveCommand(userId, id, true));
-
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
-        }
     }
 }

@@ -54,11 +54,6 @@ namespace Application.Features.Products.Commands
                 existingProduct.Description = request.UpdateProductDTO.Description;
             }
 
-            if (request.UpdateProductDTO.ProductCategoryId.HasValue)
-            {
-                existingProduct.ProductCategoryId = (int)request.UpdateProductDTO.ProductCategoryId;
-            }
-
             if (request.UpdateProductDTO.UomId.HasValue)
             {
                 existingProduct.UomId = (int)request.UpdateProductDTO.UomId;

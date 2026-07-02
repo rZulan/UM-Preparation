@@ -9,6 +9,5 @@ namespace Application.DTO.WarehouseReceiving
         public required int ProductId { get; set; }
         public required string ProductCode { get; set; }
         public required string ProductDescription { get; set; }
-        public int? MiscellaneousReceiptId { get; set; }
     }
 }

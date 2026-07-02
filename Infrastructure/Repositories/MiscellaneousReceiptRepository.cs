@@ -51,6 +51,7 @@ namespace Infrastructure.Repositories
 
             return await query.ToListAsync(cancellationToken);
         }
+
         public async Task<int> GetCountAsync(GenericFiltersDTO genericFiltersDTO, CancellationToken cancellationToken)
         {
             IQueryable<MiscellaneousReceipt> query = _context.MiscellaneousReceipt;
@@ -65,7 +66,11 @@ namespace Infrastructure.Repositories
 
         public async Task<MiscellaneousReceipt?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _context.MiscellaneousReceipt.Include(d => d.Product).FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+            return await _context.MiscellaneousReceipt
+                .Include(x => x.Warehouse)
+                .Include(x => x.Product)
+                    .ThenInclude(x => x.Uom)
+                .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
         }
 
         public async Task AddAsync(MiscellaneousReceipt miscellaneousReceipt, CancellationToken cancellationToken)

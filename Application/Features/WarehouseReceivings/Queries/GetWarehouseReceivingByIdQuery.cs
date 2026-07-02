@@ -31,7 +31,6 @@ namespace Application.Features.WarehouseReceivings.Queries
                 ProductId = warehouseReceiving.ProductId,
                 ProductCode = warehouseReceiving.Product.ItemCode,
                 ProductDescription = warehouseReceiving.Product.Description,
-                MiscellaneousReceiptId = warehouseReceiving.MiscellaneousReceiptId
             };
 
             return Result<GetWarehouseReceivingDTO>.Success(result);

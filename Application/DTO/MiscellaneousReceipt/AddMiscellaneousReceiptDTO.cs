@@ -2,11 +2,9 @@ namespace Application.DTO.MiscellaneousReceipt
 {
     public class AddMiscellaneousReceiptDTO
     {
-        public required string BatchNumber { get; set; }
+        public required int WarehouseId { get; set; }
         public required int ProductId { get; set; }
-        public required int FarmId { get; set; }
-        public required decimal QuantityOut { get; set; }
-        public required decimal QuantityReturn { get; set; }
-        public required DateTime HarvestDate { get; set; }
+        public required decimal Quantity { get; set; }
+        public required string Reason { get; set; }
     }
 }

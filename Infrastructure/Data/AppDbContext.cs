@@ -178,6 +178,12 @@ namespace Infrastructure.Data
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<MiscellaneousReceipt>()
+                .HasOne(d => d.Warehouse)
+                .WithMany()
+                .HasForeignKey(d => d.WarehouseId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<WarehouseReceiving>()
                 .HasOne(wr => wr.CreatedBy)
                 .WithMany()

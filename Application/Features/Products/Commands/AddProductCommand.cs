@@ -41,7 +41,6 @@ namespace Application.Features.Products.Commands
             {
                 ItemCode = request.AddProductDTO.ItemCode,
                 Description = request.AddProductDTO.Description,
-                ProductCategoryId = request.AddProductDTO.ProductCategoryId,
                 UomId = request.AddProductDTO.UomId,
                 CreatedAt = DateTime.UtcNow,
                 CreatedById = existingUser.Id

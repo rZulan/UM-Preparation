@@ -11,10 +11,13 @@ namespace Application.Features.MiscellaneousReceipts.Commands
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="AddMiscellaneousReceiptDTO">The miscellaneous receipt data to be created.</param>
     public record AddMiscellaneousReceiptCommand(int? UserId, AddMiscellaneousReceiptDTO AddMiscellaneousReceiptDTO) : IRequest<Result<object>>;
-    public class AddMiscellaneousReceiptCommandHandler(IMiscellaneousReceiptRepository miscellaneousReceiptRepository, IUserRepository userRepository) : IRequestHandler<AddMiscellaneousReceiptCommand, Result<object>>
+    public class AddMiscellaneousReceiptCommandHandler(IMiscellaneousReceiptRepository miscellaneousReceiptRepository, IUserRepository userRepository, IWarehouseRepository warehouseRepository, IProductRepository productRepository, IWarehouseReceivingRepository warehouseReceivingRepository) : IRequestHandler<AddMiscellaneousReceiptCommand, Result<object>>
     {
         private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellaneousReceiptRepository;
         private readonly IUserRepository _userRepository = userRepository;
+        private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
+        private readonly IProductRepository _productRepository = productRepository;
+        private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
 
         public async Task<Result<object>> Handle(AddMiscellaneousReceiptCommand request, CancellationToken cancellationToken)
         {
@@ -30,15 +33,43 @@ namespace Application.Features.MiscellaneousReceipts.Commands
                 return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
             }
 
+            var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.AddMiscellaneousReceiptDTO.WarehouseId, cancellationToken);
+
+            if (existingWarehouse == null)
+            {
+                return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+            }
+
+            var existingProduct = await _productRepository.GetByIdAsync(request.AddMiscellaneousReceiptDTO.ProductId, cancellationToken);
+
+            if (existingProduct == null)
+            {
+                return Result<object>.Failure("Product not found", HttpStatusCode.NotFound);
+            }
+
             var miscellaneousReceipt = new MiscellaneousReceipt
             {
-                ProductId = request.AddMiscellaneousReceiptDTO.ProductId,
-                Quantity = request.AddMiscellaneousReceiptDTO.QuantityOut,
+                WarehouseId = existingWarehouse.Id,
+                ProductId = existingProduct.Id,
+                Quantity = request.AddMiscellaneousReceiptDTO.Quantity,
+                Reason = request.AddMiscellaneousReceiptDTO.Reason,
                 CreatedAt = DateTime.UtcNow,
                 CreatedById = existingUser.Id
             };
 
             await _miscellaneousReceiptRepository.AddAsync(miscellaneousReceipt, cancellationToken);
+
+            var warehouseReceiving = new WarehouseReceiving
+            {
+                Quantity = request.AddMiscellaneousReceiptDTO.Quantity,
+                WarehouseId = existingWarehouse.Id,
+                ProductId = existingProduct.Id,
+                MiscellaneousReceiptId = miscellaneousReceipt.Id,
+                CreatedAt = DateTime.UtcNow,
+                CreatedById = existingUser.Id
+            };
+
+            await _warehouseReceivingRepository.AddAsync(warehouseReceiving, cancellationToken);
 
             return Result<object>.Success(miscellaneousReceipt.Id, "Miscellaneous Receipt created successfully", HttpStatusCode.Created);
         }

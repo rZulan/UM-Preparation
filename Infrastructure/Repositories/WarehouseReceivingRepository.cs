@@ -14,6 +14,7 @@ namespace Infrastructure.Repositories
         public async Task<List<WarehouseReceiving>> GetAllAsync(GenericFiltersDTO genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
         {
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
+                .Include(x => x.Warehouse)
                 .Include(x => x.Product)
                 .Include(x => x.MiscellaneousReceipt);
 
@@ -76,6 +77,7 @@ namespace Infrastructure.Repositories
         {
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
                 .Where(w => w.Id == id)
+                .Include(x => x.Warehouse)
                 .Include(x => x.Product)
                 .Include(x => x.MiscellaneousReceipt);
 

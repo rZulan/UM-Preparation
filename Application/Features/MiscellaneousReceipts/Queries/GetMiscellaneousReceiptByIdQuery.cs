@@ -26,10 +26,14 @@ namespace Application.Features.MiscellaneousReceipts.Queries
             {
                 Id = miscellaneousReceipt.Id,
                 IsActive = miscellaneousReceipt.IsActive,
+                WarehouseId = miscellaneousReceipt.WarehouseId,
+                Warehouse = miscellaneousReceipt.Warehouse.Name,
+                ProductId = miscellaneousReceipt.ProductId,
                 ItemCode = miscellaneousReceipt.Product.ItemCode,
                 Description = miscellaneousReceipt.Product.Description,
                 Uom = miscellaneousReceipt.Product.Uom.ShortName,
                 Quantity = miscellaneousReceipt.Quantity,
+                Reason = miscellaneousReceipt.Reason
             };
 
             return Result<GetMiscellaneousReceiptDTO>.Success(result);
