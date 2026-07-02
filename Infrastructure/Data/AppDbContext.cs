@@ -31,6 +31,15 @@ namespace Infrastructure.Data
                     .HasDefaultValue(true);
             }
 
+            foreach (var property in modelBuilder.Model
+                .GetEntityTypes()
+                .SelectMany(e => e.GetProperties())
+                .Where(p => p.ClrType == typeof(decimal)))
+            {
+                property.SetPrecision(18);
+                property.SetScale(4);
+            }
+
             modelBuilder.Entity<User>()
                 .HasOne(u => u.CreatedBy)
                 .WithMany()
