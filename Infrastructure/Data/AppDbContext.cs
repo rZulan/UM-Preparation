@@ -218,6 +218,14 @@ namespace Infrastructure.Data
                     CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 }
             );
+
+            modelBuilder.Entity<UserRoles>().HasData(
+                new UserRoles
+                {
+                    UserId = 1,
+                    RoleId = 1
+                }
+            );
         }
     }
 }
