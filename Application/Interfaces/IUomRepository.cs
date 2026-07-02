@@ -45,6 +45,6 @@ namespace Application.Interfaces
         /// <param name="itemCode">The item code to check for duplicates.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         /// <returns><see langword="true"/> if a duplicate exists; otherwise <see langword="false"/>.</returns>
-        Task<bool> CheckDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken);
+        Task<bool> AnyDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken);
     }
 }

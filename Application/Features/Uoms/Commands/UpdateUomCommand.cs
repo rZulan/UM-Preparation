@@ -39,7 +39,7 @@ namespace Application.Features.Uoms.Commands
 
             if (!string.IsNullOrEmpty(request.UpdateUomDTO.Name))
             {
-                var existingName = await _uomRepository.CheckDuplicateAsync(request.Id, request.UpdateUomDTO.Name, cancellationToken);
+                var existingName = await _uomRepository.AnyDuplicateAsync(request.Id, request.UpdateUomDTO.Name, cancellationToken);
 
                 if (existingName)
                 {

@@ -40,7 +40,7 @@ namespace Application.Features.Roles.Commands
 
             if (!string.IsNullOrEmpty(request.UpdateRoleDTO.Name))
             {
-                var existingName = await _roleRepository.CheckDuplicateAsync(request.Id, request.UpdateRoleDTO.Name, cancellationToken);
+                var existingName = await _roleRepository.AnyDuplicateAsync(request.Id, request.UpdateRoleDTO.Name, cancellationToken);
 
                 if (existingName)
                 {

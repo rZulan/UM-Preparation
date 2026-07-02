@@ -50,6 +50,6 @@ namespace Application.Interfaces
         /// <param name="name">The name to check for duplicates.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         /// <returns><see langword="true"/> if a duplicate exists; otherwise <see langword="false"/>.</returns>
-        Task<bool> CheckDuplicateAsync(int id, string name, CancellationToken cancellationToken);
+        Task<bool> AnyDuplicateAsync(int id, string name, CancellationToken cancellationToken);
     }
 }

@@ -39,7 +39,7 @@ namespace Application.Features.Permissions.Commands
 
             if (!string.IsNullOrEmpty(request.UpdatePermissionDTO.Name))
             {
-                var existingName = await _permissionRepository.CheckDuplicateAsync(request.Id, request.UpdatePermissionDTO.Name, cancellationToken);
+                var existingName = await _permissionRepository.AnyDuplicateAsync(request.Id, request.UpdatePermissionDTO.Name, cancellationToken);
 
                 if (existingName)
                 {

@@ -39,7 +39,7 @@ namespace Application.Features.Warehouses.Commands
 
             if (!string.IsNullOrEmpty(request.UpdateWarehouseDTO.Name))
             {
-                var existingName = await _warehouseRepository.CheckDuplicateAsync(request.Id, request.UpdateWarehouseDTO.Name, cancellationToken);
+                var existingName = await _warehouseRepository.AnyDuplicateAsync(request.Id, request.UpdateWarehouseDTO.Name, cancellationToken);
 
                 if (existingName)
                 {

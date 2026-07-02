@@ -99,7 +99,7 @@ namespace Infrastructure.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<bool> CheckDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken)
+        public async Task<bool> AnyDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken)
         {
             return await _context.Products.AnyAsync(p => p.Id != id && p.ItemCode.ToLower() == itemCode.ToLower(), cancellationToken);
         }

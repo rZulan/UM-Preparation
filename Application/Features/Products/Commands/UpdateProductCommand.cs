@@ -39,7 +39,7 @@ namespace Application.Features.Products.Commands
 
             if (!string.IsNullOrEmpty(request.UpdateProductDTO.ItemCode))
             {
-                var existingName = await _productRepository.CheckDuplicateAsync(request.Id, request.UpdateProductDTO.ItemCode, cancellationToken);
+                var existingName = await _productRepository.AnyDuplicateAsync(request.Id, request.UpdateProductDTO.ItemCode, cancellationToken);
 
                 if (existingName)
                 {
