@@ -49,7 +49,7 @@ namespace Application.Features.WarehouseReceivings.Commands
                 }
             }
 
-            var warehouse = new WarehouseReceiving
+            var warehouseReceiving = new WarehouseReceiving
             {
                 Quantity = request.AddWarehouseReceivingDTO.Quantity,
                 ProductId = request.AddWarehouseReceivingDTO.ProductId,
@@ -58,7 +58,7 @@ namespace Application.Features.WarehouseReceivings.Commands
                 CreatedById = request.UserId.Value
             };
 
-            await _warehouseReceivingRepository.AddAsync(warehouse, cancellationToken);
+            await _warehouseReceivingRepository.AddAsync(warehouseReceiving, cancellationToken);
 
             return Result<object>.Success(null);
         }

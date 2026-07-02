@@ -15,21 +15,21 @@ namespace Application.Features.WarehouseReceivings.Queries
 
         public async Task<Result<GetWarehouseReceivingDTO>> Handle(GetWarehouseReceivingByIdQuery request, CancellationToken cancellationToken)
         {
-            var warehouse = await _warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
+            var warehouseReceiving = await _warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
 
-            if (warehouse == null)
+            if (warehouseReceiving == null)
             {
-                return Result<GetWarehouseReceivingDTO>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+                return Result<GetWarehouseReceivingDTO>.Failure("Warehouse Receiving not found", HttpStatusCode.NotFound);
             }
 
             var result = new GetWarehouseReceivingDTO
             {
-                Id = warehouse.Id,
-                Quantity = warehouse.Quantity,
-                ProductId = warehouse.ProductId,
-                ProductCode = warehouse.Product.ItemCode,
-                ProductDescription = warehouse.Product.Description,
-                MiscellaneousReceiptId = warehouse.MiscellaneousReceiptId
+                Id = warehouseReceiving.Id,
+                Quantity = warehouseReceiving.Quantity,
+                ProductId = warehouseReceiving.ProductId,
+                ProductCode = warehouseReceiving.Product.ItemCode,
+                ProductDescription = warehouseReceiving.Product.Description,
+                MiscellaneousReceiptId = warehouseReceiving.MiscellaneousReceiptId
             };
 
             return Result<GetWarehouseReceivingDTO>.Success(result);

@@ -31,11 +31,11 @@ namespace Application.Features.WarehouseReceivings.Commands
                 return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
             }
 
-            var existingWarehouse = await _warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
+            var existingWarehouseReceiving = await _warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
 
-            if (existingWarehouse == null)
+            if (existingWarehouseReceiving == null)
             {
-                return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+                return Result<object>.Failure("Warehouse Receiving not found", HttpStatusCode.NotFound);
             }
 
             if (request.UpdateWarehouseReceivingDTO.ProductId.HasValue)
@@ -47,23 +47,23 @@ namespace Application.Features.WarehouseReceivings.Commands
                     return Result<object>.Failure("Product not found", HttpStatusCode.NotFound);
                 }
 
-                existingWarehouse.ProductId = request.UpdateWarehouseReceivingDTO.ProductId.Value;
+                existingWarehouseReceiving.ProductId = request.UpdateWarehouseReceivingDTO.ProductId.Value;
             }
 
             if (request.UpdateWarehouseReceivingDTO.Quantity.HasValue)
             {
-                existingWarehouse.Quantity = request.UpdateWarehouseReceivingDTO.Quantity.Value;
+                existingWarehouseReceiving.Quantity = request.UpdateWarehouseReceivingDTO.Quantity.Value;
             }
 
             if (request.UpdateWarehouseReceivingDTO.MiscellaneousReceiptId.HasValue)
             {
-                existingWarehouse.MiscellaneousReceiptId = request.UpdateWarehouseReceivingDTO.MiscellaneousReceiptId.Value;
+                existingWarehouseReceiving.MiscellaneousReceiptId = request.UpdateWarehouseReceivingDTO.MiscellaneousReceiptId.Value;
             }
 
-            existingWarehouse.UpdatedAt = DateTime.UtcNow;
-            existingWarehouse.UpdatedById = request.UserId.Value;
+            existingWarehouseReceiving.UpdatedAt = DateTime.UtcNow;
+            existingWarehouseReceiving.UpdatedById = request.UserId.Value;
 
-            await _warehouseReceivingRepository.UpdateAsync(existingWarehouse, cancellationToken);
+            await _warehouseReceivingRepository.UpdateAsync(existingWarehouseReceiving, cancellationToken);
 
             return Result<object>.Success(null);
         }

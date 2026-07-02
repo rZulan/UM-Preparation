@@ -17,9 +17,9 @@ namespace Application.Features.WarehouseReceivings.Queries
 
         public async Task<GetAllResult<List<GetWarehouseReceivingDTO>>> Handle(GetWarehouseReceivingsQuery request, CancellationToken cancellationToken)
         {
-            var warehouses = await _warehouseReceivingRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            var warehouseReceivings = await _warehouseReceivingRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = warehouses.Select(x => new GetWarehouseReceivingDTO
+            var result = warehouseReceivings.Select(x => new GetWarehouseReceivingDTO
             {
                 Id = x.Id,
                 Quantity = x.Quantity,

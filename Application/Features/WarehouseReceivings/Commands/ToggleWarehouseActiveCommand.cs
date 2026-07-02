@@ -29,32 +29,32 @@ namespace Application.Features.WarehouseReceivings.Commands
                 return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
             }
 
-            var existingWarehouse = await _warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
+            var existingWarehouseReceiving = await _warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
 
-            if (existingWarehouse == null)
+            if (existingWarehouseReceiving == null)
             {
-                return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+                return Result<object>.Failure("Warehouse Receiving not found", HttpStatusCode.NotFound);
             }
 
-            if (request.IsActive && existingWarehouse.IsActive)
+            if (request.IsActive && existingWarehouseReceiving.IsActive)
             {
-                return Result<object>.Failure("Warehouse is already active");
+                return Result<object>.Failure("Warehouse Receiving is already active");
             }
 
-            if (!request.IsActive && !existingWarehouse.IsActive)
+            if (!request.IsActive && !existingWarehouseReceiving.IsActive)
             {
-                return Result<object>.Failure("Warehouse is already archived");
+                return Result<object>.Failure("Warehouse Receiving is already archived");
             }
 
-            existingWarehouse.IsActive = request.IsActive;
-            existingWarehouse.UpdatedAt = DateTime.UtcNow;
-            existingWarehouse.UpdatedById = request.UserId.Value;
+            existingWarehouseReceiving.IsActive = request.IsActive;
+            existingWarehouseReceiving.UpdatedAt = DateTime.UtcNow;
+            existingWarehouseReceiving.UpdatedById = request.UserId.Value;
 
-            await _warehouseReceivingRepository.UpdateAsync(existingWarehouse, cancellationToken);
+            await _warehouseReceivingRepository.UpdateAsync(existingWarehouseReceiving, cancellationToken);
 
             var status = request.IsActive ? "restored" : "archived";
 
-            return Result<object>.Success(existingWarehouse.Id, $"Warehouse {status} successfully");
+            return Result<object>.Success(existingWarehouseReceiving.Id, $"Warehouse Receiving {status} successfully");
         }
     }
 }
