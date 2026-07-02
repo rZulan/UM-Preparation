@@ -29,7 +29,7 @@ namespace Application.Features.Users.Commands
 
             if (!string.IsNullOrEmpty(request.UpdateDTO.Username))
             {
-                var existingUsername = await _userRepository.CheckDuplicateAsync(request.Id, request.UpdateDTO.Username, cancellationToken);
+                var existingUsername = await _userRepository.AnyDuplicateAsync(request.Id, request.UpdateDTO.Username, cancellationToken);
 
                 if (existingUsername)
                 {

@@ -141,6 +141,19 @@ namespace Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
+        public async Task<bool> AnyUsersWarehouseTaggedAsync(int warehouseId, CancellationToken cancellationToken)
+        {
+            IQueryable<User> query = _context.Users
+                .Include(ur => ur.UserRoles!)
+                    .ThenInclude(r => r.Role!)
+                        .ThenInclude(rp => rp.RolePermissions)
+                            .ThenInclude(p => p.Permission)
+                .Include(w => w.Warehouse)
+                .Where(u => u.WarehouseId == warehouseId);
+
+            return await query.AnyAsync(cancellationToken);
+        }
+
         public async Task AddAsync(User user, CancellationToken cancellationToken)
         {
             await _context.Users.AddAsync(user, cancellationToken);
@@ -153,7 +166,7 @@ namespace Infrastructure.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<bool> CheckDuplicateAsync(int id, string username, CancellationToken cancellationToken)
+        public async Task<bool> AnyDuplicateAsync(int id, string username, CancellationToken cancellationToken)
         {
             return await _context.Users.AnyAsync(u => u.Id != id && u.Username.ToLower() == username.ToLower(), cancellationToken);
         }

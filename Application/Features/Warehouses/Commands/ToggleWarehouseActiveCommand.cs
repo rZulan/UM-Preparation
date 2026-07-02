@@ -46,6 +46,13 @@ namespace Application.Features.Warehouses.Commands
                 return Result<object>.Failure("Warehouse is already archived");
             }
 
+            var anyUsersTagged = await _userRepository.AnyUsersWarehouseTaggedAsync(existingWarehouse.Id, cancellationToken);
+
+            if (!request.IsActive && anyUsersTagged)
+            {
+                return Result<object>.Failure("Cannot archive this warehouse while it is assigned to users. Remove the user assignments first");
+            }
+
             existingWarehouse.IsActive = request.IsActive;
             existingWarehouse.UpdatedAt = DateTime.UtcNow;
             existingWarehouse.UpdatedById = existingUser.Id;

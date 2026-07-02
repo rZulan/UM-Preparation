@@ -36,6 +36,12 @@ namespace Application.Interfaces
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken);
 
+        /// <summary>Checks if any user is tagged to the specified warehouse.</summary>
+        /// <param name="warehouseId">The warehouse ID.</param>
+        /// <param name="cancellationToken">The cancellation token to cancel the operation.</param>
+        /// <returns><see langword="true"/> if any user is tagged to the warehouse; otherwise <see langword="false"/>.</returns>
+        Task<bool> AnyUsersWarehouseTaggedAsync(int warehouseId, CancellationToken cancellationToken);
+
         /// <summary>Persists a new user to the data store.</summary>
         /// <param name="user">The user entity to add.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
@@ -51,6 +57,6 @@ namespace Application.Interfaces
         /// <param name="username">The username to check for duplicates.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         /// <returns><see langword="true"/> if a duplicate exists; otherwise <see langword="false"/>.</returns>
-        Task<bool> CheckDuplicateAsync(int id, string username, CancellationToken cancellationToken);
+        Task<bool> AnyDuplicateAsync(int id, string username, CancellationToken cancellationToken);
     }
 }
