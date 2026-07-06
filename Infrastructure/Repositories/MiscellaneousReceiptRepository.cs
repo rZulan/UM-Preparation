@@ -14,27 +14,28 @@ namespace Infrastructure.Repositories
         public async Task<List<MiscellaneousReceipt>> GetAllAsync(GenericFiltersDTO genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
         {
             IQueryable<MiscellaneousReceipt> query = _context.MiscellaneousReceipt
-                .Include(d => d.Product)
+                .Include(x => x.Warehouse)
+                .Include(x => x.Product)
                     .ThenInclude(x => x.Uom);
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(d => d.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(d =>
-                    d.Id.ToString().Contains(searchTerm) ||
-                    d.WarehouseId.ToString().Contains(searchTerm) ||
-                    d.Warehouse.Name.ToLower().Contains(searchTerm) ||
-                    d.ProductId.ToString().Contains(searchTerm) ||
-                    d.Product.ItemCode.ToLower().Contains(searchTerm) ||
-                    d.Product.Description.ToLower().Contains(searchTerm) ||
-                    d.Product.Uom.ShortName.ToLower().Contains(searchTerm) ||
-                    d.Quantity.ToString().Contains(searchTerm) ||
-                    d.Reason.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.WarehouseId.ToString().Contains(searchTerm) ||
+                    x.Warehouse.Name.ToLower().Contains(searchTerm) ||
+                    x.ProductId.ToString().Contains(searchTerm) ||
+                    x.Product.ItemCode.ToLower().Contains(searchTerm) ||
+                    x.Product.Description.ToLower().Contains(searchTerm) ||
+                    x.Product.Uom.ShortName.ToLower().Contains(searchTerm) ||
+                    x.Quantity.ToString().Contains(searchTerm) ||
+                    x.Reason.ToLower().Contains(searchTerm));
             }
 
             if (sort?.SortBy != null)
@@ -44,16 +45,16 @@ namespace Infrastructure.Repositories
 
                 query = sort.SortBy.ToLower() switch
                 {
-                    "id" when isAsc => query.OrderBy(d => d.Id),
-                    "id" when isDsc => query.OrderByDescending(d => d.Id),
-                    "itemcode" when isAsc => query.OrderBy(d => d.Product.ItemCode),
-                    "itemcode" when isDsc => query.OrderByDescending(d => d.Product.ItemCode),
-                    "description" when isAsc => query.OrderBy(d => d.Product.Description),
-                    "description" when isDsc => query.OrderByDescending(d => d.Product.Description),
-                    "uom" when isAsc => query.OrderBy(d => d.Product.Uom.ShortName),
-                    "uom" when isDsc => query.OrderByDescending(d => d.Product.Uom.ShortName),
-                    "quantity" when isAsc => query.OrderBy(d => d.Quantity),
-                    "quantity" when isDsc => query.OrderByDescending(d => d.Quantity),
+                    "id" when isAsc => query.OrderBy(x => x.Id),
+                    "id" when isDsc => query.OrderByDescending(x => x.Id),
+                    "itemcode" when isAsc => query.OrderBy(x => x.Product.ItemCode),
+                    "itemcode" when isDsc => query.OrderByDescending(x => x.Product.ItemCode),
+                    "description" when isAsc => query.OrderBy(x => x.Product.Description),
+                    "description" when isDsc => query.OrderByDescending(x => x.Product.Description),
+                    "uom" when isAsc => query.OrderBy(x => x.Product.Uom.ShortName),
+                    "uom" when isDsc => query.OrderByDescending(x => x.Product.Uom.ShortName),
+                    "quantity" when isAsc => query.OrderBy(x => x.Quantity),
+                    "quantity" when isDsc => query.OrderByDescending(x => x.Quantity),
                     _ => query
                 };
             }
@@ -73,7 +74,7 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(d => d.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             return await query.CountAsync(cancellationToken);
@@ -85,7 +86,7 @@ namespace Infrastructure.Repositories
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
                     .ThenInclude(x => x.Uom)
-                .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         public async Task AddAsync(MiscellaneousReceipt miscellaneousReceipt, CancellationToken cancellationToken)

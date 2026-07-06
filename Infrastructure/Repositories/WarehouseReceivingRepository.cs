@@ -21,14 +21,14 @@ namespace Infrastructure.Repositories
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(w =>
-                    w.Id.ToString().Contains(searchTerm) ||
-                    w.WarehouseId.ToString().Contains(searchTerm) ||
-                    w.Warehouse.Name.ToLower().Contains(searchTerm) ||
-                    w.Quantity.ToString().Contains(searchTerm) ||
-                    w.ProductId.ToString().Contains(searchTerm) ||
-                    w.Product.ItemCode.ToLower().Contains(searchTerm) ||
-                    w.Product.Description.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.WarehouseId.ToString().Contains(searchTerm) ||
+                    x.Warehouse.Name.ToLower().Contains(searchTerm) ||
+                    x.Quantity.ToString().Contains(searchTerm) ||
+                    x.ProductId.ToString().Contains(searchTerm) ||
+                    x.Product.ItemCode.ToLower().Contains(searchTerm) ||
+                    x.Product.Description.ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
@@ -38,20 +38,20 @@ namespace Infrastructure.Repositories
 
                 query = sort.SortBy.ToLower() switch
                 {
-                    "id" when isAsc => query.OrderBy(w => w.Id),
-                    "id" when isDsc => query.OrderByDescending(w => w.Id),
-                    "warehouseid" when isAsc => query.OrderBy(w => w.WarehouseId),
-                    "warehouseid" when isDsc => query.OrderByDescending(w => w.WarehouseId),
-                    "warehouse" when isAsc => query.OrderBy(w => w.Warehouse.Name),
-                    "warehouse" when isDsc => query.OrderByDescending(w => w.Warehouse.Name),
-                    "quantity" when isAsc => query.OrderBy(w => w.Quantity),
-                    "quantity" when isDsc => query.OrderByDescending(w => w.Quantity),
-                    "productid" when isAsc => query.OrderBy(w => w.ProductId),
-                    "productid" when isDsc => query.OrderByDescending(w => w.ProductId),
-                    "productcode" when isAsc => query.OrderBy(w => w.Product.ItemCode),
-                    "productcode" when isDsc => query.OrderByDescending(w => w.Product.ItemCode),
-                    "productdescription" when isAsc => query.OrderBy(w => w.Product.Description),
-                    "productdescription" when isDsc => query.OrderByDescending(w => w.Product.Description),
+                    "id" when isAsc => query.OrderBy(x => x.Id),
+                    "id" when isDsc => query.OrderByDescending(x => x.Id),
+                    "warehouseid" when isAsc => query.OrderBy(x => x.WarehouseId),
+                    "warehouseid" when isDsc => query.OrderByDescending(x => x.WarehouseId),
+                    "warehouse" when isAsc => query.OrderBy(x => x.Warehouse.Name),
+                    "warehouse" when isDsc => query.OrderByDescending(x => x.Warehouse.Name),
+                    "quantity" when isAsc => query.OrderBy(x => x.Quantity),
+                    "quantity" when isDsc => query.OrderByDescending(x => x.Quantity),
+                    "productid" when isAsc => query.OrderBy(x => x.ProductId),
+                    "productid" when isDsc => query.OrderByDescending(x => x.ProductId),
+                    "productcode" when isAsc => query.OrderBy(x => x.Product.ItemCode),
+                    "productcode" when isDsc => query.OrderByDescending(x => x.Product.ItemCode),
+                    "productdescription" when isAsc => query.OrderBy(x => x.Product.Description),
+                    "productdescription" when isDsc => query.OrderByDescending(x => x.Product.Description),
                     _ => query
                 };
             }
@@ -72,14 +72,14 @@ namespace Infrastructure.Repositories
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(w =>
-                    w.Id.ToString().Contains(searchTerm) ||
-                    w.WarehouseId.ToString().Contains(searchTerm) ||
-                    w.Warehouse.Name.ToLower().Contains(searchTerm) ||
-                    w.Quantity.ToString().Contains(searchTerm) ||
-                    w.ProductId.ToString().Contains(searchTerm) ||
-                    w.Product.ItemCode.ToLower().Contains(searchTerm) ||
-                    w.Product.Description.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.WarehouseId.ToString().Contains(searchTerm) ||
+                    x.Warehouse.Name.ToLower().Contains(searchTerm) ||
+                    x.Quantity.ToString().Contains(searchTerm) ||
+                    x.ProductId.ToString().Contains(searchTerm) ||
+                    x.Product.ItemCode.ToLower().Contains(searchTerm) ||
+                    x.Product.Description.ToLower().Contains(searchTerm));
             }
 
             return await query.CountAsync(cancellationToken);
@@ -88,7 +88,7 @@ namespace Infrastructure.Repositories
         public async Task<WarehouseReceiving?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
-                .Where(w => w.Id == id)
+                .Where(x => x.Id == id)
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
                 .Include(x => x.MiscellaneousReceipt);
@@ -99,7 +99,7 @@ namespace Infrastructure.Repositories
         public async Task<List<WarehouseReceiving>> GetByProductIdAsync(int productId, CancellationToken cancellationToken)
         {
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
-                .Where(w => w.ProductId == productId)
+                .Where(x => x.ProductId == productId)
                 .Include(x => x.Product)
                 .Include(x => x.MiscellaneousReceipt);
 

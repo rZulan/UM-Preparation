@@ -18,17 +18,17 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(p => p.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(p =>
-                    p.Id.ToString().Contains(searchTerm) ||
-                    p.ItemCode.ToLower().Contains(searchTerm) ||
-                    p.Description.ToLower().Contains(searchTerm) ||
-                    p.Uom.ShortName.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.ItemCode.ToLower().Contains(searchTerm) ||
+                    x.Description.ToLower().Contains(searchTerm) ||
+                    x.Uom.ShortName.ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
@@ -38,10 +38,10 @@ namespace Infrastructure.Repositories
 
                 query = sort.SortBy.ToLower() switch
                 {
-                    "id" when isAsc => query.OrderBy(p => p.Id),
-                    "id" when isDsc => query.OrderByDescending(p => p.Id),
-                    "itemcode" when isAsc => query.OrderBy(p => p.ItemCode),
-                    "itemcode" when isDsc => query.OrderByDescending(p => p.ItemCode),
+                    "id" when isAsc => query.OrderBy(x => x.Id),
+                    "id" when isDsc => query.OrderByDescending(x => x.Id),
+                    "itemcode" when isAsc => query.OrderBy(x => x.ItemCode),
+                    "itemcode" when isDsc => query.OrderByDescending(x => x.ItemCode),
                     _ => query
                 };
             }
@@ -61,17 +61,17 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(p => p.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(p =>
-                    p.Id.ToString().Contains(searchTerm) ||
-                    p.ItemCode.ToLower().Contains(searchTerm) ||
-                    p.Description.ToLower().Contains(searchTerm) ||
-                    p.Uom.ShortName.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.ItemCode.ToLower().Contains(searchTerm) ||
+                    x.Description.ToLower().Contains(searchTerm) ||
+                    x.Uom.ShortName.ToLower().Contains(searchTerm));
             }
 
             return await query.CountAsync(cancellationToken);
@@ -80,7 +80,7 @@ namespace Infrastructure.Repositories
         public async Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             IQueryable<Product> query = _context.Products
-                .Where(p => p.Id == id);
+                .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -88,7 +88,7 @@ namespace Infrastructure.Repositories
         public async Task<Product?> GetByItemCodeAsync(string itemCode, CancellationToken cancellationToken)
         {
             IQueryable<Product> query = _context.Products
-                .Where(p => p.ItemCode.ToLower() == itemCode.ToLower());
+                .Where(x => x.ItemCode.ToLower() == itemCode.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -107,7 +107,7 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> AnyDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken)
         {
-            return await _context.Products.AnyAsync(p => p.Id != id && p.ItemCode.ToLower() == itemCode.ToLower(), cancellationToken);
+            return await _context.Products.AnyAsync(x => x.Id != id && x.ItemCode.ToLower() == itemCode.ToLower(), cancellationToken);
         }
     }
 }

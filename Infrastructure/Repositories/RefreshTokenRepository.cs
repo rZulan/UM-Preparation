@@ -18,7 +18,7 @@ namespace Infrastructure.Repositories
         public async Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken)
         {
             return await _context.RefreshTokens
-                .FirstOrDefaultAsync(rt => rt.Token == token, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Token == token, cancellationToken);
         }
 
         public async Task RevokeAsync(RefreshToken refreshToken, CancellationToken cancellationToken)

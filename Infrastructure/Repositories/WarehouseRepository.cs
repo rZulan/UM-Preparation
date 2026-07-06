@@ -17,15 +17,15 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(w => w.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(w =>
-                    w.Id.ToString().Contains(searchTerm) ||
-                    w.Name.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.Name.ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
@@ -35,10 +35,10 @@ namespace Infrastructure.Repositories
 
                 query = sort.SortBy.ToLower() switch
                 {
-                    "id" when isAsc => query.OrderBy(w => w.Id),
-                    "id" when isDsc => query.OrderByDescending(w => w.Id),
-                    "name" when isAsc => query.OrderBy(w => w.Name),
-                    "name" when isDsc => query.OrderByDescending(w => w.Name),
+                    "id" when isAsc => query.OrderBy(x => x.Id),
+                    "id" when isDsc => query.OrderByDescending(x => x.Id),
+                    "name" when isAsc => query.OrderBy(x => x.Name),
+                    "name" when isDsc => query.OrderByDescending(x => x.Name),
                     _ => query
                 };
             }
@@ -58,15 +58,15 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(w => w.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(w =>
-                    w.Id.ToString().Contains(searchTerm) ||
-                    w.Name.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.Name.ToLower().Contains(searchTerm));
             }
 
             return await query.CountAsync(cancellationToken);
@@ -75,7 +75,7 @@ namespace Infrastructure.Repositories
         public async Task<Warehouse?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             IQueryable<Warehouse> query = _context.Warehouses
-                .Where(w => w.Id == id);
+                .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -83,7 +83,7 @@ namespace Infrastructure.Repositories
         public async Task<Warehouse?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
             IQueryable<Warehouse> query = _context.Warehouses
-                .Where(w => w.Name.ToLower() == name.ToLower());
+                .Where(x => x.Name.ToLower() == name.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -102,7 +102,7 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> AnyDuplicateAsync(int id, string name, CancellationToken cancellationToken)
         {
-            return await _context.Warehouses.AnyAsync(w => w.Id != id && w.Name.ToLower() == name.ToLower(), cancellationToken);
+            return await _context.Warehouses.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(), cancellationToken);
         }
     }
 }

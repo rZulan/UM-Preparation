@@ -14,20 +14,20 @@ namespace Infrastructure.Repositories
         public async Task<List<Role>> GetAllAsync(GenericFiltersDTO genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
         {
             IQueryable<Role> query = _context.Roles
-                .Include(rp => rp.RolePermissions)
-                    .ThenInclude(p => p.Permission);
+                .Include(x => x.RolePermissions)
+                    .ThenInclude(x => x.Permission);
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(r => r.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(r =>
-                    r.Id.ToString().Contains(searchTerm) ||
-                    r.Name.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.Name.ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
@@ -37,10 +37,10 @@ namespace Infrastructure.Repositories
 
                 query = sort.SortBy.ToLower() switch
                 {
-                    "id" when isAsc => query.OrderBy(r => r.Id),
-                    "id" when isDsc => query.OrderByDescending(r => r.Id),
-                    "name" when isAsc => query.OrderBy(r => r.Name),
-                    "name" when isDsc => query.OrderByDescending(r => r.Name),
+                    "id" when isAsc => query.OrderBy(x => x.Id),
+                    "id" when isDsc => query.OrderByDescending(x => x.Id),
+                    "name" when isAsc => query.OrderBy(x => x.Name),
+                    "name" when isDsc => query.OrderByDescending(x => x.Name),
                     _ => query
                 };
             }
@@ -60,15 +60,15 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(r => r.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(r =>
-                    r.Id.ToString().Contains(searchTerm) ||
-                    r.Name.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.Name.ToLower().Contains(searchTerm));
             }
 
             return await query.CountAsync(cancellationToken);
@@ -77,9 +77,9 @@ namespace Infrastructure.Repositories
         public async Task<Role?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             IQueryable<Role> query = _context.Roles
-                .Include(rp => rp.RolePermissions!)
-                    .ThenInclude(p => p.Permission)
-                .Where(r => r.Id == id);
+                .Include(x => x.RolePermissions!)
+                    .ThenInclude(x => x.Permission)
+                .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -87,9 +87,9 @@ namespace Infrastructure.Repositories
         public async Task<List<Role>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken)
         {
             IQueryable<Role> query = _context.Roles
-                .Include(rp => rp.RolePermissions!)
-                    .ThenInclude(p => p.Permission)
-                .Where(r => ids.Contains(r.Id));
+                .Include(x => x.RolePermissions!)
+                    .ThenInclude(x => x.Permission)
+                .Where(x => ids.Contains(x.Id));
 
             return await query.ToListAsync(cancellationToken);
         }
@@ -97,9 +97,9 @@ namespace Infrastructure.Repositories
         public async Task<Role?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
             IQueryable<Role> query = _context.Roles
-                .Include(rp => rp.RolePermissions!)
-                    .ThenInclude(p => p.Permission)
-                .Where(r => r.Name.ToLower() == name.ToLower());
+                .Include(x => x.RolePermissions!)
+                    .ThenInclude(x => x.Permission)
+                .Where(x => x.Name.ToLower() == name.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -118,7 +118,7 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> AnyDuplicateAsync(int id, string name, CancellationToken cancellationToken)
         {
-            return await _context.Roles.AnyAsync(r => r.Id != id && r.Name.ToLower() == name.ToLower(), cancellationToken);
+            return await _context.Roles.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(), cancellationToken);
         }
     }
 }

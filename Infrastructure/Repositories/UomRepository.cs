@@ -17,16 +17,16 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(u => u.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(u =>
-                    u.Id.ToString().Contains(searchTerm) ||
-                    u.Name.ToLower().Contains(searchTerm) ||
-                    u.ShortName.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.Name.ToLower().Contains(searchTerm) ||
+                    x.ShortName.ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
@@ -36,14 +36,14 @@ namespace Infrastructure.Repositories
 
                 query = sort.SortBy.ToLower() switch
                 {
-                    "id" when isAsc => query.OrderBy(u => u.Id),
-                    "id" when isDsc => query.OrderByDescending(u => u.Id),
-                    "name" when isAsc => query.OrderBy(u => u.Name),
-                    "name" when isDsc => query.OrderByDescending(u => u.Name),
-                    "shortname" when isAsc => query.OrderBy(u => u.ShortName),
-                    "shortname" when isDsc => query.OrderByDescending(u => u.ShortName),
-                    "isinteger" when isAsc => query.OrderBy(u => u.IsInteger),
-                    "isinteger" when isDsc => query.OrderByDescending(u => u.IsInteger),
+                    "id" when isAsc => query.OrderBy(x => x.Id),
+                    "id" when isDsc => query.OrderByDescending(x => x.Id),
+                    "name" when isAsc => query.OrderBy(x => x.Name),
+                    "name" when isDsc => query.OrderByDescending(x => x.Name),
+                    "shortname" when isAsc => query.OrderBy(x => x.ShortName),
+                    "shortname" when isDsc => query.OrderByDescending(x => x.ShortName),
+                    "isinteger" when isAsc => query.OrderBy(x => x.IsInteger),
+                    "isinteger" when isDsc => query.OrderByDescending(x => x.IsInteger),
                     _ => query
                 };
             }
@@ -69,10 +69,10 @@ namespace Infrastructure.Repositories
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(u =>
-                    u.Id.ToString().Contains(searchTerm) ||
-                    u.Name.ToLower().Contains(searchTerm) ||
-                    u.ShortName.ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.Name.ToLower().Contains(searchTerm) ||
+                    x.ShortName.ToLower().Contains(searchTerm));
             }
 
             return await query.CountAsync(cancellationToken);
@@ -81,7 +81,7 @@ namespace Infrastructure.Repositories
         public async Task<Uom?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             IQueryable<Uom> query = _context.Uoms
-                .Where(u => u.Id == id);
+                .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -89,7 +89,7 @@ namespace Infrastructure.Repositories
         public async Task<Uom?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
             IQueryable<Uom> query = _context.Uoms
-                .Where(u => u.Name.ToLower() == name.ToLower());
+                .Where(x => x.Name.ToLower() == name.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -108,7 +108,7 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> AnyDuplicateAsync(int id, string name, CancellationToken cancellationToken)
         {
-            return await _context.Uoms.AnyAsync(u => u.Id != id && u.Name.ToLower() == name.ToLower(), cancellationToken);
+            return await _context.Uoms.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(), cancellationToken);
         }
     }
 }

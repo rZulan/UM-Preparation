@@ -17,21 +17,21 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(r => r.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(r =>
-                    r.Id.ToString().Contains(searchTerm) ||
-                    r.EmployeePrefix.ToLower().Contains(searchTerm) ||
-                    r.EmployeeId.ToLower().Contains(searchTerm) ||
-                    r.Username.ToLower().Contains(searchTerm) ||
-                    r.FirstName.ToLower().Contains(searchTerm) ||
-                    (r.MiddleName ?? "").ToLower().Contains(searchTerm) ||
-                    r.LastName.ToLower().Contains(searchTerm) ||
-                    (r.Suffix ?? "").ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.EmployeePrefix.ToLower().Contains(searchTerm) ||
+                    x.EmployeeId.ToLower().Contains(searchTerm) ||
+                    x.Username.ToLower().Contains(searchTerm) ||
+                    x.FirstName.ToLower().Contains(searchTerm) ||
+                    (x.MiddleName ?? "").ToLower().Contains(searchTerm) ||
+                    x.LastName.ToLower().Contains(searchTerm) ||
+                    (x.Suffix ?? "").ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
@@ -41,22 +41,22 @@ namespace Infrastructure.Repositories
 
                 query = sort.SortBy.ToLower() switch
                 {
-                    "id" when isAsc => query.OrderBy(r => r.Id),
-                    "id" when isDsc => query.OrderByDescending(r => r.Id),
-                    "employeeprefix" when isAsc => query.OrderBy(r => r.EmployeePrefix),
-                    "employeeprefix" when isDsc => query.OrderByDescending(r => r.EmployeePrefix),
-                    "employeeid" when isAsc => query.OrderBy(r => r.EmployeeId),
-                    "employeeid" when isDsc => query.OrderByDescending(r => r.EmployeeId),
-                    "username" when isAsc => query.OrderBy(r => r.Username),
-                    "username" when isDsc => query.OrderByDescending(r => r.Username),
-                    "firstname" when isAsc => query.OrderBy(r => r.FirstName),
-                    "firstname" when isDsc => query.OrderByDescending(r => r.FirstName),
-                    "middlename" when isAsc => query.OrderBy(r => r.MiddleName),
-                    "middlename" when isDsc => query.OrderByDescending(r => r.MiddleName),
-                    "lastname" when isAsc => query.OrderBy(r => r.LastName),
-                    "lastname" when isDsc => query.OrderByDescending(r => r.LastName),
-                    "suffix" when isAsc => query.OrderBy(r => r.Suffix),
-                    "suffix" when isDsc => query.OrderByDescending(r => r.Suffix),
+                    "id" when isAsc => query.OrderBy(x => x.Id),
+                    "id" when isDsc => query.OrderByDescending(x => x.Id),
+                    "employeeprefix" when isAsc => query.OrderBy(x => x.EmployeePrefix),
+                    "employeeprefix" when isDsc => query.OrderByDescending(x => x.EmployeePrefix),
+                    "employeeid" when isAsc => query.OrderBy(x => x.EmployeeId),
+                    "employeeid" when isDsc => query.OrderByDescending(x => x.EmployeeId),
+                    "username" when isAsc => query.OrderBy(x => x.Username),
+                    "username" when isDsc => query.OrderByDescending(x => x.Username),
+                    "firstname" when isAsc => query.OrderBy(x => x.FirstName),
+                    "firstname" when isDsc => query.OrderByDescending(x => x.FirstName),
+                    "middlename" when isAsc => query.OrderBy(x => x.MiddleName),
+                    "middlename" when isDsc => query.OrderByDescending(x => x.MiddleName),
+                    "lastname" when isAsc => query.OrderBy(x => x.LastName),
+                    "lastname" when isDsc => query.OrderByDescending(x => x.LastName),
+                    "suffix" when isAsc => query.OrderBy(x => x.Suffix),
+                    "suffix" when isDsc => query.OrderByDescending(x => x.Suffix),
                     _ => query
                 };
             }
@@ -76,21 +76,21 @@ namespace Infrastructure.Repositories
 
             if (genericFiltersDTO.IsActive != null)
             {
-                query = query.Where(r => r.IsActive == genericFiltersDTO.IsActive);
+                query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
                 string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
-                query = query.Where(r =>
-                    r.Id.ToString().Contains(searchTerm) ||
-                    r.EmployeePrefix.ToLower().Contains(searchTerm) ||
-                    r.EmployeeId.ToLower().Contains(searchTerm) ||
-                    r.Username.ToLower().Contains(searchTerm) ||
-                    r.FirstName.ToLower().Contains(searchTerm) ||
-                    (r.MiddleName ?? "").ToLower().Contains(searchTerm) ||
-                    r.LastName.ToLower().Contains(searchTerm) ||
-                    (r.Suffix ?? "").ToLower().Contains(searchTerm));
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.EmployeePrefix.ToLower().Contains(searchTerm) ||
+                    x.EmployeeId.ToLower().Contains(searchTerm) ||
+                    x.Username.ToLower().Contains(searchTerm) ||
+                    x.FirstName.ToLower().Contains(searchTerm) ||
+                    (x.MiddleName ?? "").ToLower().Contains(searchTerm) ||
+                    x.LastName.ToLower().Contains(searchTerm) ||
+                    (x.Suffix ?? "").ToLower().Contains(searchTerm));
             }
 
             return await query.CountAsync(cancellationToken);
@@ -99,7 +99,7 @@ namespace Infrastructure.Repositories
         public async Task<PendingAccount?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             IQueryable<PendingAccount> query = _context.PendingAccounts
-                .Where(r => r.Id == id);
+                .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
@@ -107,7 +107,7 @@ namespace Infrastructure.Repositories
         public async Task<PendingAccount?> GetByFullIdNoAsync(string employeePrefix, string employeeId, CancellationToken cancellationToken)
         {
             IQueryable<PendingAccount> query = _context.PendingAccounts
-                .Where(r => r.EmployeePrefix == employeePrefix && r.EmployeeId == employeeId);
+                .Where(x => x.EmployeePrefix == employeePrefix && x.EmployeeId == employeeId);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
