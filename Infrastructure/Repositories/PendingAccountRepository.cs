@@ -29,9 +29,9 @@ namespace Infrastructure.Repositories
                     r.EmployeeId.ToLower().Contains(searchTerm) ||
                     r.Username.ToLower().Contains(searchTerm) ||
                     r.FirstName.ToLower().Contains(searchTerm) ||
-                    r.MiddleName.ToLower().Contains(searchTerm) ||
+                    (r.MiddleName ?? "").ToLower().Contains(searchTerm) ||
                     r.LastName.ToLower().Contains(searchTerm) ||
-                    r.Suffix.ToLower().Contains(searchTerm));
+                    (r.Suffix ?? "").ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
