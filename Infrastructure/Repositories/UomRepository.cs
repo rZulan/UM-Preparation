@@ -22,9 +22,11 @@ namespace Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
+                string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
                 query = query.Where(u =>
-                    u.Name.Contains(genericFiltersDTO.SearchTerm)
-                );
+                    u.Id.ToString().Contains(searchTerm) ||
+                    u.Name.ToLower().Contains(searchTerm) ||
+                    u.ShortName.ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
@@ -66,9 +68,11 @@ namespace Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
+                string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
                 query = query.Where(u =>
-                    u.Name.Contains(genericFiltersDTO.SearchTerm)
-                );
+                    u.Id.ToString().Contains(searchTerm) ||
+                    u.Name.ToLower().Contains(searchTerm) ||
+                    u.ShortName.ToLower().Contains(searchTerm));
             }
 
             return await query.CountAsync(cancellationToken);

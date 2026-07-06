@@ -22,6 +22,21 @@ namespace Infrastructure.Repositories
                 query = query.Where(d => d.IsActive == genericFiltersDTO.IsActive);
             }
 
+            if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
+            {
+                string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
+                query = query.Where(d =>
+                    d.Id.ToString().Contains(searchTerm) ||
+                    d.WarehouseId.ToString().Contains(searchTerm) ||
+                    d.Warehouse.Name.ToLower().Contains(searchTerm) ||
+                    d.ProductId.ToString().Contains(searchTerm) ||
+                    d.Product.ItemCode.ToLower().Contains(searchTerm) ||
+                    d.Product.Description.ToLower().Contains(searchTerm) ||
+                    d.Product.Uom.ShortName.ToLower().Contains(searchTerm) ||
+                    d.Quantity.ToString().Contains(searchTerm) ||
+                    d.Reason.ToLower().Contains(searchTerm));
+            }
+
             if (sort?.SortBy != null)
             {
                 bool isAsc = string.Equals(sort.SortDirection, "asc", StringComparison.OrdinalIgnoreCase);

@@ -20,9 +20,15 @@ namespace Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
+                string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
                 query = query.Where(w =>
-                    w.Product.ItemCode.Contains(genericFiltersDTO.SearchTerm)
-                );
+                    w.Id.ToString().Contains(searchTerm) ||
+                    w.WarehouseId.ToString().Contains(searchTerm) ||
+                    w.Warehouse.Name.ToLower().Contains(searchTerm) ||
+                    w.Quantity.ToString().Contains(searchTerm) ||
+                    w.ProductId.ToString().Contains(searchTerm) ||
+                    w.Product.ItemCode.ToLower().Contains(searchTerm) ||
+                    w.Product.Description.ToLower().Contains(searchTerm));
             }
 
             if (sort.SortBy != null)
@@ -65,9 +71,15 @@ namespace Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
+                string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
                 query = query.Where(w =>
-                    w.Product.ItemCode.Contains(genericFiltersDTO.SearchTerm)
-                );
+                    w.Id.ToString().Contains(searchTerm) ||
+                    w.WarehouseId.ToString().Contains(searchTerm) ||
+                    w.Warehouse.Name.ToLower().Contains(searchTerm) ||
+                    w.Quantity.ToString().Contains(searchTerm) ||
+                    w.ProductId.ToString().Contains(searchTerm) ||
+                    w.Product.ItemCode.ToLower().Contains(searchTerm) ||
+                    w.Product.Description.ToLower().Contains(searchTerm));
             }
 
             return await query.CountAsync(cancellationToken);

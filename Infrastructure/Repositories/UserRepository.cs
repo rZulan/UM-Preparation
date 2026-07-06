@@ -27,14 +27,17 @@ namespace Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
+                string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
                 query = query.Where(u =>
-                    u.Username.Contains(genericFiltersDTO.SearchTerm) ||
-                    u.FirstName.Contains(genericFiltersDTO.SearchTerm) ||
-                    (u.MiddleName ?? "").Contains(genericFiltersDTO.SearchTerm) ||
-                    u.LastName.Contains(genericFiltersDTO.SearchTerm) ||
-                    (u.Suffix ?? "").Contains(genericFiltersDTO.SearchTerm) ||
-                    u.IDPrefix.Contains(genericFiltersDTO.SearchTerm) ||
-                    u.IDNumber.Contains(genericFiltersDTO.SearchTerm)
+                    u.Id.ToString().Contains(searchTerm) ||
+                    u.Username.ToLower().Contains(searchTerm) ||
+                    u.FirstName.ToLower().Contains(searchTerm) ||
+                    (u.MiddleName ?? "").ToLower().Contains(searchTerm) ||
+                    u.LastName.ToLower().Contains(searchTerm) ||
+                    (u.Suffix ?? "").ToLower().Contains(searchTerm) ||
+                    u.IDPrefix.ToLower().Contains(searchTerm) ||
+                    u.IDNumber.ToLower().Contains(searchTerm) ||
+                    u.Warehouse!.Name.ToLower().Contains(searchTerm)
                 );
             }
 
@@ -89,16 +92,20 @@ namespace Infrastructure.Repositories
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
+                string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
                 query = query.Where(u =>
-                    u.Username.Contains(genericFiltersDTO.SearchTerm) ||
-                    u.FirstName.Contains(genericFiltersDTO.SearchTerm) ||
-                    (u.MiddleName ?? "").Contains(genericFiltersDTO.SearchTerm) ||
-                    u.LastName.Contains(genericFiltersDTO.SearchTerm) ||
-                    (u.Suffix ?? "").Contains(genericFiltersDTO.SearchTerm) ||
-                    u.IDPrefix.Contains(genericFiltersDTO.SearchTerm) ||
-                    u.IDNumber.Contains(genericFiltersDTO.SearchTerm)
+                    u.Id.ToString().Contains(searchTerm) ||
+                    u.Username.ToLower().Contains(searchTerm) ||
+                    u.FirstName.ToLower().Contains(searchTerm) ||
+                    (u.MiddleName ?? "").ToLower().Contains(searchTerm) ||
+                    u.LastName.ToLower().Contains(searchTerm) ||
+                    (u.Suffix ?? "").ToLower().Contains(searchTerm) ||
+                    u.IDPrefix.ToLower().Contains(searchTerm) ||
+                    u.IDNumber.ToLower().Contains(searchTerm) ||
+                    u.Warehouse!.Name.ToLower().Contains(searchTerm)
                 );
             }
+
             return await query.CountAsync(cancellationToken);
         }
 
