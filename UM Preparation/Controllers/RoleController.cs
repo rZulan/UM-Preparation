@@ -3,6 +3,7 @@ using Application.DTO.Misc.Sorts;
 using Application.DTO.Role;
 using Application.Features.Roles.Commands;
 using Application.Features.Roles.Queries;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,63 +19,64 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetRoles([FromQuery] GenericFiltersDTO genericFiltersDTO, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetRoles([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
         {
-            var result = await _mediator.Send(new GetRolesQuery(genericFiltersDTO, sort));
+            GetAllResult<List<GetRoleDto>> result = await _mediator.Send(new GetRolesQuery(genericFiltersDto, sort));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetRoleById(int id)
         {
-            var result = await _mediator.Send(new GetRoleByIdQuery(id));
+            Result<GetRoleDto> result = await _mediator.Send(new GetRoleByIdQuery(id));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddRole([FromBody] AddRoleDTO addRoleDTO)
+        public async Task<IActionResult> AddRole([FromBody] AddRoleDto addRoleDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new AddRoleCommand(userId, addRoleDTO));
+            Result<object> result = await _mediator.Send(new AddRoleCommand(userId, addRoleDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleDTO updateRoleDTO)
+        public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateRoleDto updateRoleDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new UpdateRoleCommand(userId, id, updateRoleDTO));
+            Result<object> result = await _mediator.Send(new UpdateRoleCommand(userId, id, updateRoleDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/archive")]
+        [HttpPatch("{id:int}/archive")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ArchiveRole(int id)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ToggleRoleActiveCommand(userId, id, false));
+            Result<object> result = await _mediator.Send(new ToggleRoleActiveCommand(userId, id, false));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/restore")]
+        [HttpPatch("{id:int}/restore")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RestoreRole(int id)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ToggleRoleActiveCommand(userId, id, true));
+            Result<object> result = await _mediator.Send(new ToggleRoleActiveCommand(userId, id, true));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
     }
 }
+

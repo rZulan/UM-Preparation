@@ -10,16 +10,16 @@ namespace Application.Features.Uoms.Queries
     /// <summary>Query to retrieve a filtered, sorted, and paginated list of units of measure.</summary>
     /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
     /// <param name="Sort">Sort direction and field.</param>
-    public record GetUomsQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetUomDTO>>>;
-    public class GetUomsQueryHandler(IUomRepository uomRepository) : IRequestHandler<GetUomsQuery, GetAllResult<List<GetUomDTO>>>
+    public record GetUomsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetUomDto>>>;
+    public class GetUomsQueryHandler(IUomRepository uomRepository) : IRequestHandler<GetUomsQuery, GetAllResult<List<GetUomDto>>>
     {
         private readonly IUomRepository _uomRepository = uomRepository;
 
-        public async Task<GetAllResult<List<GetUomDTO>>> Handle(GetUomsQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetUomDto>>> Handle(GetUomsQuery request, CancellationToken cancellationToken)
         {
             var uoms = await _uomRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = uoms.Select(x => new GetUomDTO
+            var result = uoms.Select(x => new GetUomDto
             {
                 Id = x.Id,
                 IsActive = x.IsActive,
@@ -50,7 +50,7 @@ namespace Application.Features.Uoms.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetUomDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetUomDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

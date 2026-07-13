@@ -10,7 +10,7 @@ namespace Application.Features.Users.Commands
 {
     /// <summary>Command to register a new user account.</summary>
     /// <param name="RegisterDTO">The registration data (employee info, credentials, and role).</param>
-    public record RegisterUserCommand(RegisterUserDTO RegisterDTO) : IRequest<Result<object>>;
+    public record RegisterUserCommand(RegisterUserDto RegisterDTO) : IRequest<Result<object>>;
     public class RegisterUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasher, IRoleRepository roleRepository, IWarehouseRepository warehouseRepository) : IRequestHandler<RegisterUserCommand, Result<object>>
     {
         private readonly IUserRepository _userRepository = userRepository;

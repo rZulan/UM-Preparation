@@ -13,12 +13,12 @@ namespace Application.Interfaces
         /// <param name="genericFiltersDTO">Search and pagination filters.</param>
         /// <param name="userSort">Sort direction and field.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
-        Task<List<User>> GetAllAsync(GenericFiltersDTO genericFiltersDTO, Sort userSort, CancellationToken cancellationToken);
+        Task<List<User>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort userSort, CancellationToken cancellationToken);
 
         /// <summary>Returns the total count of users matching the given filters.</summary>
         /// <param name="genericFiltersDTO">Filters to apply before counting.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
-        Task<int> GetCountAsync(GenericFiltersDTO genericFiltersDTO, CancellationToken cancellationToken);
+        Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken);
 
         /// <summary>Returns a user by their ID, or <see langword="null"/> if not found.</summary>
         /// <param name="id">The user's unique identifier.</param>

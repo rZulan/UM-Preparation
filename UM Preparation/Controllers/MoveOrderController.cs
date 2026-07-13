@@ -3,6 +3,7 @@ using Application.DTO.Misc.Sorts;
 using Application.DTO.MoveOrder;
 using Application.Features.MoveOrders.Commands;
 using Application.Features.MoveOrders.Queries;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,30 +19,30 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetMoveOrders([FromQuery] GenericFiltersDTO genericFiltersDTO, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetMoveOrders([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
         {
-            var result = await _mediator.Send(new GetMoveOrdersQuery(genericFiltersDTO, sort));
+            GetAllResult<List<GetMoveOrderDto>> result = await _mediator.Send(new GetMoveOrdersQuery(genericFiltersDto, sort));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetMoveOrderById(int id)
         {
-            var result = await _mediator.Send(new GetMoveOrderByIdQuery(id));
+            Result<GetMoveOrderDto> result = await _mediator.Send(new GetMoveOrderByIdQuery(id));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddMoveOrder([FromBody] AddMoveOrderDTO addMoveOrderDTO)
+        public async Task<IActionResult> AddMoveOrder([FromBody] AddMoveOrderDto addMoveOrderDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new AddMoveOrderCommand(userId, addMoveOrderDTO));
+            Result<object> result = await _mediator.Send(new AddMoveOrderCommand(userId, addMoveOrderDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
     }
 }

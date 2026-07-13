@@ -10,16 +10,16 @@ namespace Application.Features.Permissions.Queries
     /// <summary>Query to retrieve a filtered, sorted, and paginated list of permissions.</summary>
     /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
     /// <param name="Sort">Sort direction and field.</param>
-    public record GetPermissionsQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetPermissionDTO>>>;
-    public class GetPermissionsQueryHandler(IPermissionRepository permissionRepository) : IRequestHandler<GetPermissionsQuery, GetAllResult<List<GetPermissionDTO>>>
+    public record GetPermissionsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetPermissionDto>>>;
+    public class GetPermissionsQueryHandler(IPermissionRepository permissionRepository) : IRequestHandler<GetPermissionsQuery, GetAllResult<List<GetPermissionDto>>>
     {
         private readonly IPermissionRepository _permissionRepository = permissionRepository;
 
-        public async Task<GetAllResult<List<GetPermissionDTO>>> Handle(GetPermissionsQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetPermissionDto>>> Handle(GetPermissionsQuery request, CancellationToken cancellationToken)
         {
             var permissions = await _permissionRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = permissions.Select(x => new GetPermissionDTO
+            var result = permissions.Select(x => new GetPermissionDto
             {
                 Id = x.Id,
                 IsActive = x.IsActive,
@@ -48,7 +48,7 @@ namespace Application.Features.Permissions.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetPermissionDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetPermissionDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

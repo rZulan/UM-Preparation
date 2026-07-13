@@ -3,6 +3,7 @@ using Application.DTO.Misc.Sorts;
 using Application.DTO.Uom;
 using Application.Features.Uoms.Commands;
 using Application.Features.Uoms.Queries;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,63 +19,63 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetUoms([FromQuery] GenericFiltersDTO genericFiltersDTO, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetUoms([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
         {
-            var result = await _mediator.Send(new GetUomsQuery(genericFiltersDTO, sort));
+            GetAllResult<List<GetUomDto>> result = await _mediator.Send(new GetUomsQuery(genericFiltersDto, sort));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUomById(int id)
         {
-            var result = await _mediator.Send(new GetUomByIdQuery(id));
+            Result<GetUomDto> result = await _mediator.Send(new GetUomByIdQuery(id));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddUom([FromBody] AddUomDTO addUomDTO)
+        public async Task<IActionResult> AddUom([FromBody] AddUomDto addUomDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new AddUomCommand(userId, addUomDTO));
+            Result<object> result = await _mediator.Send(new AddUomCommand(userId, addUomDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUom(int id, [FromBody] UpdateUomDTO updateUomDTO)
+        public async Task<IActionResult> UpdateUom(int id, [FromBody] UpdateUomDto updateUomDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new UpdateUomCommand(userId, id, updateUomDTO));
+            Result<object> result = await _mediator.Send(new UpdateUomCommand(userId, id, updateUomDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/archive")]
+        [HttpPatch("{id:int}/archive")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ArchiveUom(int id)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ToggleUomActiveCommand(userId, id, false));
+            Result<object> result = await _mediator.Send(new ToggleUomActiveCommand(userId, id, false));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/restore")]
+        [HttpPatch("{id:int}/restore")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RestoreUom(int id)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ToggleUomActiveCommand(userId, id, true));
+            Result<object> result = await _mediator.Send(new ToggleUomActiveCommand(userId, id, true));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
     }
 }

@@ -10,33 +10,33 @@ namespace Application.Features.Users.Commands
     /// <summary>Command to authenticate a user and issue a JWT access token and refresh token.</summary>
     /// <param name="LoginDTO">The login credentials (username and password).</param>
     /// <param name="RefreshToken">An existing refresh token to revoke on re-login, or <see langword="null"/> if none.</param>
-    public record LoginUserCommand(LoginUserDTO LoginDTO, string? RefreshToken) : IRequest<Result<LoginResultDTO>>;
-    public class LoginUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasherService, IJwtService jwtService, IRefreshTokenRepository refreshTokenRepository) : IRequestHandler<LoginUserCommand, Result<LoginResultDTO>>
+    public record LoginUserCommand(LoginUserDto LoginDTO, string? RefreshToken) : IRequest<Result<LoginResultDto>>;
+    public class LoginUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasherService, IJwtService jwtService, IRefreshTokenRepository refreshTokenRepository) : IRequestHandler<LoginUserCommand, Result<LoginResultDto>>
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IPasswordHasherService _passwordHasherService = passwordHasherService;
         private readonly IJwtService _jwtService = jwtService;
         private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
 
-        public async Task<Result<LoginResultDTO>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<Result<LoginResultDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
             var existingUser = await _userRepository.GetByUsernameAsync(request.LoginDTO.Username, cancellationToken);
 
             if (existingUser == null)
             {
-                return Result<LoginResultDTO>.Failure("Invalid username or password", HttpStatusCode.Unauthorized);
+                return Result<LoginResultDto>.Failure("Invalid username or password", HttpStatusCode.Unauthorized);
             }
 
             var isPasswordValid = _passwordHasherService.Verify(request.LoginDTO.Password, existingUser.PasswordHash);
 
             if (isPasswordValid == false)
             {
-                return Result<LoginResultDTO>.Failure("Invalid username or password", HttpStatusCode.Unauthorized);
+                return Result<LoginResultDto>.Failure("Invalid username or password", HttpStatusCode.Unauthorized);
             }
 
             if (existingUser.IsActive == false)
             {
-                return Result<LoginResultDTO>.Failure("Your account is deactivated, please contact an administrator.");
+                return Result<LoginResultDto>.Failure("Your account is deactivated, please contact an administrator.");
             }
 
             if (request.RefreshToken != null)
@@ -75,7 +75,7 @@ namespace Application.Features.Users.Commands
 
             await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
 
-            var loginResult = new LoginResultDTO
+            var loginResult = new LoginResultDto
             {
                 Id = existingUser.Id,
                 Username = existingUser.Username,
@@ -98,7 +98,7 @@ namespace Application.Features.Users.Commands
                 RefreshToken = refreshTokenValue,
             };
 
-            return Result<LoginResultDTO>.Success(loginResult, "User logged in successfully", HttpStatusCode.OK);
+            return Result<LoginResultDto>.Success(loginResult, "User logged in successfully", HttpStatusCode.OK);
         }
     }
 }

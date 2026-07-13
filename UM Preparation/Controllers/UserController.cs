@@ -3,6 +3,7 @@ using Application.DTO.Misc.Sorts;
 using Application.DTO.User;
 using Application.Features.Users.Commands;
 using Application.Features.Users.Queries;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,56 +19,57 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetUsers([FromQuery] GenericFiltersDTO genericFiltersDTO, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetUsers([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
         {
-            var result = await _mediator.Send(new GetUsersQuery(genericFiltersDTO, sort));
+            GetAllResult<List<GetUserDto>> result = await _mediator.Send(new GetUsersQuery(genericFiltersDto, sort));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var result = await _mediator.Send(new GetUserByIdQuery(id));
+            Result<GetUserDto> result = await _mediator.Send(new GetUserByIdQuery(id));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPatch("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] UpdatePasswordDTO updatePasswordDTO)
+        public async Task<IActionResult> ChangePassword([FromBody] UpdatePasswordDto updatePasswordDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ChangeUserPasswordCommand(userId, updatePasswordDTO));
+            Result<object> result = await _mediator.Send(new ChangeUserPasswordCommand(userId, updatePasswordDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDTO updateUserDTO)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
-            var result = await _mediator.Send(new UpdateUserCommand(id, updateUserDTO));
+            Result<object> result = await _mediator.Send(new UpdateUserCommand(id, updateUserDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/archive")]
+        [HttpPatch("{id:int}/archive")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ArchiveUser(int id)
         {
-            var result = await _mediator.Send(new ToggleUserActiveCommand(id, false));
+            Result<object> result = await _mediator.Send(new ToggleUserActiveCommand(id, false));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/restore")]
+        [HttpPatch("{id:int}/restore")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RestoreUser(int id)
         {
-            var result = await _mediator.Send(new ToggleUserActiveCommand(id, true));
+            Result<object> result = await _mediator.Send(new ToggleUserActiveCommand(id, true));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
     }
 }
+

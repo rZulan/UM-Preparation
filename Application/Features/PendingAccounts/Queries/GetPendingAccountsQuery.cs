@@ -10,16 +10,16 @@ namespace Application.Features.PendingAccounts.Queries
     /// <summary>Query to retrieve a filtered, sorted, and paginated list of pending accounts.</summary>
     /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
     /// <param name="Sort">Sort direction and field.</param>
-    public record GetPendingAccountsQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetPendingAccountDTO>>>;
-    public class GetPendingAccountsQueryHandler(IPendingAccountRepository pendingAccountRepository) : IRequestHandler<GetPendingAccountsQuery, GetAllResult<List<GetPendingAccountDTO>>>
+    public record GetPendingAccountsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetPendingAccountDto>>>;
+    public class GetPendingAccountsQueryHandler(IPendingAccountRepository pendingAccountRepository) : IRequestHandler<GetPendingAccountsQuery, GetAllResult<List<GetPendingAccountDto>>>
     {
         private readonly IPendingAccountRepository _pendingAccountRepository = pendingAccountRepository;
 
-        public async Task<GetAllResult<List<GetPendingAccountDTO>>> Handle(GetPendingAccountsQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetPendingAccountDto>>> Handle(GetPendingAccountsQuery request, CancellationToken cancellationToken)
         {
             var pendingAccounts = await _pendingAccountRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = pendingAccounts.Select(x => new GetPendingAccountDTO
+            var result = pendingAccounts.Select(x => new GetPendingAccountDto
             {
                 Id = x.Id,
                 IsActive = x.IsActive,
@@ -54,7 +54,7 @@ namespace Application.Features.PendingAccounts.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetPendingAccountDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetPendingAccountDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

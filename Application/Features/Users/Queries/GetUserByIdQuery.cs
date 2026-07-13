@@ -8,21 +8,21 @@ namespace Application.Features.Users.Queries
 {
     /// <summary>Query to retrieve a single user by their ID.</summary>
     /// <param name="Id">The unique identifier of the user to retrieve.</param>
-    public record GetUserByIdQuery(int Id) : IRequest<Result<GetUserDTO>>;
-    public class GetUserByIdQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUserByIdQuery, Result<GetUserDTO>>
+    public record GetUserByIdQuery(int Id) : IRequest<Result<GetUserDto>>;
+    public class GetUserByIdQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUserByIdQuery, Result<GetUserDto>>
     {
         private readonly IUserRepository _userRepository = userRepository;
 
-        public async Task<Result<GetUserDTO>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<GetUserDto>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (user is null)
             {
-                return Result<GetUserDTO>.Failure("User not found", HttpStatusCode.NotFound);
+                return Result<GetUserDto>.Failure("User not found", HttpStatusCode.NotFound);
             }
 
-            var userDto = new GetUserDTO
+            var userDto = new GetUserDto
             {
                 Id = user.Id,
                 IsActive = user.IsActive,
@@ -40,7 +40,7 @@ namespace Application.Features.Users.Queries
                     .Distinct()]
             };
 
-            return Result<GetUserDTO>.Success(userDto);
+            return Result<GetUserDto>.Success(userDto);
         }
     }
 }

@@ -3,6 +3,7 @@ using Application.DTO.Misc.Sorts;
 using Application.DTO.MiscellaneousReceipt;
 using Application.Features.MiscellaneousReceipts.Commands;
 using Application.Features.MiscellaneousReceipts.Queries;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,28 +19,28 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetMiscellaneousReceipts([FromQuery] GenericFiltersDTO genericFiltersDTO, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetMiscellaneousReceipts([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
         {
-            var result = await _mediator.Send(new GetMiscellaneousReceiptsQuery(genericFiltersDTO, sort));
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            GetAllResult<List<GetMiscellaneousReceiptDto>> result = await _mediator.Send(new GetMiscellaneousReceiptsQuery(genericFiltersDto, sort));
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetMiscellaneousReceiptById(int id)
         {
-            var result = await _mediator.Send(new GetMiscellaneousReceiptByIdQuery(id));
+            Result<GetMiscellaneousReceiptDto> result = await _mediator.Send(new GetMiscellaneousReceiptByIdQuery(id));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddMiscellaneousReceipt([FromBody] AddMiscellaneousReceiptDTO addMiscellaneousReceiptDTO)
+        public async Task<IActionResult> AddMiscellaneousReceipt([FromBody] AddMiscellaneousReceiptDto addMiscellaneousReceiptDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new AddMiscellaneousReceiptCommand(userId, addMiscellaneousReceiptDTO));
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            Result<object> result = await _mediator.Send(new AddMiscellaneousReceiptCommand(userId, addMiscellaneousReceiptDto));
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
     }
 }

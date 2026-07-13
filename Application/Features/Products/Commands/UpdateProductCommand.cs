@@ -10,7 +10,7 @@ namespace Application.Features.Products.Commands
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="Id">The ID of the product to update.</param>
     /// <param name="UpdateProductDTO">The updated product data.</param>
-    public record UpdateProductCommand(int? UserId, int Id, UpdateProductDTO UpdateProductDTO) : IRequest<Result<object>>;
+    public record UpdateProductCommand(int? UserId, int Id, UpdateProductDto UpdateProductDTO) : IRequest<Result<object>>;
     public class UpdateProductCommandHandler(IProductRepository productRepository, IUserRepository userRepository) : IRequestHandler<UpdateProductCommand, Result<object>>
     {
         private readonly IProductRepository _productRepository = productRepository;

@@ -8,21 +8,21 @@ namespace Application.Features.Uoms.Queries
 {
     /// <summary>Query to retrieve a single unit of measure by its ID.</summary>
     /// <param name="Id">The unique identifier of the unit of measure to retrieve.</param>
-    public record GetUomByIdQuery(int Id) : IRequest<Result<GetUomDTO>>;
-    public class GetUomByIdQueryHandler(IUomRepository uomRepository) : IRequestHandler<GetUomByIdQuery, Result<GetUomDTO>>
+    public record GetUomByIdQuery(int Id) : IRequest<Result<GetUomDto>>;
+    public class GetUomByIdQueryHandler(IUomRepository uomRepository) : IRequestHandler<GetUomByIdQuery, Result<GetUomDto>>
     {
         private readonly IUomRepository _uomRepository = uomRepository;
 
-        public async Task<Result<GetUomDTO>> Handle(GetUomByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<GetUomDto>> Handle(GetUomByIdQuery request, CancellationToken cancellationToken)
         {
             var uom = await _uomRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (uom == null)
             {
-                return Result<GetUomDTO>.Failure("Uom not found", HttpStatusCode.NotFound);
+                return Result<GetUomDto>.Failure("Uom not found", HttpStatusCode.NotFound);
             }
 
-            var result = new GetUomDTO
+            var result = new GetUomDto
             {
                 Id = uom.Id,
                 IsActive = uom.IsActive,
@@ -31,7 +31,7 @@ namespace Application.Features.Uoms.Queries
                 IsInteger = uom.IsInteger,
             };
 
-            return Result<GetUomDTO>.Success(result);
+            return Result<GetUomDto>.Success(result);
         }
     }
 }

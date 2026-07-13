@@ -6,22 +6,22 @@ using System.Net;
 
 namespace Application.Features.MoveOrders.Queries
 {
-    public record GetMoveOrderByIdQuery(int Id) : IRequest<Result<GetMoveOrderDTO>>;
+    public record GetMoveOrderByIdQuery(int Id) : IRequest<Result<GetMoveOrderDto>>;
 
-    public class GetMoveOrderByIdQueryHandler(IMoveOrderRepository moveOrderRepository) : IRequestHandler<GetMoveOrderByIdQuery, Result<GetMoveOrderDTO>>
+    public class GetMoveOrderByIdQueryHandler(IMoveOrderRepository moveOrderRepository) : IRequestHandler<GetMoveOrderByIdQuery, Result<GetMoveOrderDto>>
     {
         private readonly IMoveOrderRepository _moveOrderRepository = moveOrderRepository;
 
-        public async Task<Result<GetMoveOrderDTO>> Handle(GetMoveOrderByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<GetMoveOrderDto>> Handle(GetMoveOrderByIdQuery request, CancellationToken cancellationToken)
         {
             var moveOrder = await _moveOrderRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (moveOrder == null)
             {
-                return Result<GetMoveOrderDTO>.Failure("Move order not found", HttpStatusCode.NotFound);
+                return Result<GetMoveOrderDto>.Failure("Move order not found", HttpStatusCode.NotFound);
             }
 
-            var result = new GetMoveOrderDTO
+            var result = new GetMoveOrderDto
             {
                 Id = moveOrder.Id,
                 IsActive = moveOrder.IsActive,
@@ -38,7 +38,7 @@ namespace Application.Features.MoveOrders.Queries
                 }).ToList()
             };
 
-            return Result<GetMoveOrderDTO>.Success(result);
+            return Result<GetMoveOrderDto>.Success(result);
         }
     }
 }

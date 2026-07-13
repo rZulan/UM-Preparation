@@ -10,7 +10,7 @@ namespace Application.Features.Permissions.Commands
     /// <summary>Command to create a new permission.</summary>
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="AddPermissionDTO">The permission data to be created.</param>
-    public record AddPermissionCommand(int? UserId, AddPermissionDTO AddPermissionDTO) : IRequest<Result<object>>;
+    public record AddPermissionCommand(int? UserId, AddPermissionDto AddPermissionDTO) : IRequest<Result<object>>;
     public class AddPermissionCommandHandler(IPermissionRepository permissionRepository, IUserRepository userRepository) : IRequestHandler<AddPermissionCommand, Result<object>>
     {
         private readonly IPermissionRepository _permissionRepository = permissionRepository;

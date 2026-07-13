@@ -11,7 +11,7 @@ namespace Application.Features.PendingAccounts.Commands
     /// <summary>Command to import a pending account into the system as a registered user.</summary>
     /// <param name="Id">The ID of the pending account to import.</param>
     /// <param name="RoleId">The ID of the role to assign to the newly registered user.</param>
-    public record ImportPendingAccountCommand(int Id, ImportPendingAccountDTO ImportPendingAccountDTO) : IRequest<Result<object>>;
+    public record ImportPendingAccountCommand(int Id, ImportPendingAccountDto ImportPendingAccountDTO) : IRequest<Result<object>>;
     public class ImportPendingAccountCommandHandler(IPendingAccountRepository pendingAccountRepository, IRoleRepository roleRepository, IWarehouseRepository warehouseRepository, IMediator mediator) : IRequestHandler<ImportPendingAccountCommand, Result<object>>
     {
         private readonly IPendingAccountRepository _pendingAccountRepository = pendingAccountRepository;
@@ -45,7 +45,7 @@ namespace Application.Features.PendingAccounts.Commands
                 }
             }
 
-            var registerDTO = new RegisterUserDTO
+            var registerDTO = new RegisterUserDto
             {
                 Username = existingPendingAccount.Username,
                 Password = existingPendingAccount.Password,

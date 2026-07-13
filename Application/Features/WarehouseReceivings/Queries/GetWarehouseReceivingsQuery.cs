@@ -10,16 +10,16 @@ namespace Application.Features.WarehouseReceivings.Queries
     /// <summary>Query to retrieve a filtered, sorted, and paginated list of warehouse entries.</summary>
     /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
     /// <param name="Sort">Sort direction and field.</param>
-    public record GetWarehouseReceivingsQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetWarehouseReceivingDTO>>>;
-    public class GetWarehouseReceivingsQueryHandler(IWarehouseReceivingRepository warehouseReceivingRepository) : IRequestHandler<GetWarehouseReceivingsQuery, GetAllResult<List<GetWarehouseReceivingDTO>>>
+    public record GetWarehouseReceivingsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetWarehouseReceivingDto>>>;
+    public class GetWarehouseReceivingsQueryHandler(IWarehouseReceivingRepository warehouseReceivingRepository) : IRequestHandler<GetWarehouseReceivingsQuery, GetAllResult<List<GetWarehouseReceivingDto>>>
     {
         private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
 
-        public async Task<GetAllResult<List<GetWarehouseReceivingDTO>>> Handle(GetWarehouseReceivingsQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetWarehouseReceivingDto>>> Handle(GetWarehouseReceivingsQuery request, CancellationToken cancellationToken)
         {
             var warehouseReceivings = await _warehouseReceivingRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = warehouseReceivings.Select(x => new GetWarehouseReceivingDTO
+            var result = warehouseReceivings.Select(x => new GetWarehouseReceivingDto
             {
                 Id = x.Id,
                 WarehouseId = x.WarehouseId,
@@ -53,7 +53,7 @@ namespace Application.Features.WarehouseReceivings.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetWarehouseReceivingDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetWarehouseReceivingDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

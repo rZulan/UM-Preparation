@@ -10,7 +10,7 @@ namespace Application.Features.WarehouseReceivings.Commands
     /// <summary>Command to create a new warehouse entry.</summary>
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="AddWarehouseReceivingDTO">The warehouse data to be created.</param>
-    public record AddWarehouseReceivingCommand(int? UserId, AddWarehouseReceivingDTO AddWarehouseReceivingDTO) : IRequest<Result<object>>;
+    public record AddWarehouseReceivingCommand(int? UserId, AddWarehouseReceivingDto AddWarehouseReceivingDTO) : IRequest<Result<object>>;
     public class AddWarehouseReceivingCommandHandler(IWarehouseReceivingRepository warehouseReceivingRepository, IUserRepository userRepository, IProductRepository productRepository, IMiscellaneousReceiptRepository miscellaneousReceiptRepository) : IRequestHandler<AddWarehouseReceivingCommand, Result<object>>
     {
         private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;

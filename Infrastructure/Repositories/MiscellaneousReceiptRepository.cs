@@ -11,7 +11,7 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<MiscellaneousReceipt>> GetAllAsync(GenericFiltersDTO genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
+        public async Task<List<MiscellaneousReceipt>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
         {
             IQueryable<MiscellaneousReceipt> query = _context.MiscellaneousReceipts
                 .Include(x => x.Warehouse)
@@ -68,7 +68,7 @@ namespace Infrastructure.Repositories
             return await query.ToListAsync(cancellationToken);
         }
 
-        public async Task<int> GetCountAsync(GenericFiltersDTO genericFiltersDTO, CancellationToken cancellationToken)
+        public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
             IQueryable<MiscellaneousReceipt> query = _context.MiscellaneousReceipts;
 

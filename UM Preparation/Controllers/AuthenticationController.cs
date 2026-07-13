@@ -1,4 +1,4 @@
-﻿using Application.DTO.User;
+using Application.DTO.User;
 using Application.Features.Users.Commands;
 using Application.Features.Users.Queries;
 using Application.Results;
@@ -17,82 +17,82 @@ namespace UM_Preparation.Controllers
         private readonly IConfiguration _configuration = configuration;
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserDTO registerDTO)
+        public async Task<IActionResult> Register([FromBody] RegisterUserDto registerDto)
         {
-            var result = await _mediator.Send(new RegisterUserCommand(registerDTO));
+            Result<object> result = await _mediator.Send(new RegisterUserCommand(registerDto));
 
             if (result.IsFailure)
             {
-                return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+                return StatusCode((int)result.StatusCode!.Value, result);
             }
 
             return CreatedAtAction(nameof(UserController.GetUserById), "User", new { id = result.Value }, result);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromQuery] RefreshTokenDTO? refreshTokenDTO, [FromBody] LoginUserDTO loginDTO)
+        public async Task<IActionResult> Login([FromQuery] RefreshTokenDto? refreshTokenDto, [FromBody] LoginUserDto loginDto)
         {
-            var refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDTO?.RefreshToken);
+            string? refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDto?.RefreshToken);
 
-            var result = await _mediator.Send(new LoginUserCommand(loginDTO, refreshToken));
+            Result<LoginResultDto> result = await _mediator.Send(new LoginUserCommand(loginDto, refreshToken));
 
             if (result.IsSuccess && result.Value != null)
             {
                 SetAuthCookies(result.Value.AccessToken, result.Value.RefreshToken);
             }
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> RefreshToken([FromQuery] RefreshTokenDTO? refreshTokenDTO)
+        public async Task<IActionResult> RefreshToken([FromQuery] RefreshTokenDto? refreshTokenDto)
         {
-            var refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDTO?.RefreshToken);
+            string? refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDto?.RefreshToken);
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                var missingTokenResult = Result<LoginResultDTO>.Failure("Refresh token is missing.", HttpStatusCode.Unauthorized);
+                Result<LoginResultDto> missingTokenResult = Result<LoginResultDto>.Failure("Refresh token is missing.", HttpStatusCode.Unauthorized);
 
-                return StatusCode(missingTokenResult.StatusCode!.Value.GetHashCode(), missingTokenResult);
+                return StatusCode((int)missingTokenResult.StatusCode!.Value, missingTokenResult);
             }
 
-            var result = await _mediator.Send(new RefreshTokenCommand(refreshToken));
+            Result<RefreshResultDto> result = await _mediator.Send(new RefreshTokenCommand(refreshToken));
 
             if (result.IsFailure)
             {
-                return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+                return StatusCode((int)result.StatusCode!.Value, result);
             }
 
             SetAuthCookies(result.Value!.AccessToken, null);
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpGet("me")]
         public async Task<IActionResult> Me()
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new MeQuery(userId));
+            Result<MeResultDto> result = await _mediator.Send(new MeQuery(userId));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromQuery] RefreshTokenDTO? refreshTokenDTO)
+        public async Task<IActionResult> Logout([FromQuery] RefreshTokenDto? refreshTokenDto)
         {
-            var refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDTO?.RefreshToken);
+            string? refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDto?.RefreshToken);
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                var missingTokenResult = Result<object>.Failure("Refresh token is missing.", HttpStatusCode.Unauthorized);
+                Result<object> missingTokenResult = Result<object>.Failure("Refresh token is missing.", HttpStatusCode.Unauthorized);
 
-                return StatusCode(missingTokenResult.StatusCode!.Value.GetHashCode(), missingTokenResult);
+                return StatusCode((int)missingTokenResult.StatusCode!.Value, missingTokenResult);
             }
 
-            var result = await _mediator.Send(new LogoutUserCommand(refreshToken));
+            Result<object> result = await _mediator.Send(new LogoutUserCommand(refreshToken));
 
-            var cookieOptions = new CookieOptions
+            CookieOptions cookieOptions = new CookieOptions
             {
                 SameSite = SameSiteMode.None,
                 Secure = true
@@ -101,12 +101,12 @@ namespace UM_Preparation.Controllers
             Response.Cookies.Delete("access_token", cookieOptions);
             Response.Cookies.Delete("refresh_token", cookieOptions);
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         private void SetAuthCookies(string accessToken, string? refreshToken)
         {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
+            IConfigurationSection jwtSettings = _configuration.GetSection("JwtSettings");
 
             Response.Cookies.Append("access_token", accessToken, new CookieOptions
             {

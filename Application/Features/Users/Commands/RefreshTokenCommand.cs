@@ -8,28 +8,28 @@ namespace Application.Features.Users.Commands
 {
     /// <summary>Command to issue a new JWT access token using a valid refresh token.</summary>
     /// <param name="RefreshToken">The refresh token string to validate and exchange.</param>
-    public record RefreshTokenCommand(string RefreshToken) : IRequest<Result<RefreshResultDTO>>;
+    public record RefreshTokenCommand(string RefreshToken) : IRequest<Result<RefreshResultDto>>;
 
-    public class RefreshTokenCommandHandler(IRefreshTokenRepository refreshTokenRepository, IUserRepository userRepository, IJwtService jwtService) : IRequestHandler<RefreshTokenCommand, Result<RefreshResultDTO>>
+    public class RefreshTokenCommandHandler(IRefreshTokenRepository refreshTokenRepository, IUserRepository userRepository, IJwtService jwtService) : IRequestHandler<RefreshTokenCommand, Result<RefreshResultDto>>
     {
         private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IJwtService _jwtService = jwtService;
 
-        public async Task<Result<RefreshResultDTO>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+        public async Task<Result<RefreshResultDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
             var existing = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
 
             if (existing == null || existing.IsRevoked || existing.ExpiresAt < DateTime.UtcNow)
             {
-                return Result<RefreshResultDTO>.Failure("Invalid or expired refresh token.", HttpStatusCode.Unauthorized);
+                return Result<RefreshResultDto>.Failure("Invalid or expired refresh token.", HttpStatusCode.Unauthorized);
             }
 
             var user = await _userRepository.GetByIdAsync(existing.UserId, cancellationToken);
 
             if (user == null)
             {
-                return Result<RefreshResultDTO>.Failure("User not found.", HttpStatusCode.Unauthorized);
+                return Result<RefreshResultDto>.Failure("User not found.", HttpStatusCode.Unauthorized);
             }
 
             //await _refreshTokenRepository.RevokeAsync(existing, cancellationToken);
@@ -60,12 +60,12 @@ namespace Application.Features.Users.Commands
 
             //await _refreshTokenRepository.AddAsync(newRefreshToken, cancellationToken);
 
-            var loginResult = new RefreshResultDTO
+            var loginResult = new RefreshResultDto
             {
                 AccessToken = newAccessToken,
             };
 
-            return Result<RefreshResultDTO>.Success(loginResult, "Token refreshed successfully.", HttpStatusCode.OK);
+            return Result<RefreshResultDto>.Success(loginResult, "Token refreshed successfully.", HttpStatusCode.OK);
         }
     }
 }

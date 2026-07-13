@@ -10,7 +10,7 @@ namespace Application.Features.Uoms.Commands
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="Id">The ID of the unit of measure to update.</param>
     /// <param name="UpdateUomDTO">The updated unit of measure data.</param>
-    public record UpdateUomCommand(int? UserId, int Id, UpdateUomDTO UpdateUomDTO) : IRequest<Result<object>>;
+    public record UpdateUomCommand(int? UserId, int Id, UpdateUomDto UpdateUomDTO) : IRequest<Result<object>>;
     public class UpdateUomCommandHandler(IUomRepository uomRepository, IUserRepository userRepository) : IRequestHandler<UpdateUomCommand, Result<object>>
     {
         private readonly IUomRepository _uomRepository = uomRepository;

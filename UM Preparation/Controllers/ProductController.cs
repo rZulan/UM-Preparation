@@ -3,6 +3,7 @@ using Application.DTO.Misc.Sorts;
 using Application.DTO.Product;
 using Application.Features.Products.Commands;
 using Application.Features.Products.Queries;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,63 +19,64 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetProducts([FromQuery] GenericFiltersDTO genericFiltersDTO, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetProducts([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
         {
-            var result = await _mediator.Send(new GetProductsQuery(genericFiltersDTO, sort));
+            GetAllResult<List<GetProductDto>> result = await _mediator.Send(new GetProductsQuery(genericFiltersDto, sort));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetProductById(int id)
         {
-            var result = await _mediator.Send(new GetProductByIdQuery(id));
+            Result<GetProductDto> result = await _mediator.Send(new GetProductByIdQuery(id));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddProduct([FromBody] AddProductDTO addProductDTO)
+        public async Task<IActionResult> AddProduct([FromBody] AddProductDto addProductDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new AddProductCommand(userId, addProductDTO));
+            Result<object> result = await _mediator.Send(new AddProductCommand(userId, addProductDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO updateProductDTO)
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDto updateProductDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new UpdateProductCommand(userId, id, updateProductDTO));
+            Result<object> result = await _mediator.Send(new UpdateProductCommand(userId, id, updateProductDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/archive")]
+        [HttpPatch("{id:int}/archive")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ArchiveProduct(int id)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ToggleProductActiveCommand(userId, id, false));
+            Result<object> result = await _mediator.Send(new ToggleProductActiveCommand(userId, id, false));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/restore")]
+        [HttpPatch("{id:int}/restore")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RestoreProduct(int id)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ToggleProductActiveCommand(userId, id, true));
+            Result<object> result = await _mediator.Send(new ToggleProductActiveCommand(userId, id, true));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
     }
 }
+

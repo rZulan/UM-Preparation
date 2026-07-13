@@ -9,7 +9,7 @@ namespace Application.Features.Users.Commands
     /// <summary>Command to change the password of an existing user.</summary>
     /// <param name="Id">The ID of the user whose password is being changed.</param>
     /// <param name="UpdatePasswordDTO">The current and new password data.</param>
-    public record ChangeUserPasswordCommand(int? Id, UpdatePasswordDTO UpdatePasswordDTO) : IRequest<Result<object>>;
+    public record ChangeUserPasswordCommand(int? Id, UpdatePasswordDto UpdatePasswordDTO) : IRequest<Result<object>>;
     public class ChangeUserPasswordCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasher, IRoleRepository roleRepository) : IRequestHandler<ChangeUserPasswordCommand, Result<object>>
     {
         private readonly IUserRepository _userRepository = userRepository;

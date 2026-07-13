@@ -11,7 +11,7 @@ namespace Application.Features.Roles.Commands
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="Id">The ID of the role to update.</param>
     /// <param name="UpdateRoleDTO">The updated role data.</param>
-    public record UpdateRoleCommand(int? UserId, int Id, UpdateRoleDTO UpdateRoleDTO) : IRequest<Result<object>>;
+    public record UpdateRoleCommand(int? UserId, int Id, UpdateRoleDto UpdateRoleDTO) : IRequest<Result<object>>;
     public class UpdateRoleCommandHandler(IRoleRepository roleRepository, IPermissionRepository permissionRepository, IUserRepository userRepository) : IRequestHandler<UpdateRoleCommand, Result<object>>
     {
         private readonly IRoleRepository _roleRepository = roleRepository;

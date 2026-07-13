@@ -10,7 +10,7 @@ namespace Application.Features.Roles.Commands
     /// <summary>Command to create a new role.</summary>
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="AddRoleDTO">The role data to be created.</param>
-    public record AddRoleCommand(int? UserId, AddRoleDTO AddRoleDTO) : IRequest<Result<object>>;
+    public record AddRoleCommand(int? UserId, AddRoleDto AddRoleDTO) : IRequest<Result<object>>;
     public class AddRoleCommandHandler(IRoleRepository roleRepository, IUserRepository userRepository) : IRequestHandler<AddRoleCommand, Result<object>>
     {
         private readonly IRoleRepository _roleRepository = roleRepository;

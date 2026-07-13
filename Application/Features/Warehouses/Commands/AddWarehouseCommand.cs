@@ -10,7 +10,7 @@ namespace Application.Features.Warehouses.Commands
     /// <summary>Command to create a new warehouse.</summary>
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="AddWarehouseDTO">The warehouse data to be created.</param>
-    public record AddWarehouseCommand(int? UserId, AddWarehouseDTO AddWarehouseDTO) : IRequest<Result<object>>;
+    public record AddWarehouseCommand(int? UserId, AddWarehouseDto AddWarehouseDTO) : IRequest<Result<object>>;
     public class AddWarehouseCommandHandler(IWarehouseRepository warehouseRepository, IUserRepository userRepository) : IRequestHandler<AddWarehouseCommand, Result<object>>
     {
         private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;

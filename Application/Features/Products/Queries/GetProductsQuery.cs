@@ -10,16 +10,16 @@ namespace Application.Features.Products.Queries
     /// <summary>Query to retrieve a filtered, sorted, and paginated list of products.</summary>
     /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
     /// <param name="Sort">Sort direction and field.</param>
-    public record GetProductsQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetProductDTO>>>;
-    public class GetProductsQueryHandler(IProductRepository productRepository) : IRequestHandler<GetProductsQuery, GetAllResult<List<GetProductDTO>>>
+    public record GetProductsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetProductDto>>>;
+    public class GetProductsQueryHandler(IProductRepository productRepository) : IRequestHandler<GetProductsQuery, GetAllResult<List<GetProductDto>>>
     {
         private readonly IProductRepository _productRepository = productRepository;
 
-        public async Task<GetAllResult<List<GetProductDTO>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetProductDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
         {
             var products = await _productRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = products.Select(x => new GetProductDTO
+            var result = products.Select(x => new GetProductDto
             {
                 Id = x.Id,
                 IsActive = x.IsActive,
@@ -50,7 +50,7 @@ namespace Application.Features.Products.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetProductDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetProductDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

@@ -7,17 +7,17 @@ using MediatR;
 
 namespace Application.Features.MoveOrders.Queries
 {
-    public record GetMoveOrdersQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetMoveOrderDTO>>>;
+    public record GetMoveOrdersQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetMoveOrderDto>>>;
 
-    public class GetMoveOrdersQueryHandler(IMoveOrderRepository moveOrderRepository) : IRequestHandler<GetMoveOrdersQuery, GetAllResult<List<GetMoveOrderDTO>>>
+    public class GetMoveOrdersQueryHandler(IMoveOrderRepository moveOrderRepository) : IRequestHandler<GetMoveOrdersQuery, GetAllResult<List<GetMoveOrderDto>>>
     {
         private readonly IMoveOrderRepository _moveOrderRepository = moveOrderRepository;
 
-        public async Task<GetAllResult<List<GetMoveOrderDTO>>> Handle(GetMoveOrdersQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetMoveOrderDto>>> Handle(GetMoveOrdersQuery request, CancellationToken cancellationToken)
         {
             var moveOrders = await _moveOrderRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = moveOrders.Select(moveOrder => new GetMoveOrderDTO
+            var result = moveOrders.Select(moveOrder => new GetMoveOrderDto
             {
                 Id = moveOrder.Id,
                 IsActive = moveOrder.IsActive,
@@ -56,7 +56,7 @@ namespace Application.Features.MoveOrders.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetMoveOrderDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetMoveOrderDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Application.Features.Users.Commands
     /// <summary>Command to update an existing user's profile and role assignments.</summary>
     /// <param name="Id">The ID of the user to update.</param>
     /// <param name="UpdateDTO">The updated user data.</param>
-    public record UpdateUserCommand(int Id, UpdateUserDTO UpdateDTO) : IRequest<Result<object>>;
+    public record UpdateUserCommand(int Id, UpdateUserDto UpdateDTO) : IRequest<Result<object>>;
     public class UpdateUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasher, IRoleRepository roleRepository, IWarehouseRepository warehouseRepository) : IRequestHandler<UpdateUserCommand, Result<object>>
     {
         private readonly IUserRepository _userRepository = userRepository;

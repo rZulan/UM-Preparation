@@ -11,23 +11,23 @@ namespace Application.Features.Roles.Queries
     /// <summary>Query to retrieve a filtered, sorted, and paginated list of roles.</summary>
     /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
     /// <param name="Sort">Sort direction and field.</param>
-    public record GetRolesQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetRoleDTO>>>;
-    public class GetRolesQueryHandler(IRoleRepository roleRepository) : IRequestHandler<GetRolesQuery, GetAllResult<List<GetRoleDTO>>>
+    public record GetRolesQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetRoleDto>>>;
+    public class GetRolesQueryHandler(IRoleRepository roleRepository) : IRequestHandler<GetRolesQuery, GetAllResult<List<GetRoleDto>>>
     {
         private readonly IRoleRepository _roleRepository = roleRepository;
 
-        public async Task<GetAllResult<List<GetRoleDTO>>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetRoleDto>>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
         {
             var roles = await _roleRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = roles.Select(x => new GetRoleDTO
+            var result = roles.Select(x => new GetRoleDto
             {
                 Id = x.Id,
                 IsActive = x.IsActive,
                 Name = x.Name,
                 Permissions = x.RolePermissions
                     .Where(rp => rp.Permission != null)
-                    .Select(rp => new GetPermissionDTO
+                    .Select(rp => new GetPermissionDto
                     {
                         Id = rp.Permission!.Id,
                         IsActive = rp.Permission!.IsActive,
@@ -57,7 +57,7 @@ namespace Application.Features.Roles.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetRoleDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetRoleDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

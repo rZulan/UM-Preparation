@@ -3,6 +3,7 @@ using Application.DTO.Misc.Sorts;
 using Application.DTO.PendingAccount;
 using Application.Features.PendingAccounts.Commands;
 using Application.Features.PendingAccounts.Queries;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,43 +19,44 @@ namespace UM_Preparation.Controllers
 
         [HttpPost]
         [ApiKey]
-        public async Task<IActionResult> CreatePendingAccount([FromBody] AddPendingAccountDTO createPendingAccountDTO)
+        public async Task<IActionResult> CreatePendingAccount([FromBody] AddPendingAccountDto createPendingAccountDto)
         {
-            var result = await _mediator.Send(new AddPendingAccountCommand(createPendingAccountDTO));
+            Result<object> result = await _mediator.Send(new AddPendingAccountCommand(createPendingAccountDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetPendingAccounts([FromQuery] GenericFiltersDTO genericFiltersDTO, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetPendingAccounts([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
         {
-            var result = await _mediator.Send(new GetPendingAccountsQuery(genericFiltersDTO, sort));
+            GetAllResult<List<GetPendingAccountDto>> result = await _mediator.Send(new GetPendingAccountsQuery(genericFiltersDto, sort));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         [Authorize]
         public async Task<IActionResult> GetPendingAccountById(int id)
         {
-            var result = await _mediator.Send(new GetPendingAccountByIdQuery(id));
+            Result<GetPendingAccountDto> result = await _mediator.Send(new GetPendingAccountByIdQuery(id));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost("import")]
         [Authorize]
-        public async Task<IActionResult> ImportPendingAccount(int id, [FromQuery] ImportPendingAccountDTO importPendingAccountDTO)
+        public async Task<IActionResult> ImportPendingAccount(int id, [FromQuery] ImportPendingAccountDto importPendingAccountDto)
         {
-            var result = await _mediator.Send(new ImportPendingAccountCommand(id, importPendingAccountDTO));
+            Result<object> result = await _mediator.Send(new ImportPendingAccountCommand(id, importPendingAccountDto));
 
             if (result.IsFailure)
             {
-                return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+                return StatusCode((int)result.StatusCode!.Value, result);
             }
 
             return CreatedAtAction(nameof(UserController.GetUserById), "User", new { id = result.Value }, result);
         }
     }
 }
+

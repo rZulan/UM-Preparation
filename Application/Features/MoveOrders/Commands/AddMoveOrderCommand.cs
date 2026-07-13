@@ -18,7 +18,7 @@ namespace Application.Features.MoveOrders.Commands
     /// <summary>Command to create a new product.</summary>
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="AddMoveOrderDto">The product data to be created.</param>
-    public record AddMoveOrderCommand(int? UserId, AddMoveOrderDTO AddMoveOrderDto) : IRequest<Result<object>>;
+    public record AddMoveOrderCommand(int? UserId, AddMoveOrderDto AddMoveOrderDto) : IRequest<Result<object>>;
     public class AddMoveOrderCommandHandler(IMoveOrderRepository moveOrderRepository, IUserRepository userRepository, IProductRepository productRepository, IWarehouseReceivingRepository warehouseReceivingRepository) : IRequestHandler<AddMoveOrderCommand, Result<object>>
     {
         private readonly IUserRepository _userRepository = userRepository;
@@ -60,7 +60,7 @@ namespace Application.Features.MoveOrders.Commands
 
             var products = await _productRepository.GetByIdsAsync([.. request.AddMoveOrderDto.AddMoveOrderProducts.Select(x => x.ProductId)], cancellationToken);
 
-            var consolidatedProducts = products.Select(x => new ConsolidatedProductsDTO
+            var consolidatedProducts = products.Select(x => new ConsolidatedProductsDto
             {
                 Id = x.Id,
                 Quantity = request.AddMoveOrderDto.AddMoveOrderProducts

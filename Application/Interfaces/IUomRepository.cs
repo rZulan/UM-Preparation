@@ -13,12 +13,12 @@ namespace Application.Interfaces
         /// <param name="genericFiltersDTO">Search and pagination filters.</param>
         /// <param name="sort">Sort direction and field.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
-        Task<List<Uom>> GetAllAsync(GenericFiltersDTO genericFiltersDTO, Sort sort, CancellationToken cancellationToken);
+        Task<List<Uom>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken);
 
         /// <summary>Returns the total count of units of measure matching the given filters.</summary>
         /// <param name="genericFiltersDTO">Filters to apply before counting.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
-        Task<int> GetCountAsync(GenericFiltersDTO genericFiltersDTO, CancellationToken cancellationToken);
+        Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken);
 
         /// <summary>Returns a unit of measure by its ID, or <see langword="null"/> if not found.</summary>
         /// <param name="id">The unit of measure's unique identifier.</param>

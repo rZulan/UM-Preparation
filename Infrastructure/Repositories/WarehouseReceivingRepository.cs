@@ -12,7 +12,7 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<WarehouseReceiving>> GetAllAsync(GenericFiltersDTO genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
+        public async Task<List<WarehouseReceiving>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
         {
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
                 .Include(x => x.Warehouse)
@@ -67,7 +67,7 @@ namespace Infrastructure.Repositories
             return await query.ToListAsync(cancellationToken);
         }
 
-        public async Task<int> GetCountAsync(GenericFiltersDTO genericFiltersDTO, CancellationToken cancellationToken)
+        public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings;
 

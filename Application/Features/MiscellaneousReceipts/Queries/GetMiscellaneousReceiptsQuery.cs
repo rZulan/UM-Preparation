@@ -10,16 +10,16 @@ namespace Application.Features.MiscellaneousReceipts.Queries
     /// <summary>Query to retrieve a filtered, sorted, and paginated list of miscellaneous receipts.</summary>
     /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
     /// <param name="Sort">Sort direction and field.</param>
-    public record GetMiscellaneousReceiptsQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetMiscellaneousReceiptDTO>>>;
-    public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepository miscellanousReceiptRepository) : IRequestHandler<GetMiscellaneousReceiptsQuery, GetAllResult<List<GetMiscellaneousReceiptDTO>>>
+    public record GetMiscellaneousReceiptsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetMiscellaneousReceiptDto>>>;
+    public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepository miscellanousReceiptRepository) : IRequestHandler<GetMiscellaneousReceiptsQuery, GetAllResult<List<GetMiscellaneousReceiptDto>>>
     {
         private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellanousReceiptRepository;
 
-        public async Task<GetAllResult<List<GetMiscellaneousReceiptDTO>>> Handle(GetMiscellaneousReceiptsQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetMiscellaneousReceiptDto>>> Handle(GetMiscellaneousReceiptsQuery request, CancellationToken cancellationToken)
         {
             var miscellaneousReceipts = await _miscellaneousReceiptRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = miscellaneousReceipts.Select(d => new GetMiscellaneousReceiptDTO
+            var result = miscellaneousReceipts.Select(d => new GetMiscellaneousReceiptDto
             {
                 Id = d.Id,
                 IsActive = d.IsActive,
@@ -55,7 +55,7 @@ namespace Application.Features.MiscellaneousReceipts.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetMiscellaneousReceiptDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetMiscellaneousReceiptDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

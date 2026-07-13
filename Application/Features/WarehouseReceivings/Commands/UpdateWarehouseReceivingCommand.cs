@@ -10,7 +10,7 @@ namespace Application.Features.WarehouseReceivings.Commands
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="Id">The ID of the warehouse entry to update.</param>
     /// <param name="UpdateWarehouseReceivingDTO">The updated warehouse data.</param>
-    public record UpdateWarehouseReceivingCommand(int? UserId, int Id, UpdateWarehouseReceivingDTO UpdateWarehouseReceivingDTO) : IRequest<Result<object>>;
+    public record UpdateWarehouseReceivingCommand(int? UserId, int Id, UpdateWarehouseReceivingDto UpdateWarehouseReceivingDTO) : IRequest<Result<object>>;
     public class UpdateWarehouseReceivingCommandHandler(IWarehouseReceivingRepository warehouseReceivingRepository, IUserRepository userRepository, IProductRepository productRepository) : IRequestHandler<UpdateWarehouseReceivingCommand, Result<object>>
     {
         private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;

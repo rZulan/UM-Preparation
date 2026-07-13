@@ -10,16 +10,16 @@ namespace Application.Features.Users.Queries
     /// <summary>Query to retrieve a filtered, sorted, and paginated list of users.</summary>
     /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
     /// <param name="Sort">Sort direction and field.</param>
-    public record GetUsersQuery(GenericFiltersDTO GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetUserDTO>>>;
-    public class GetUsersQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUsersQuery, GetAllResult<List<GetUserDTO>>>
+    public record GetUsersQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetUserDto>>>;
+    public class GetUsersQueryHandler(IUserRepository userRepository) : IRequestHandler<GetUsersQuery, GetAllResult<List<GetUserDto>>>
     {
         private readonly IUserRepository _userRepository = userRepository;
 
-        public async Task<GetAllResult<List<GetUserDTO>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+        public async Task<GetAllResult<List<GetUserDto>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
         {
             var users = await _userRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-            var result = users.Select(u => new GetUserDTO
+            var result = users.Select(u => new GetUserDto
             {
                 Id = u.Id,
                 IsActive = u.IsActive,
@@ -60,7 +60,7 @@ namespace Application.Features.Users.Queries
                 } : null
             };
 
-            return GetAllResult<List<GetUserDTO>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
+            return GetAllResult<List<GetUserDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
         }
     }
 }

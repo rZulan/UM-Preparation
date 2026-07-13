@@ -10,7 +10,7 @@ namespace Application.Features.MiscellaneousReceipts.Commands
     /// <summary>Command to create a new miscellaneous receipt.</summary>
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="AddMiscellaneousReceiptDTO">The miscellaneous receipt data to be created.</param>
-    public record AddMiscellaneousReceiptCommand(int? UserId, AddMiscellaneousReceiptDTO AddMiscellaneousReceiptDTO) : IRequest<Result<object>>;
+    public record AddMiscellaneousReceiptCommand(int? UserId, AddMiscellaneousReceiptDto AddMiscellaneousReceiptDTO) : IRequest<Result<object>>;
     public class AddMiscellaneousReceiptCommandHandler(IMiscellaneousReceiptRepository miscellaneousReceiptRepository, IUserRepository userRepository, IWarehouseRepository warehouseRepository, IProductRepository productRepository, IWarehouseReceivingRepository warehouseReceivingRepository) : IRequestHandler<AddMiscellaneousReceiptCommand, Result<object>>
     {
         private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellaneousReceiptRepository;

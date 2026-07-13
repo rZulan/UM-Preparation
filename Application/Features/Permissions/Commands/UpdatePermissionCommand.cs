@@ -10,7 +10,7 @@ namespace Application.Features.Permissions.Commands
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="Id">The ID of the permission to update.</param>
     /// <param name="UpdatePermissionDTO">The updated permission data.</param>
-    public record UpdatePermissionCommand(int? UserId, int Id, UpdatePermissionDTO UpdatePermissionDTO) : IRequest<Result<object>>;
+    public record UpdatePermissionCommand(int? UserId, int Id, UpdatePermissionDto UpdatePermissionDTO) : IRequest<Result<object>>;
     public class UpdatePermissionCommandHandler(IPermissionRepository permissionRepository, IUserRepository userRepository) : IRequestHandler<UpdatePermissionCommand, Result<object>>
     {
         private readonly IPermissionRepository _permissionRepository = permissionRepository;

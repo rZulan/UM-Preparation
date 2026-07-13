@@ -7,26 +7,26 @@ using System.Net;
 namespace Application.Features.Users.Queries
 {
     /// <summary>Query to retrieve the current user's information.</summary>
-    public record MeQuery(int? UserId) : IRequest<Result<MeResultDTO>>;
-    public class MeQueryHandler(IUserRepository userRepository) : IRequestHandler<MeQuery, Result<MeResultDTO>>
+    public record MeQuery(int? UserId) : IRequest<Result<MeResultDto>>;
+    public class MeQueryHandler(IUserRepository userRepository) : IRequestHandler<MeQuery, Result<MeResultDto>>
     {
         private readonly IUserRepository _userRepository = userRepository;
 
-        public async Task<Result<MeResultDTO>> Handle(MeQuery request, CancellationToken cancellationToken)
+        public async Task<Result<MeResultDto>> Handle(MeQuery request, CancellationToken cancellationToken)
         {
             if (request.UserId == null)
             {
-                return Result<MeResultDTO>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
+                return Result<MeResultDto>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
             }
 
             var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
             if (existingUser == null)
             {
-                return Result<MeResultDTO>.Failure("User not found", HttpStatusCode.NotFound);
+                return Result<MeResultDto>.Failure("User not found", HttpStatusCode.NotFound);
             }
 
-            var result = new MeResultDTO
+            var result = new MeResultDto
             {
                 Id = existingUser.Id,
                 Username = existingUser.Username,
@@ -45,7 +45,7 @@ namespace Application.Features.Users.Queries
                     .ToList()
             };
 
-            return Result<MeResultDTO>.Success(result);
+            return Result<MeResultDto>.Success(result);
         }
     }
 }

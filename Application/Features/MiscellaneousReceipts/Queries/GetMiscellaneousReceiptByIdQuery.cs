@@ -8,21 +8,21 @@ namespace Application.Features.MiscellaneousReceipts.Queries
 {
     /// <summary>Query to retrieve a single miscellaneous receipt by its ID.</summary>
     /// <param name="Id">The unique identifier of the miscellaneous receipt to retrieve.</param>
-    public record GetMiscellaneousReceiptByIdQuery(int Id) : IRequest<Result<GetMiscellaneousReceiptDTO>>;
-    public class GetMiscellaneousReceiptByIdQueryHandler(IMiscellaneousReceiptRepository miscellaneousReceiptRepository) : IRequestHandler<GetMiscellaneousReceiptByIdQuery, Result<GetMiscellaneousReceiptDTO>>
+    public record GetMiscellaneousReceiptByIdQuery(int Id) : IRequest<Result<GetMiscellaneousReceiptDto>>;
+    public class GetMiscellaneousReceiptByIdQueryHandler(IMiscellaneousReceiptRepository miscellaneousReceiptRepository) : IRequestHandler<GetMiscellaneousReceiptByIdQuery, Result<GetMiscellaneousReceiptDto>>
     {
         private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellaneousReceiptRepository;
 
-        public async Task<Result<GetMiscellaneousReceiptDTO>> Handle(GetMiscellaneousReceiptByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<GetMiscellaneousReceiptDto>> Handle(GetMiscellaneousReceiptByIdQuery request, CancellationToken cancellationToken)
         {
             var miscellaneousReceipt = await _miscellaneousReceiptRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (miscellaneousReceipt == null)
             {
-                return Result<GetMiscellaneousReceiptDTO>.Failure("Miscellaneous receipt not found", HttpStatusCode.NotFound);
+                return Result<GetMiscellaneousReceiptDto>.Failure("Miscellaneous receipt not found", HttpStatusCode.NotFound);
             }
 
-            var result = new GetMiscellaneousReceiptDTO
+            var result = new GetMiscellaneousReceiptDto
             {
                 Id = miscellaneousReceipt.Id,
                 IsActive = miscellaneousReceipt.IsActive,
@@ -36,7 +36,7 @@ namespace Application.Features.MiscellaneousReceipts.Queries
                 Reason = miscellaneousReceipt.Reason
             };
 
-            return Result<GetMiscellaneousReceiptDTO>.Success(result);
+            return Result<GetMiscellaneousReceiptDto>.Success(result);
         }
     }
 }

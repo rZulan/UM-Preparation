@@ -8,21 +8,21 @@ namespace Application.Features.PendingAccounts.Queries
 {
     /// <summary>Query to retrieve a single pending account by its ID.</summary>
     /// <param name="Id">The unique identifier of the pending account to retrieve.</param>
-    public record GetPendingAccountByIdQuery(int Id) : IRequest<Result<GetPendingAccountDTO>>;
-    public class GetPendingAccountByIdQueryHandler(IPendingAccountRepository pendingAccountRepository) : IRequestHandler<GetPendingAccountByIdQuery, Result<GetPendingAccountDTO>>
+    public record GetPendingAccountByIdQuery(int Id) : IRequest<Result<GetPendingAccountDto>>;
+    public class GetPendingAccountByIdQueryHandler(IPendingAccountRepository pendingAccountRepository) : IRequestHandler<GetPendingAccountByIdQuery, Result<GetPendingAccountDto>>
     {
         private readonly IPendingAccountRepository _pendingAccountRepository = pendingAccountRepository;
 
-        public async Task<Result<GetPendingAccountDTO>> Handle(GetPendingAccountByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<GetPendingAccountDto>> Handle(GetPendingAccountByIdQuery request, CancellationToken cancellationToken)
         {
             var pendingAccount = await _pendingAccountRepository.GetByIdAsync(request.Id, cancellationToken);
 
             if (pendingAccount == null)
             {
-                return Result<GetPendingAccountDTO>.Failure("Pending Account not found", HttpStatusCode.NotFound);
+                return Result<GetPendingAccountDto>.Failure("Pending Account not found", HttpStatusCode.NotFound);
             }
 
-            var result = new GetPendingAccountDTO
+            var result = new GetPendingAccountDto
             {
                 Id = pendingAccount.Id,
                 IsActive = pendingAccount.IsActive,
@@ -35,7 +35,7 @@ namespace Application.Features.PendingAccounts.Queries
                 Suffix = pendingAccount.Suffix ?? "N/A"
             };
 
-            return Result<GetPendingAccountDTO>.Success(result);
+            return Result<GetPendingAccountDto>.Success(result);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Application.Features.Warehouses.Commands
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="Id">The ID of the warehouse to update.</param>
     /// <param name="UpdateWarehouseDTO">The updated warehouse data.</param>
-    public record UpdateWarehouseCommand(int? UserId, int Id, UpdateWarehouseDTO UpdateWarehouseDTO) : IRequest<Result<object>>;
+    public record UpdateWarehouseCommand(int? UserId, int Id, UpdateWarehouseDto UpdateWarehouseDTO) : IRequest<Result<object>>;
     public class UpdateWarehouseCommandHandler(IWarehouseRepository warehouseRepository, IUserRepository userRepository) : IRequestHandler<UpdateWarehouseCommand, Result<object>>
     {
         private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;

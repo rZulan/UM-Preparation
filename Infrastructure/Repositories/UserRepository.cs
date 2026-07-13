@@ -11,7 +11,7 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<User>> GetAllAsync(GenericFiltersDTO genericFiltersDTO, Sort userSort, CancellationToken cancellationToken)
+        public async Task<List<User>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort userSort, CancellationToken cancellationToken)
         {
             IQueryable<User> query = _context.Users
                 .Include(x => x.UserRoles)
@@ -81,7 +81,7 @@ namespace Infrastructure.Repositories
             return await query.ToListAsync(cancellationToken);
         }
 
-        public async Task<int> GetCountAsync(GenericFiltersDTO genericFiltersDTO, CancellationToken cancellationToken)
+        public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
             IQueryable<User> query = _context.Users;
 

@@ -3,6 +3,7 @@ using Application.DTO.Misc.Sorts;
 using Application.DTO.WarehouseReceiving;
 using Application.Features.WarehouseReceivings.Commands;
 using Application.Features.WarehouseReceivings.Queries;
+using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,63 +19,64 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetWarehouseReceivings([FromQuery] GenericFiltersDTO genericFiltersDTO, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetWarehouseReceivings([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
         {
-            var result = await _mediator.Send(new GetWarehouseReceivingsQuery(genericFiltersDTO, sort));
+            GetAllResult<List<GetWarehouseReceivingDto>> result = await _mediator.Send(new GetWarehouseReceivingsQuery(genericFiltersDto, sort));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetWarehouseReceivingById(int id)
         {
-            var result = await _mediator.Send(new GetWarehouseReceivingByIdQuery(id));
+            Result<GetWarehouseReceivingDto> result = await _mediator.Send(new GetWarehouseReceivingByIdQuery(id));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddWarehouseReceiving([FromBody] AddWarehouseReceivingDTO addWarehouseDTO)
+        public async Task<IActionResult> AddWarehouseReceiving([FromBody] AddWarehouseReceivingDto addWarehouseDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new AddWarehouseReceivingCommand(userId, addWarehouseDTO));
+            Result<object> result = await _mediator.Send(new AddWarehouseReceivingCommand(userId, addWarehouseDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateWarehouse(int id, [FromBody] UpdateWarehouseReceivingDTO updateWarehouseDTO)
+        public async Task<IActionResult> UpdateWarehouse(int id, [FromBody] UpdateWarehouseReceivingDto updateWarehouseDto)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new UpdateWarehouseReceivingCommand(userId, id, updateWarehouseDTO));
+            Result<object> result = await _mediator.Send(new UpdateWarehouseReceivingCommand(userId, id, updateWarehouseDto));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/archive")]
+        [HttpPatch("{id:int}/archive")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ArchiveWarehouseReceiving(int id)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ToggleWarehouseReceivingActiveCommand(userId, id, false));
+            Result<object> result = await _mediator.Send(new ToggleWarehouseReceivingActiveCommand(userId, id, false));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
 
-        [HttpPatch("{id}/restore")]
+        [HttpPatch("{id:int}/restore")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RestoreWarehouseReceiving(int id)
         {
-            var userId = this.GetCurrentUserId();
+            int? userId = this.GetCurrentUserId();
 
-            var result = await _mediator.Send(new ToggleWarehouseReceivingActiveCommand(userId, id, true));
+            Result<object> result = await _mediator.Send(new ToggleWarehouseReceivingActiveCommand(userId, id, true));
 
-            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+            return StatusCode((int)result.StatusCode!.Value, result);
         }
     }
 }
+

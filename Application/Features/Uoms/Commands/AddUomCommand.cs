@@ -10,7 +10,7 @@ namespace Application.Features.Uoms.Commands
     /// <summary>Command to create a new unit of measure.</summary>
     /// <param name="UserId">The ID of the authenticated user performing the action.</param>
     /// <param name="AddUomDTO">The unit of measure data to be created.</param>
-    public record AddUomCommand(int? UserId, AddUomDTO AddUomDTO) : IRequest<Result<object>>;
+    public record AddUomCommand(int? UserId, AddUomDto AddUomDTO) : IRequest<Result<object>>;
     public class AddUomCommandHandler(IUomRepository uomRepository, IUserRepository userRepository) : IRequestHandler<AddUomCommand, Result<object>>
     {
         private readonly IUomRepository _uomRepository = uomRepository;

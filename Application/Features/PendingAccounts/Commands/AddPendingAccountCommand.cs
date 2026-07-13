@@ -9,7 +9,7 @@ namespace Application.Features.PendingAccounts.Commands
 {
     /// <summary>Command to register a new pending account from an employee ID.</summary>
     /// <param name="AddPendingAccountDTO">The pending account data to be created.</param>
-    public record AddPendingAccountCommand(AddPendingAccountDTO AddPendingAccountDTO) : IRequest<Result<object>>;
+    public record AddPendingAccountCommand(AddPendingAccountDto AddPendingAccountDTO) : IRequest<Result<object>>;
     public class AddPendingAccountCommandHandler(IPendingAccountRepository pendingAccountRepository, IUserRepository userRepository, IPasswordHasherService passwordHasher) : IRequestHandler<AddPendingAccountCommand, Result<object>>
     {
         private readonly IPendingAccountRepository _pendingAccountRepository = pendingAccountRepository;
