@@ -4,10 +4,10 @@ namespace Domain.Entities.Junction
 {
     public class RolePermissions
     {
-        public int RoleId { get; set; }
-        public int PermissionId { get; set; }
+        public required int RoleId { get; set; }
+        public required int PermissionId { get; set; }
 
-        public Role? Role { get; set; }
-        public Permission? Permission { get; set; }
+        public Role Role { get; set; } = null!;
+        public Permission Permission { get; set; } = null!;
     }
 }

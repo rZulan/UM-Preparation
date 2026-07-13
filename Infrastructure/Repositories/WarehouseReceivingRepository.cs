@@ -1,5 +1,6 @@
 using Application.DTO.Misc;
 using Application.DTO.Misc.Sorts;
+using Application.Features.MoveOrders.Commands;
 using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Data;
@@ -16,6 +17,7 @@ namespace Infrastructure.Repositories
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
+                    .ThenInclude(x => x.Uom)
                 .Include(x => x.MiscellaneousReceipt);
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
@@ -91,6 +93,7 @@ namespace Infrastructure.Repositories
                 .Where(x => x.Id == id)
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
+                    .ThenInclude(x => x.Uom)
                 .Include(x => x.MiscellaneousReceipt);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -116,6 +119,84 @@ namespace Infrastructure.Repositories
         {
             _context.WarehouseReceivings.Update(warehouse);
             await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<bool> ProductHasAvailableReserve(int warehouseId, int productId, decimal quantity, CancellationToken cancellationToken)
+        {
+            var totalReceived = await _context.WarehouseReceivings
+                .Where(x =>
+                    x.IsActive &&
+                    x.WarehouseId == warehouseId &&
+                    x.ProductId == productId
+                )
+                .SumAsync(x => x.Quantity, cancellationToken);
+
+            var totalMoved = await _context.MoveOrderProductWarehouseReceivings
+                .Where(x =>
+                    x.MoveOrderProduct.MoveOrder.IsActive &&
+                    x.WarehouseReceiving.WarehouseId == warehouseId &&
+                    x.WarehouseReceiving.ProductId == productId
+                )
+                .Select(x => (decimal?)x.Quantity)
+                .SumAsync(cancellationToken) ?? 0m;
+
+            var availableStock = totalReceived - totalMoved;
+
+            return availableStock >= quantity;
+        }
+
+        public async Task<List<AvailableMoveOrderProductWarehouseReceivingsDto>> GetProductAffectedWarehouseReceivings(int warehouseId, int productId, decimal quantity, CancellationToken cancellationToken)
+        {
+            var receivingLots = await _context.WarehouseReceivings
+                .AsNoTracking()
+                .Where(x =>
+                    x.IsActive &&
+                    x.WarehouseId == warehouseId &&
+                    x.ProductId == productId
+                )
+                .OrderBy(x => x.CreatedAt)
+                .ThenBy(x => x.Id)
+                .Select(x => new
+                {
+                    x.Id,
+                    AvailableQuantity = x.Quantity -
+                        (_context.MoveOrderProductWarehouseReceivings
+                            .Where(allocation =>
+                                allocation.WarehouseReceivingId == x.Id &&
+                                allocation.MoveOrderProduct.MoveOrder.IsActive)
+                            .Select(allocation => (decimal?)allocation.Quantity)
+                            .Sum() ?? 0m)
+                })
+                .ToListAsync(cancellationToken);
+
+            var affectedWarehouseReceivings = new List<AvailableMoveOrderProductWarehouseReceivingsDto>();
+            var remainingQuantity = quantity;
+
+            foreach (var receivingLot in receivingLots)
+            {
+                if (remainingQuantity <= 0)
+                {
+                    break;
+                }
+
+                var availableQuantity = Math.Max(0m, receivingLot.AvailableQuantity);
+                if (availableQuantity == 0)
+                {
+                    continue;
+                }
+
+                var allocatedQuantity = Math.Min(remainingQuantity, availableQuantity);
+                affectedWarehouseReceivings.Add(new AvailableMoveOrderProductWarehouseReceivingsDto
+                {
+                    ProductId = productId,
+                    WarehouseReceivingId = receivingLot.Id,
+                    AvailableQuantity = allocatedQuantity
+                });
+
+                remainingQuantity -= allocatedQuantity;
+            }
+
+            return affectedWarehouseReceivings;
         }
     }
 }

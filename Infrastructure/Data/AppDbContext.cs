@@ -17,8 +17,16 @@ namespace Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Uom> Uoms { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
-        public DbSet<MiscellaneousReceipt> MiscellaneousReceipt { get; set; }
+        public DbSet<MiscellaneousReceipt> MiscellaneousReceipts { get; set; }
         public DbSet<WarehouseReceiving> WarehouseReceivings { get; set; }
+        public DbSet<MoveOrder> MoveOrders { get; set; }
+        public DbSet<MoveOrderProducts> MoveOrderProducts { get; set; }
+        public DbSet<MoveOrderProductWarehouseReceivings> MoveOrderProductWarehouseReceivings { get; set; }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder.Properties<decimal>().HavePrecision(18, 4);
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,62 +39,16 @@ namespace Infrastructure.Data
                     .HasDefaultValue(true);
             }
 
-            foreach (var property in modelBuilder.Model
-                .GetEntityTypes()
-                .SelectMany(e => e.GetProperties())
-                .Where(p => p.ClrType == typeof(decimal)))
-            {
-                property.SetPrecision(18);
-                property.SetScale(4);
-            }
-
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.CreatedBy)
-                .WithMany()
-                .HasForeignKey(u => u.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(u => u.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<PendingAccount>()
-                .HasOne(f => f.CreatedBy)
-                .WithMany()
-                .HasForeignKey(f => f.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<PendingAccount>()
-                .HasOne(f => f.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(f => f.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Role>()
-                .HasOne(r => r.CreatedBy)
-                .WithMany()
-                .HasForeignKey(r => r.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Role>()
-                .HasOne(r => r.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(r => r.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Permission>()
-                .HasOne(p => p.CreatedBy)
-                .WithMany()
-                .HasForeignKey(p => p.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Permission>()
-                .HasOne(p => p.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(p => p.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
+            ConfigureAuditableEntity<User>(modelBuilder);
+            ConfigureAuditableEntity<PendingAccount>(modelBuilder);
+            ConfigureAuditableEntity<Role>(modelBuilder);
+            ConfigureAuditableEntity<Permission>(modelBuilder);
+            ConfigureAuditableEntity<Product>(modelBuilder);
+            ConfigureAuditableEntity<Uom>(modelBuilder);
+            ConfigureAuditableEntity<Warehouse>(modelBuilder);
+            ConfigureAuditableEntity<MiscellaneousReceipt>(modelBuilder);
+            ConfigureAuditableEntity<WarehouseReceiving>(modelBuilder);
+            ConfigureAuditableEntity<MoveOrder>(modelBuilder);
 
             modelBuilder.Entity<UserRoles>()
                 .HasKey(ur => new { ur.UserId, ur.RoleId });
@@ -118,58 +80,19 @@ namespace Infrastructure.Data
                 .HasForeignKey(rp => rp.PermissionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.CreatedBy)
-                .WithMany()
-                .HasForeignKey(p => p.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MoveOrderProductWarehouseReceivings>()
+                .HasKey(mowr => new { mowr.MoveOrderId, mowr.ProductId, mowr.WarehouseReceivingId });
 
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(p => p.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Product>()
-                .HasOne(p => p.Uom)
-                .WithMany()
-                .HasForeignKey(p => p.UomId)
+            modelBuilder.Entity<MoveOrderProductWarehouseReceivings>()
+                .HasOne(mowr => mowr.MoveOrderProduct)
+                .WithMany(mop => mop.MoveOrderProductWarehouseReceivings)
+                .HasForeignKey(mowr => new { mowr.MoveOrderId, mowr.ProductId })
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Uom>()
-                .HasOne(p => p.CreatedBy)
-                .WithMany()
-                .HasForeignKey(p => p.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Uom>()
-                .HasOne(p => p.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(p => p.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Warehouse>()
-                .HasOne(w => w.CreatedBy)
-                .WithMany()
-                .HasForeignKey(w => w.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Warehouse>()
-                .HasOne(w => w.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(w => w.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<MiscellaneousReceipt>()
-                .HasOne(d => d.CreatedBy)
-                .WithMany()
-                .HasForeignKey(d => d.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<MiscellaneousReceipt>()
-                .HasOne(d => d.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(d => d.UpdatedById)
+            modelBuilder.Entity<MoveOrderProductWarehouseReceivings>()
+                .HasOne(mopwr => mopwr.WarehouseReceiving)
+                .WithMany(wr => wr.MoveOrderProductWarehouseReceivings)
+                .HasForeignKey(mopwr => mopwr.WarehouseReceivingId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<MiscellaneousReceipt>()
@@ -185,18 +108,6 @@ namespace Infrastructure.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<WarehouseReceiving>()
-                .HasOne(wr => wr.CreatedBy)
-                .WithMany()
-                .HasForeignKey(wr => wr.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<WarehouseReceiving>()
-                .HasOne(wr => wr.UpdatedBy)
-                .WithMany()
-                .HasForeignKey(wr => wr.UpdatedById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<WarehouseReceiving>()
                 .HasOne(wr => wr.Product)
                 .WithMany()
                 .HasForeignKey(wr => wr.ProductId)
@@ -207,6 +118,27 @@ namespace Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(wr => wr.MiscellaneousReceiptId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<MoveOrder>()
+                .HasOne(mo => mo.Warehouse)
+                .WithMany()
+                .HasForeignKey(mo => mo.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<MoveOrderProducts>()
+                .HasKey(mop => new { mop.MoveOrderId, mop.ProductId });
+
+            modelBuilder.Entity<MoveOrderProducts>()
+                .HasOne(mop => mop.MoveOrder)
+                .WithMany(mo => mo.MoveOrderProducts)
+                .HasForeignKey(mop => mop.MoveOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MoveOrderProducts>()
+                .HasOne(mop => mop.Product)
+                .WithMany()
+                .HasForeignKey(mop => mop.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Role>().HasData(
                 new Role
@@ -241,6 +173,21 @@ namespace Infrastructure.Data
                     RoleId = 1
                 }
             );
+        }
+
+        private static void ConfigureAuditableEntity<T>(ModelBuilder modelBuilder) where T : class
+        {
+            modelBuilder.Entity<T>()
+                .HasOne(nameof(BaseEntity.CreatedBy))
+                .WithMany()
+                .HasForeignKey(nameof(BaseEntity.CreatedById))
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<T>()
+                .HasOne(nameof(BaseEntity.UpdatedBy))
+                .WithMany()
+                .HasForeignKey(nameof(BaseEntity.UpdatedById))
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

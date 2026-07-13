@@ -82,6 +82,16 @@ namespace Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
+        public async Task<List<Permission>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken)
+        {
+            IQueryable<Permission> query = _context.Permissions
+                .Include(x => x.RolePermissions!)
+                    .ThenInclude(x => x.Role)
+                .Where(x => ids.Contains(x.Id));
+
+            return await query.ToListAsync(cancellationToken);
+        }
+
         public async Task<Permission?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
             IQueryable<Permission> query = _context.Permissions

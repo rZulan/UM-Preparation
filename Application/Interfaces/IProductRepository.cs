@@ -25,6 +25,11 @@ namespace Application.Interfaces
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken);
 
+        /// <summary>Returns a list of products by their IDs, or <see langword="null"/> if not found.</summary>
+        /// <param name="ids">The product IDs.</param>
+        /// <param name="cancellationToken">Token to cancel the operation.</param>
+        Task<List<Product?>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken);
+
         /// <summary>Returns a product matching the given item code, or <see langword="null"/> if not found.</summary>
         /// <param name="itemCode">The exact item code to search for.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
@@ -46,5 +51,11 @@ namespace Application.Interfaces
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         /// <returns><see langword="true"/> if a duplicate exists; otherwise <see langword="false"/>.</returns>
         Task<bool> AnyDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken);
+
+        /// <summary>Checks whether all of the products in the list exists.</summary>
+        /// <param name="products">The IDs of the products to check.</param>
+        /// <param name="cancellationToken">Token to cancel the operation.</param>
+        /// <returns><see langword="true"/> if all products exists; otherwise <see langword="false"/>.</returns>
+        Task<bool> AllExistsAsync(List<int> productIds, CancellationToken cancellationToken);
     }
 }

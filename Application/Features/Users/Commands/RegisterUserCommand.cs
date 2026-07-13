@@ -36,11 +36,14 @@ namespace Application.Features.Users.Commands
                 return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
             }
 
-            var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.RegisterDTO.WarehouseId, cancellationToken);
-
-            if (existingWarehouse == null)
+            if (request.RegisterDTO.WarehouseId.HasValue)
             {
-                return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+                var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.RegisterDTO.WarehouseId.Value, cancellationToken);
+
+                if (existingWarehouse == null)
+                {
+                    return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+                }
             }
 
             var user = new User

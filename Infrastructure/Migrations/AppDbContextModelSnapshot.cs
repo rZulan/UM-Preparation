@@ -17,10 +17,51 @@ namespace Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Entities.Junction.MoveOrderProductWarehouseReceivings", b =>
+                {
+                    b.Property<int>("MoveOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseReceivingId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("MoveOrderId", "ProductId", "WarehouseReceivingId");
+
+                    b.HasIndex("WarehouseReceivingId");
+
+                    b.ToTable("MoveOrderProductWarehouseReceivings");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Junction.MoveOrderProducts", b =>
+                {
+                    b.Property<int>("MoveOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalQuantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("MoveOrderId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("MoveOrderProducts");
+                });
 
             modelBuilder.Entity("Domain.Entities.Junction.RolePermissions", b =>
                 {
@@ -323,7 +364,49 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("MiscellaneousReceipt");
+                    b.ToTable("MiscellaneousReceipts");
+                });
+
+            modelBuilder.Entity("Domain.Entities.MoveOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsTransacted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UpdatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("UpdatedById");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("MoveOrders");
                 });
 
             modelBuilder.Entity("Domain.Entities.PendingAccount", b =>
@@ -575,6 +658,44 @@ namespace Infrastructure.Migrations
                     b.ToTable("WarehouseReceivings");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Junction.MoveOrderProductWarehouseReceivings", b =>
+                {
+                    b.HasOne("Domain.Entities.WarehouseReceiving", "WarehouseReceiving")
+                        .WithMany("MoveOrderProductWarehouseReceivings")
+                        .HasForeignKey("WarehouseReceivingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Junction.MoveOrderProducts", "MoveOrderProduct")
+                        .WithMany("MoveOrderProductWarehouseReceivings")
+                        .HasForeignKey("MoveOrderId", "ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MoveOrderProduct");
+
+                    b.Navigation("WarehouseReceiving");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Junction.MoveOrderProducts", b =>
+                {
+                    b.HasOne("Domain.Entities.MoveOrder", "MoveOrder")
+                        .WithMany("MoveOrderProducts")
+                        .HasForeignKey("MoveOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Masterlist.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MoveOrder");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Domain.Entities.Junction.RolePermissions", b =>
                 {
                     b.HasOne("Domain.Entities.Masterlist.Permission", "Permission")
@@ -739,6 +860,31 @@ namespace Infrastructure.Migrations
                     b.Navigation("Warehouse");
                 });
 
+            modelBuilder.Entity("Domain.Entities.MoveOrder", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.User", "UpdatedBy")
+                        .WithMany()
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Domain.Entities.Masterlist.Warehouse", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
+
+                    b.Navigation("Warehouse");
+                });
+
             modelBuilder.Entity("Domain.Entities.PendingAccount", b =>
                 {
                     b.HasOne("Domain.Entities.User", "CreatedBy")
@@ -842,6 +988,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Warehouse");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Junction.MoveOrderProducts", b =>
+                {
+                    b.Navigation("MoveOrderProductWarehouseReceivings");
+                });
+
             modelBuilder.Entity("Domain.Entities.Masterlist.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
@@ -854,9 +1005,19 @@ namespace Infrastructure.Migrations
                     b.Navigation("UserRoles");
                 });
 
+            modelBuilder.Entity("Domain.Entities.MoveOrder", b =>
+                {
+                    b.Navigation("MoveOrderProducts");
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Domain.Entities.WarehouseReceiving", b =>
+                {
+                    b.Navigation("MoveOrderProductWarehouseReceivings");
                 });
 #pragma warning restore 612, 618
         }

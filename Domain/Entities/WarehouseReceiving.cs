@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Masterlist;
+﻿using Domain.Entities.Junction;
+using Domain.Entities.Masterlist;
 
 namespace Domain.Entities
 {
@@ -13,5 +14,6 @@ namespace Domain.Entities
         public Warehouse Warehouse { get; set; } = null!;
         public Product Product { get; set; } = null!;
         public MiscellaneousReceipt? MiscellaneousReceipt { get; set; }
+        public List<MoveOrderProductWarehouseReceivings> MoveOrderProductWarehouseReceivings { get; set; } = [];
     }
 }

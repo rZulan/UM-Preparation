@@ -11,6 +11,6 @@
         public required string IDPrefix { get; set; }
         public required string IDNumber { get; set; }
         public required int RoleId { get; set; }
-        public required int WarehouseId { get; set; }
+        public int? WarehouseId { get; set; }
     }
 }

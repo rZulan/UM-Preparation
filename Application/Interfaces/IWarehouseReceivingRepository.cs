@@ -1,5 +1,6 @@
 using Application.DTO.Misc;
 using Application.DTO.Misc.Sorts;
+using Application.Features.MoveOrders.Commands;
 using Domain.Entities;
 
 namespace Application.Interfaces
@@ -39,5 +40,19 @@ namespace Application.Interfaces
         /// <param name="warehouseReceiving">The warehouse entity with updated values.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         Task UpdateAsync(WarehouseReceiving warehouseReceiving, CancellationToken cancellationToken);
+
+        /// <summary>Checks whether the specified product has available stock for the given quantity.</summary>
+        /// <param name="warehouseId">The warehouse whose stock is checked.</param>
+        /// <param name="productId">The product ID to check.</param>
+        /// <param name="quantity">The quantity to check for availability.</param>
+        /// <param name="cancellationToken">Token to cancel the operation.</param>
+        Task<bool> ProductHasAvailableReserve(int warehouseId, int productId, decimal quantity, CancellationToken cancellationToken);
+
+        /// <summary>Returns a list of warehouse receiving entries that can fulfill the specified product quantity.</summary>
+        /// <param name="warehouseId">The warehouse whose receiving lots are checked.</param>
+        /// <param name="productId">The product ID to check.</param>
+        /// <param name="quantity">The quantity to check for availability.</param>
+        /// <param name="cancellationToken">Token to cancel the operation.</param>
+        Task<List<AvailableMoveOrderProductWarehouseReceivingsDto>> GetProductAffectedWarehouseReceivings(int warehouseId, int productId, decimal quantity, CancellationToken cancellationToken);
     }
 }

@@ -3,6 +3,6 @@
     public class ImportPendingAccountDTO
     {
         public required int RoleId;
-        public required int WarehouseId;
+        public int? WarehouseId;
     }
 }

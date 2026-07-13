@@ -28,6 +28,7 @@ namespace Application.Features.WarehouseReceivings.Queries
                 ProductId = x.ProductId,
                 ProductCode = x.Product.ItemCode,
                 ProductDescription = x.Product.Description,
+                IsInteger = x.Product.Uom.IsInteger,
             }).ToList();
 
             PaginationInfo? paginationInfo = null;

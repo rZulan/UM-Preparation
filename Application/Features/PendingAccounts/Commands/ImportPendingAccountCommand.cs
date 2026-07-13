@@ -35,11 +35,14 @@ namespace Application.Features.PendingAccounts.Commands
                 return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
             }
 
-            var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.ImportPendingAccountDTO.WarehouseId, cancellationToken);
-
-            if (existingWarehouse == null)
+            if (request.ImportPendingAccountDTO.WarehouseId.HasValue)
             {
-                return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+                var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.ImportPendingAccountDTO.WarehouseId.Value, cancellationToken);
+
+                if (existingWarehouse == null)
+                {
+                    return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+                }
             }
 
             var registerDTO = new RegisterUserDTO
@@ -53,7 +56,7 @@ namespace Application.Features.PendingAccounts.Commands
                 IDPrefix = existingPendingAccount.EmployeePrefix,
                 IDNumber = existingPendingAccount.EmployeeId,
                 RoleId = existingRole.Id,
-                WarehouseId = existingWarehouse.Id
+                WarehouseId = request.ImportPendingAccountDTO.WarehouseId
             };
 
             var result = await _mediator.Send(new RegisterUserCommand(registerDTO), cancellationToken);

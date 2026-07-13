@@ -36,6 +36,7 @@ namespace Infrastructure
             services.AddScoped<IWarehouseRepository, WarehouseRepository>();
             services.AddScoped<IMiscellaneousReceiptRepository, MiscellaneousReceiptRepository>();
             services.AddScoped<IWarehouseReceivingRepository, WarehouseReceivingRepository>();
+            services.AddScoped<IMoveOrderRepository, MoveOrderRepository>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {

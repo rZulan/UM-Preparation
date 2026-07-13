@@ -31,6 +31,7 @@ namespace Application.Features.WarehouseReceivings.Queries
                 ProductId = warehouseReceiving.ProductId,
                 ProductCode = warehouseReceiving.Product.ItemCode,
                 ProductDescription = warehouseReceiving.Product.Description,
+                IsInteger = warehouseReceiving.Product.Uom.IsInteger,
             };
 
             return Result<GetWarehouseReceivingDTO>.Success(result);

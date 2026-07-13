@@ -25,6 +25,11 @@ namespace Application.Interfaces
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         Task<Permission?> GetByIdAsync(int id, CancellationToken cancellationToken);
 
+        /// <summary>Returns a list of permissions by their IDs, or an empty list if none are found.</summary>
+        /// <param name="ids">The list of permission IDs.</param>
+        /// <param name="cancellationToken">Token to cancel the operation.</param>
+        Task<List<Permission>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken);
+
         /// <summary>Returns a permission matching the given name, or <see langword="null"/> if not found.</summary>
         /// <param name="name">The exact permission name to search for.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>

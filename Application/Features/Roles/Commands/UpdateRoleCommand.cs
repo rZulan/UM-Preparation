@@ -12,9 +12,10 @@ namespace Application.Features.Roles.Commands
     /// <param name="Id">The ID of the role to update.</param>
     /// <param name="UpdateRoleDTO">The updated role data.</param>
     public record UpdateRoleCommand(int? UserId, int Id, UpdateRoleDTO UpdateRoleDTO) : IRequest<Result<object>>;
-    public class UpdateRoleCommandHandler(IRoleRepository roleRepository, IUserRepository userRepository) : IRequestHandler<UpdateRoleCommand, Result<object>>
+    public class UpdateRoleCommandHandler(IRoleRepository roleRepository, IPermissionRepository permissionRepository, IUserRepository userRepository) : IRequestHandler<UpdateRoleCommand, Result<object>>
     {
         private readonly IRoleRepository _roleRepository = roleRepository;
+        private readonly IPermissionRepository _permissionRepository = permissionRepository;
         private readonly IUserRepository _userRepository = userRepository;
 
         public async Task<Result<object>> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
@@ -35,7 +36,7 @@ namespace Application.Features.Roles.Commands
 
             if (existingRole == null)
             {
-                return Result<object>.Failure("Role not found", System.Net.HttpStatusCode.NotFound);
+                return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
             }
 
             if (!string.IsNullOrEmpty(request.UpdateRoleDTO.Name))
@@ -44,7 +45,7 @@ namespace Application.Features.Roles.Commands
 
                 if (existingName)
                 {
-                    return Result<object>.Failure("Role name already exists", System.Net.HttpStatusCode.BadRequest);
+                    return Result<object>.Failure("Role name already exists", HttpStatusCode.BadRequest);
                 }
 
                 existingRole.Name = request.UpdateRoleDTO.Name;
@@ -53,7 +54,7 @@ namespace Application.Features.Roles.Commands
             if (request.UpdateRoleDTO.Permissions != null)
             {
                 var permissions = request.UpdateRoleDTO.Permissions.Count > 0
-                    ? await _roleRepository.GetByIdsAsync(request.UpdateRoleDTO.Permissions, cancellationToken)
+                    ? await _permissionRepository.GetByIdsAsync(request.UpdateRoleDTO.Permissions, cancellationToken)
                     : [];
 
                 existingRole.RolePermissions.Clear();
@@ -68,8 +69,8 @@ namespace Application.Features.Roles.Commands
                 }
             }
 
-            existingUser.UpdatedAt = DateTime.UtcNow;
-            existingUser.UpdatedById = existingUser.Id;
+            existingRole.UpdatedAt = DateTime.UtcNow;
+            existingRole.UpdatedById = existingUser.Id;
 
             await _roleRepository.UpdateAsync(existingRole, cancellationToken);
 

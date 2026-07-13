@@ -85,6 +85,14 @@ namespace Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
+        public async Task<List<Product>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken)
+        {
+            IQueryable<Product> query = _context.Products
+                .Where(x => ids.Contains(x.Id));
+
+            return await query.ToListAsync(cancellationToken);
+        }
+
         public async Task<Product?> GetByItemCodeAsync(string itemCode, CancellationToken cancellationToken)
         {
             IQueryable<Product> query = _context.Products
@@ -108,6 +116,11 @@ namespace Infrastructure.Repositories
         public async Task<bool> AnyDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken)
         {
             return await _context.Products.AnyAsync(x => x.Id != id && x.ItemCode.ToLower() == itemCode.ToLower(), cancellationToken);
+        }
+
+        public async Task<bool> AllExistsAsync(List<int> productIds, CancellationToken cancellationToken)
+        {
+            return await _context.Products.CountAsync(x => productIds.Contains(x.Id), cancellationToken) == productIds.Count;
         }
     }
 }

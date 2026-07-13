@@ -6,7 +6,7 @@ namespace Domain.Entities.Masterlist
     {
         public required string Name { get; set; }
 
-        public List<UserRoles>? UserRoles { get; set; }
+        public List<UserRoles> UserRoles { get; set; } = [];
         public List<RolePermissions> RolePermissions { get; set; } = [];
     }
 }

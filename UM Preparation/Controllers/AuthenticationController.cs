@@ -1,17 +1,20 @@
 ﻿using Application.DTO.User;
 using Application.Features.Users.Commands;
+using Application.Features.Users.Queries;
 using Application.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using UM_Preparation.Extensions;
 
 namespace UM_Preparation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthenticationController(IMediator mediator) : ControllerBase
+    public class AuthenticationController(IMediator mediator, IConfiguration configuration) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
+        private readonly IConfiguration _configuration = configuration;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDTO registerDTO)
@@ -41,7 +44,7 @@ namespace UM_Preparation.Controllers
             return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
         }
 
-        [HttpPost("refresh-token")]
+        [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromQuery] RefreshTokenDTO? refreshTokenDTO)
         {
             var refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDTO?.RefreshToken);
@@ -60,7 +63,17 @@ namespace UM_Preparation.Controllers
                 return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
             }
 
-            SetAuthCookies(result.Value!.AccessToken, result.Value.RefreshToken);
+            SetAuthCookies(result.Value!.AccessToken, null);
+
+            return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
+        }
+
+        [HttpGet("me")]
+        public async Task<IActionResult> Me()
+        {
+            var userId = this.GetCurrentUserId();
+
+            var result = await _mediator.Send(new MeQuery(userId));
 
             return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
         }
@@ -85,30 +98,34 @@ namespace UM_Preparation.Controllers
                 Secure = true
             };
 
-
             Response.Cookies.Delete("access_token", cookieOptions);
             Response.Cookies.Delete("refresh_token", cookieOptions);
 
             return StatusCode(result.StatusCode!.Value.GetHashCode(), result);
         }
 
-        private void SetAuthCookies(string accessToken, string refreshToken)
+        private void SetAuthCookies(string accessToken, string? refreshToken)
         {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+
             Response.Cookies.Append("access_token", accessToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(60)
+                Expires = DateTimeOffset.UtcNow.AddMinutes(jwtSettings.GetValue<double>("ExpiryMinutes"))
             });
 
-            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+            if (refreshToken != null)
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddDays(7)
-            });
+                Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7)
+                });
+            }
         }
     }
 }
