@@ -14,18 +14,15 @@ public record ToggleProductActiveCommand(int? UserId, int Id, bool IsActive) : I
 public class ToggleProductActiveCommandHandler(IProductRepository productRepository, IUserRepository userRepository)
     : IRequestHandler<ToggleProductActiveCommand, Result<object>>
 {
-    private readonly IProductRepository _productRepository = productRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(ToggleProductActiveCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingProduct = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingProduct = await productRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingProduct == null) return Result<object>.Failure("Product not found");
 
@@ -38,7 +35,7 @@ public class ToggleProductActiveCommandHandler(IProductRepository productReposit
         existingProduct.UpdatedAt = DateTime.UtcNow;
         existingProduct.UpdatedById = existingUser.Id;
 
-        await _productRepository.UpdateAsync(existingProduct, cancellationToken);
+        await productRepository.UpdateAsync(existingProduct, cancellationToken);
 
         var status = existingProduct.IsActive ? "restored" : "archived";
 

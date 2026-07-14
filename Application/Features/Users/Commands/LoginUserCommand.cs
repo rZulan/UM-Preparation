@@ -18,19 +18,14 @@ public class LoginUserCommandHandler(
     IJwtService jwtService,
     IRefreshTokenRepository refreshTokenRepository) : IRequestHandler<LoginUserCommand, Result<LoginResultDto>>
 {
-    private readonly IJwtService _jwtService = jwtService;
-    private readonly IPasswordHasherService _passwordHasherService = passwordHasherService;
-    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<LoginResultDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.GetByUsernameAsync(request.LoginDTO.Username, cancellationToken);
+        var existingUser = await userRepository.GetByUsernameAsync(request.LoginDTO.Username, cancellationToken);
 
         if (existingUser == null)
             return Result<LoginResultDto>.Failure("Invalid username or password", HttpStatusCode.Unauthorized);
 
-        var isPasswordValid = _passwordHasherService.Verify(request.LoginDTO.Password, existingUser.PasswordHash);
+        var isPasswordValid = passwordHasherService.Verify(request.LoginDTO.Password, existingUser.PasswordHash);
 
         if (!isPasswordValid)
             return Result<LoginResultDto>.Failure("Invalid username or password", HttpStatusCode.Unauthorized);
@@ -41,10 +36,10 @@ public class LoginUserCommandHandler(
         if (request.RefreshToken != null)
         {
             var existingRefreshToken =
-                await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
+                await refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
 
             if (existingRefreshToken != null)
-                await _refreshTokenRepository.RevokeAsync(existingRefreshToken, cancellationToken);
+                await refreshTokenRepository.RevokeAsync(existingRefreshToken, cancellationToken);
         }
 
         var roles = existingUser.UserRoles?
@@ -60,8 +55,8 @@ public class LoginUserCommandHandler(
             .Distinct()
             .ToArray() ?? [];
 
-        var token = _jwtService.GenerateToken(existingUser.Id, existingUser.Username, roles, permissions);
-        var refreshTokenValue = _jwtService.GenerateRefreshToken();
+        var token = jwtService.GenerateToken(existingUser.Id, existingUser.Username, roles, permissions);
+        var refreshTokenValue = jwtService.GenerateRefreshToken();
 
         var refreshToken = new RefreshToken
         {
@@ -71,7 +66,7 @@ public class LoginUserCommandHandler(
             CreatedAt = DateTime.UtcNow
         };
 
-        await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
+        await refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
 
         var loginResult = new LoginResultDto
         {

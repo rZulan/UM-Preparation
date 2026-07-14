@@ -15,18 +15,14 @@ public class RefreshTokenCommandHandler(
     IUserRepository userRepository,
     IJwtService jwtService) : IRequestHandler<RefreshTokenCommand, Result<RefreshResultDto>>
 {
-    private readonly IJwtService _jwtService = jwtService;
-    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<RefreshResultDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var existing = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
+        var existing = await refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
 
         if (existing == null || existing.IsRevoked || existing.ExpiresAt < DateTime.UtcNow)
             return Result<RefreshResultDto>.Failure("Invalid or expired refresh token.", HttpStatusCode.Unauthorized);
 
-        var user = await _userRepository.GetByIdAsync(existing.UserId, cancellationToken);
+        var user = await userRepository.GetByIdAsync(existing.UserId, cancellationToken);
 
         if (user == null) return Result<RefreshResultDto>.Failure("User not found.", HttpStatusCode.Unauthorized);
 
@@ -45,7 +41,7 @@ public class RefreshTokenCommandHandler(
             .Distinct()
             .ToArray() ?? [];
 
-        var newAccessToken = _jwtService.GenerateToken(user.Id, user.Username, roles, permissions);
+        var newAccessToken = jwtService.GenerateToken(user.Id, user.Username, roles, permissions);
         //var newRefreshTokenValue = _jwtService.GenerateRefreshToken();
 
         //var newRefreshToken = new RefreshToken

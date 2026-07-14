@@ -9,12 +9,10 @@ namespace Infrastructure.Repositories
 {
     public class PendingAccountRepository(AppDbContext context) : IPendingAccountRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<List<PendingAccount>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
             CancellationToken cancellationToken)
         {
-            IQueryable<PendingAccount> query = _context.PendingAccounts;
+            IQueryable<PendingAccount> query = context.PendingAccounts;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -73,7 +71,7 @@ namespace Infrastructure.Repositories
 
         public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
-            IQueryable<PendingAccount> query = _context.PendingAccounts;
+            IQueryable<PendingAccount> query = context.PendingAccounts;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -99,7 +97,7 @@ namespace Infrastructure.Repositories
 
         public async Task<PendingAccount?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            IQueryable<PendingAccount> query = _context.PendingAccounts
+            IQueryable<PendingAccount> query = context.PendingAccounts
                 .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -108,7 +106,7 @@ namespace Infrastructure.Repositories
         public async Task<PendingAccount?> GetByFullIdNoAsync(string employeePrefix, string employeeId,
             CancellationToken cancellationToken)
         {
-            IQueryable<PendingAccount> query = _context.PendingAccounts
+            IQueryable<PendingAccount> query = context.PendingAccounts
                 .Where(x => x.EmployeePrefix == employeePrefix && x.EmployeeId == employeeId);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -116,14 +114,14 @@ namespace Infrastructure.Repositories
 
         public async Task AddAsync(PendingAccount permission, CancellationToken cancellationToken)
         {
-            await _context.PendingAccounts.AddAsync(permission, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await context.PendingAccounts.AddAsync(permission, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(PendingAccount permission, CancellationToken cancellationToken)
         {
-            _context.PendingAccounts.Update(permission);
-            await _context.SaveChangesAsync(cancellationToken);
+            context.PendingAccounts.Update(permission);
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

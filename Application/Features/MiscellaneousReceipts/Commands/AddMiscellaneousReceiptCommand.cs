@@ -21,28 +21,22 @@ public class AddMiscellaneousReceiptCommandHandler(
     IWarehouseReceivingRepository warehouseReceivingRepository)
     : IRequestHandler<AddMiscellaneousReceiptCommand, Result<object>>
 {
-    private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellaneousReceiptRepository;
-    private readonly IProductRepository _productRepository = productRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
-    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
-
     public async Task<Result<object>> Handle(AddMiscellaneousReceiptCommand request,
         CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
         var existingWarehouse =
-            await _warehouseRepository.GetByIdAsync(request.AddMiscellaneousReceiptDTO.WarehouseId, cancellationToken);
+            await warehouseRepository.GetByIdAsync(request.AddMiscellaneousReceiptDTO.WarehouseId, cancellationToken);
 
         if (existingWarehouse == null) return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
 
         var existingProduct =
-            await _productRepository.GetByIdAsync(request.AddMiscellaneousReceiptDTO.ProductId, cancellationToken);
+            await productRepository.GetByIdAsync(request.AddMiscellaneousReceiptDTO.ProductId, cancellationToken);
 
         if (existingProduct == null) return Result<object>.Failure("Product not found", HttpStatusCode.NotFound);
 
@@ -56,7 +50,7 @@ public class AddMiscellaneousReceiptCommandHandler(
             CreatedById = existingUser.Id
         };
 
-        await _miscellaneousReceiptRepository.AddAsync(miscellaneousReceipt, cancellationToken);
+        await miscellaneousReceiptRepository.AddAsync(miscellaneousReceipt, cancellationToken);
 
         var warehouseReceiving = new WarehouseReceiving
         {
@@ -68,7 +62,7 @@ public class AddMiscellaneousReceiptCommandHandler(
             CreatedById = existingUser.Id
         };
 
-        await _warehouseReceivingRepository.AddAsync(warehouseReceiving, cancellationToken);
+        await warehouseReceivingRepository.AddAsync(warehouseReceiving, cancellationToken);
 
         return Result<object>.Success(miscellaneousReceipt.Id, "Miscellaneous Receipt created successfully",
             HttpStatusCode.Created);

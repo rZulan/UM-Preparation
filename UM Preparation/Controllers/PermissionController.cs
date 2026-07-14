@@ -16,14 +16,12 @@ namespace UM_Preparation.Controllers
     [Authorize]
     public class PermissionController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
-
         [HttpGet]
         public async Task<IActionResult> GetPermissions([FromQuery] GenericFiltersDto genericFiltersDto,
             [FromQuery] Sort sort)
         {
             GetAllResult<List<GetPermissionDto>> result =
-                await _mediator.Send(new GetPermissionsQuery(genericFiltersDto, sort));
+                await mediator.Send(new GetPermissionsQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -31,7 +29,7 @@ namespace UM_Preparation.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetPermissionById(int id)
         {
-            Result<GetPermissionDto> result = await _mediator.Send(new GetPermissionByIdQuery(id));
+            Result<GetPermissionDto> result = await mediator.Send(new GetPermissionByIdQuery(id));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -42,7 +40,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new AddPermissionCommand(userId, addPermissionDto));
+            Result<object> result = await mediator.Send(new AddPermissionCommand(userId, addPermissionDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -53,7 +51,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new UpdatePermissionCommand(userId, id, updatePermissionDto));
+            Result<object> result = await mediator.Send(new UpdatePermissionCommand(userId, id, updatePermissionDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -64,7 +62,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new TogglePermissionActiveCommand(userId, id, false));
+            Result<object> result = await mediator.Send(new TogglePermissionActiveCommand(userId, id, false));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -75,7 +73,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new TogglePermissionActiveCommand(userId, id, true));
+            Result<object> result = await mediator.Send(new TogglePermissionActiveCommand(userId, id, true));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

@@ -13,13 +13,11 @@ public record GetMoveOrdersQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort)
 public class GetMoveOrdersQueryHandler(IMoveOrderRepository moveOrderRepository)
     : IRequestHandler<GetMoveOrdersQuery, GetAllResult<List<GetMoveOrderDto>>>
 {
-    private readonly IMoveOrderRepository _moveOrderRepository = moveOrderRepository;
-
     public async Task<GetAllResult<List<GetMoveOrderDto>>> Handle(GetMoveOrdersQuery request,
         CancellationToken cancellationToken)
     {
         var moveOrders =
-            await _moveOrderRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            await moveOrderRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
         var result = moveOrders.Select(moveOrder => new GetMoveOrderDto
         {
@@ -45,7 +43,7 @@ public class GetMoveOrdersQueryHandler(IMoveOrderRepository moveOrderRepository)
             {
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
-                TotalCount = await _moveOrderRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                TotalCount = await moveOrderRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

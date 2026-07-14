@@ -15,11 +15,9 @@ public record GetUomsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRe
 public class GetUomsQueryHandler(IUomRepository uomRepository)
     : IRequestHandler<GetUomsQuery, GetAllResult<List<GetUomDto>>>
 {
-    private readonly IUomRepository _uomRepository = uomRepository;
-
     public async Task<GetAllResult<List<GetUomDto>>> Handle(GetUomsQuery request, CancellationToken cancellationToken)
     {
-        var uoms = await _uomRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+        var uoms = await uomRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
         var result = uoms.Select(x => new GetUomDto
         {
@@ -37,7 +35,7 @@ public class GetUomsQueryHandler(IUomRepository uomRepository)
             {
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
-                TotalCount = await _uomRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                TotalCount = await uomRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

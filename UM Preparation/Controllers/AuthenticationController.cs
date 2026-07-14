@@ -13,13 +13,10 @@ namespace UM_Preparation.Controllers
     [ApiController]
     public class AuthenticationController(IMediator mediator, IConfiguration configuration) : ControllerBase
     {
-        private readonly IConfiguration _configuration = configuration;
-        private readonly IMediator _mediator = mediator;
-
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto registerDto)
         {
-            Result<object> result = await _mediator.Send(new RegisterUserCommand(registerDto));
+            Result<object> result = await mediator.Send(new RegisterUserCommand(registerDto));
 
             if (result.IsFailure)
             {
@@ -35,7 +32,7 @@ namespace UM_Preparation.Controllers
         {
             string? refreshToken = Request.Cookies["refresh_token"] ?? refreshTokenDto?.RefreshToken;
 
-            Result<LoginResultDto> result = await _mediator.Send(new LoginUserCommand(loginDto, refreshToken));
+            Result<LoginResultDto> result = await mediator.Send(new LoginUserCommand(loginDto, refreshToken));
 
             if (result.IsSuccess && result.Value != null)
             {
@@ -58,7 +55,7 @@ namespace UM_Preparation.Controllers
                 return StatusCode((int)missingTokenResult.StatusCode!.Value, missingTokenResult);
             }
 
-            Result<RefreshResultDto> result = await _mediator.Send(new RefreshTokenCommand(refreshToken));
+            Result<RefreshResultDto> result = await mediator.Send(new RefreshTokenCommand(refreshToken));
 
             if (result.IsFailure)
             {
@@ -75,7 +72,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<MeResultDto> result = await _mediator.Send(new MeQuery(userId));
+            Result<MeResultDto> result = await mediator.Send(new MeQuery(userId));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -93,7 +90,7 @@ namespace UM_Preparation.Controllers
                 return StatusCode((int)missingTokenResult.StatusCode!.Value, missingTokenResult);
             }
 
-            Result<object> result = await _mediator.Send(new LogoutUserCommand(refreshToken));
+            Result<object> result = await mediator.Send(new LogoutUserCommand(refreshToken));
 
             CookieOptions cookieOptions = new() { SameSite = SameSiteMode.None, Secure = true };
 
@@ -105,7 +102,7 @@ namespace UM_Preparation.Controllers
 
         private void SetAuthCookies(string accessToken, string? refreshToken)
         {
-            IConfigurationSection jwtSettings = _configuration.GetSection("JwtSettings");
+            IConfigurationSection jwtSettings = configuration.GetSection("JwtSettings");
 
             Response.Cookies.Append("access_token", accessToken,
                 new CookieOptions

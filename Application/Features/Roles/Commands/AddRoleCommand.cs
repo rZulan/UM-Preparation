@@ -15,18 +15,15 @@ public record AddRoleCommand(int? UserId, AddRoleDto AddRoleDTO) : IRequest<Resu
 public class AddRoleCommandHandler(IRoleRepository roleRepository, IUserRepository userRepository)
     : IRequestHandler<AddRoleCommand, Result<object>>
 {
-    private readonly IRoleRepository _roleRepository = roleRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(AddRoleCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingRole = await _roleRepository.GetByNameAsync(request.AddRoleDTO.Name, cancellationToken);
+        var existingRole = await roleRepository.GetByNameAsync(request.AddRoleDTO.Name, cancellationToken);
 
         if (existingRole != null) return Result<object>.Failure("Role already exists", HttpStatusCode.Conflict);
 
@@ -37,7 +34,7 @@ public class AddRoleCommandHandler(IRoleRepository roleRepository, IUserReposito
             CreatedById = existingUser.Id
         };
 
-        await _roleRepository.AddAsync(role, cancellationToken);
+        await roleRepository.AddAsync(role, cancellationToken);
 
         return Result<object>.Success(role.Id, "Role created successfully", HttpStatusCode.Created);
     }

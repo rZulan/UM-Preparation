@@ -16,13 +16,11 @@ public record GetMiscellaneousReceiptsQuery(GenericFiltersDto GenericFiltersDTO,
 public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepository miscellanousReceiptRepository)
     : IRequestHandler<GetMiscellaneousReceiptsQuery, GetAllResult<List<GetMiscellaneousReceiptDto>>>
 {
-    private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellanousReceiptRepository;
-
     public async Task<GetAllResult<List<GetMiscellaneousReceiptDto>>> Handle(GetMiscellaneousReceiptsQuery request,
         CancellationToken cancellationToken)
     {
         var miscellaneousReceipts =
-            await _miscellaneousReceiptRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort,
+            await miscellanousReceiptRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort,
                 cancellationToken);
 
         var result = miscellaneousReceipts.Select(d => new GetMiscellaneousReceiptDto
@@ -47,7 +45,7 @@ public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepositor
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
                 TotalCount =
-                    await _miscellaneousReceiptRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                    await miscellanousReceiptRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

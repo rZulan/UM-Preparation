@@ -15,25 +15,22 @@ public record UpdateProductCommand(int? UserId, int Id, UpdateProductDto UpdateP
 public class UpdateProductCommandHandler(IProductRepository productRepository, IUserRepository userRepository)
     : IRequestHandler<UpdateProductCommand, Result<object>>
 {
-    private readonly IProductRepository _productRepository = productRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingProduct = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingProduct = await productRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingProduct == null) return Result<object>.Failure("Product not found", HttpStatusCode.NotFound);
 
         if (!string.IsNullOrEmpty(request.UpdateProductDTO.ItemCode))
         {
             var existingName =
-                await _productRepository.AnyDuplicateAsync(request.Id, request.UpdateProductDTO.ItemCode,
+                await productRepository.AnyDuplicateAsync(request.Id, request.UpdateProductDTO.ItemCode,
                     cancellationToken);
 
             if (existingName) return Result<object>.Failure("Product name already exists");
@@ -49,7 +46,7 @@ public class UpdateProductCommandHandler(IProductRepository productRepository, I
         existingProduct.UpdatedAt = DateTime.UtcNow;
         existingProduct.UpdatedById = existingUser.Id;
 
-        await _productRepository.UpdateAsync(existingProduct, cancellationToken);
+        await productRepository.UpdateAsync(existingProduct, cancellationToken);
 
         return Result<object>.Success(null, "Product updated successfully");
     }

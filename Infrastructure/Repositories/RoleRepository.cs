@@ -9,12 +9,10 @@ namespace Infrastructure.Repositories
 {
     public class RoleRepository(AppDbContext context) : IRoleRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<List<Role>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
             CancellationToken cancellationToken)
         {
-            IQueryable<Role> query = _context.Roles
+            IQueryable<Role> query = context.Roles
                 .Include(x => x.RolePermissions)
                 .ThenInclude(x => x.Permission);
 
@@ -57,7 +55,7 @@ namespace Infrastructure.Repositories
 
         public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
-            IQueryable<Role> query = _context.Roles;
+            IQueryable<Role> query = context.Roles;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -77,7 +75,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Role?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            IQueryable<Role> query = _context.Roles
+            IQueryable<Role> query = context.Roles
                 .Include(x => x.RolePermissions!)
                 .ThenInclude(x => x.Permission)
                 .Where(x => x.Id == id);
@@ -87,7 +85,7 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Role>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken)
         {
-            IQueryable<Role> query = _context.Roles
+            IQueryable<Role> query = context.Roles
                 .Include(x => x.RolePermissions!)
                 .ThenInclude(x => x.Permission)
                 .Where(x => ids.Contains(x.Id));
@@ -97,7 +95,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Role?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
-            IQueryable<Role> query = _context.Roles
+            IQueryable<Role> query = context.Roles
                 .Include(x => x.RolePermissions!)
                 .ThenInclude(x => x.Permission)
                 .Where(x => x.Name.ToLower() == name.ToLower());
@@ -107,19 +105,19 @@ namespace Infrastructure.Repositories
 
         public async Task AddAsync(Role role, CancellationToken cancellationToken)
         {
-            await _context.Roles.AddAsync(role, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await context.Roles.AddAsync(role, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(Role role, CancellationToken cancellationToken)
         {
-            _context.Roles.Update(role);
-            await _context.SaveChangesAsync(cancellationToken);
+            context.Roles.Update(role);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<bool> AnyDuplicateAsync(int id, string name, CancellationToken cancellationToken)
         {
-            return await _context.Roles.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(),
+            return await context.Roles.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(),
                 cancellationToken);
         }
     }

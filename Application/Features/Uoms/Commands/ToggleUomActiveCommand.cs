@@ -14,18 +14,15 @@ public record ToggleUomActiveCommand(int? UserId, int Id, bool IsActive) : IRequ
 public class ToggleUomActiveCommandHandler(IUomRepository uomRepository, IUserRepository userRepository)
     : IRequestHandler<ToggleUomActiveCommand, Result<object>>
 {
-    private readonly IUomRepository _uomRepository = uomRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(ToggleUomActiveCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingUom = await _uomRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingUom = await uomRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingUom == null) return Result<object>.Failure("Uom not found");
 
@@ -37,7 +34,7 @@ public class ToggleUomActiveCommandHandler(IUomRepository uomRepository, IUserRe
         existingUom.UpdatedAt = DateTime.UtcNow;
         existingUom.UpdatedById = existingUser.Id;
 
-        await _uomRepository.UpdateAsync(existingUom, cancellationToken);
+        await uomRepository.UpdateAsync(existingUom, cancellationToken);
 
         var status = existingUom.IsActive ? "restored" : "archived";
 

@@ -10,12 +10,10 @@ namespace Infrastructure.Services
 {
     public class JwtService(IConfiguration config) : IJwtService
     {
-        private readonly IConfiguration _config = config;
-
         public string GenerateToken(int userId, string username, IEnumerable<string> roles,
             IEnumerable<string> permissions)
         {
-            IConfigurationSection jwtSettings = _config.GetSection("JwtSettings");
+            IConfigurationSection jwtSettings = config.GetSection("JwtSettings");
 
             SymmetricSecurityKey key = new(
                 Encoding.UTF8.GetBytes(jwtSettings["Key"]!));

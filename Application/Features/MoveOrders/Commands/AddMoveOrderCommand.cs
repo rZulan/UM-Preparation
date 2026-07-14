@@ -26,16 +26,11 @@ public class AddMoveOrderCommandHandler(
     IProductRepository productRepository,
     IWarehouseReceivingRepository warehouseReceivingRepository) : IRequestHandler<AddMoveOrderCommand, Result<object>>
 {
-    private readonly IMoveOrderRepository _moveOrderRepository = moveOrderRepository;
-    private readonly IProductRepository _productRepository = productRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
-
     public async Task<Result<object>> Handle(AddMoveOrderCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
@@ -47,12 +42,12 @@ public class AddMoveOrderCommandHandler(
             if (duplicateCount > 1) return Result<object>.Failure("Duplicate product found");
         }
 
-        var existingProducts = await _productRepository.AllExistsAsync(
+        var existingProducts = await productRepository.AllExistsAsync(
             [.. request.AddMoveOrderDto.AddMoveOrderProducts.Select(x => x.ProductId)], cancellationToken);
 
         if (!existingProducts) return Result<object>.Failure("One or more products do not exist");
 
-        var products = await _productRepository.GetByIdsAsync(
+        var products = await productRepository.GetByIdsAsync(
             [.. request.AddMoveOrderDto.AddMoveOrderProducts.Select(x => x.ProductId)], cancellationToken);
 
         var consolidatedProducts = products.Select(x => new ConsolidatedProductsDto
@@ -68,7 +63,7 @@ public class AddMoveOrderCommandHandler(
         foreach (var product in consolidatedProducts)
         {
             var hasAvailableReserve =
-                await _warehouseReceivingRepository.ProductHasAvailableReserve(request.AddMoveOrderDto.WarehouseId,
+                await warehouseReceivingRepository.ProductHasAvailableReserve(request.AddMoveOrderDto.WarehouseId,
                     product.Id, product.Quantity, cancellationToken);
 
             if (!hasAvailableReserve)
@@ -93,7 +88,7 @@ public class AddMoveOrderCommandHandler(
             };
 
             var affectedWarehouseReceivings =
-                await _warehouseReceivingRepository.GetProductAffectedWarehouseReceivings(
+                await warehouseReceivingRepository.GetProductAffectedWarehouseReceivings(
                     request.AddMoveOrderDto.WarehouseId, product.Id, product.Quantity, cancellationToken);
 
             foreach (var warehouseReceiving in affectedWarehouseReceivings)
@@ -113,7 +108,7 @@ public class AddMoveOrderCommandHandler(
             moveOrder.MoveOrderProducts.Add(moveOrderProduct);
         }
 
-        await _moveOrderRepository.AddAsync(moveOrder, cancellationToken);
+        await moveOrderRepository.AddAsync(moveOrder, cancellationToken);
 
         return Result<object>.Success(moveOrder.Id, "MoveOrder created successfully", HttpStatusCode.Created);
     }

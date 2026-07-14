@@ -13,12 +13,10 @@ namespace UM_Preparation.Controllers
     [Authorize]
     public class InventoryController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
-
         [HttpGet]
         public async Task<IActionResult> GetInventory([FromQuery] [BindRequired] int warehouseId)
         {
-            Result<GetInventoryDto> result = await _mediator.Send(new GetInventoryQuery(warehouseId));
+            Result<GetInventoryDto> result = await mediator.Send(new GetInventoryQuery(warehouseId));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -28,7 +26,7 @@ namespace UM_Preparation.Controllers
         public async Task<IActionResult> GetInventoryReceiving([FromQuery] [BindRequired] int warehouseId)
         {
             Result<GetInventoryReceivingDto> result =
-                await _mediator.Send(new GetInventoryReceivingsQuery(warehouseId));
+                await mediator.Send(new GetInventoryReceivingsQuery(warehouseId));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -40,7 +38,7 @@ namespace UM_Preparation.Controllers
             int productId)
         {
             Result<GetInventoryReceivingDto> result =
-                await _mediator.Send(new GetInventoryReceivingByProductQuery(warehouseId, productId));
+                await mediator.Send(new GetInventoryReceivingByProductQuery(warehouseId, productId));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

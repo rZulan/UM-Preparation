@@ -13,11 +13,9 @@ public record GetProductByIdQuery(int Id) : IRequest<Result<GetProductDto>>;
 public class GetProductByIdQueryHandler(IProductRepository productRepository)
     : IRequestHandler<GetProductByIdQuery, Result<GetProductDto>>
 {
-    private readonly IProductRepository _productRepository = productRepository;
-
     public async Task<Result<GetProductDto>> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
+        var product = await productRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (product == null) return Result<GetProductDto>.Failure("Product not found", HttpStatusCode.NotFound);
 

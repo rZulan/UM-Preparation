@@ -9,12 +9,10 @@ namespace Infrastructure.Repositories
 {
     public class MiscellaneousReceiptRepository(AppDbContext context) : IMiscellaneousReceiptRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<List<MiscellaneousReceipt>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
             CancellationToken cancellationToken)
         {
-            IQueryable<MiscellaneousReceipt> query = _context.MiscellaneousReceipts
+            IQueryable<MiscellaneousReceipt> query = context.MiscellaneousReceipts
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
                 .ThenInclude(x => x.Uom);
@@ -71,7 +69,7 @@ namespace Infrastructure.Repositories
 
         public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
-            IQueryable<MiscellaneousReceipt> query = _context.MiscellaneousReceipts;
+            IQueryable<MiscellaneousReceipt> query = context.MiscellaneousReceipts;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -83,7 +81,7 @@ namespace Infrastructure.Repositories
 
         public async Task<MiscellaneousReceipt?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _context.MiscellaneousReceipts
+            return await context.MiscellaneousReceipts
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
                 .ThenInclude(x => x.Uom)
@@ -92,14 +90,14 @@ namespace Infrastructure.Repositories
 
         public async Task AddAsync(MiscellaneousReceipt miscellaneousReceipt, CancellationToken cancellationToken)
         {
-            await _context.MiscellaneousReceipts.AddAsync(miscellaneousReceipt, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await context.MiscellaneousReceipts.AddAsync(miscellaneousReceipt, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(MiscellaneousReceipt miscellaneousReceipt, CancellationToken cancellationToken)
         {
-            _context.MiscellaneousReceipts.Update(miscellaneousReceipt);
-            await _context.SaveChangesAsync(cancellationToken);
+            context.MiscellaneousReceipts.Update(miscellaneousReceipt);
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

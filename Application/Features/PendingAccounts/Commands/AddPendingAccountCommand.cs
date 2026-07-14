@@ -16,13 +16,9 @@ public class AddPendingAccountCommandHandler(
     IUserRepository userRepository,
     IPasswordHasherService passwordHasher) : IRequestHandler<AddPendingAccountCommand, Result<object>>
 {
-    private readonly IPasswordHasherService _paswordHasher = passwordHasher;
-    private readonly IPendingAccountRepository _pendingAccountRepository = pendingAccountRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(AddPendingAccountCommand request, CancellationToken cancellationToken)
     {
-        var existingPendingAccount = await _pendingAccountRepository.GetByFullIdNoAsync(
+        var existingPendingAccount = await pendingAccountRepository.GetByFullIdNoAsync(
             request.AddPendingAccountDTO.id_prefix, request.AddPendingAccountDTO.id_no, cancellationToken);
 
         if (existingPendingAccount != null)
@@ -34,17 +30,17 @@ public class AddPendingAccountCommandHandler(
             existingPendingAccount.LastName = request.AddPendingAccountDTO.last_name;
             existingPendingAccount.Suffix = request.AddPendingAccountDTO.Suffix;
 
-            await _pendingAccountRepository.UpdateAsync(existingPendingAccount, cancellationToken);
+            await pendingAccountRepository.UpdateAsync(existingPendingAccount, cancellationToken);
 
             return Result<object>.Success(existingPendingAccount.Id, "Pending Account updated successfully");
         }
 
-        var existingUserAccount = await _userRepository.GetByFullIdNoAsync(request.AddPendingAccountDTO.id_prefix,
+        var existingUserAccount = await userRepository.GetByFullIdNoAsync(request.AddPendingAccountDTO.id_prefix,
             request.AddPendingAccountDTO.id_no, cancellationToken);
 
         if (existingUserAccount != null)
         {
-            var hashPassword = _paswordHasher.Hash(request.AddPendingAccountDTO.Password);
+            var hashPassword = passwordHasher.Hash(request.AddPendingAccountDTO.Password);
 
             existingUserAccount.Username = request.AddPendingAccountDTO.Username;
             existingUserAccount.PasswordHash = hashPassword;
@@ -53,7 +49,7 @@ public class AddPendingAccountCommandHandler(
             existingUserAccount.LastName = request.AddPendingAccountDTO.last_name;
             existingUserAccount.Suffix = request.AddPendingAccountDTO.Suffix;
 
-            await _userRepository.UpdateAsync(existingUserAccount, cancellationToken);
+            await userRepository.UpdateAsync(existingUserAccount, cancellationToken);
 
             return Result<object>.Success(existingUserAccount.Id, "User Account updated successfully");
         }
@@ -71,7 +67,7 @@ public class AddPendingAccountCommandHandler(
             CreatedAt = DateTime.UtcNow
         };
 
-        await _pendingAccountRepository.AddAsync(pendingAccount, cancellationToken);
+        await pendingAccountRepository.AddAsync(pendingAccount, cancellationToken);
 
         return Result<object>.Success(pendingAccount.Id, "Pending Account created successfully",
             HttpStatusCode.Created);

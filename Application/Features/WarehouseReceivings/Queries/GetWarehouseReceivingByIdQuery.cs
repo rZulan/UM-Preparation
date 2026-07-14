@@ -13,12 +13,10 @@ public record GetWarehouseReceivingByIdQuery(int Id) : IRequest<Result<GetWareho
 public class GetWarehouseReceivingByIdQueryHandler(IWarehouseReceivingRepository warehouseReceivingRepository)
     : IRequestHandler<GetWarehouseReceivingByIdQuery, Result<GetWarehouseReceivingDto>>
 {
-    private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
-
     public async Task<Result<GetWarehouseReceivingDto>> Handle(GetWarehouseReceivingByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var warehouseReceiving = await _warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
+        var warehouseReceiving = await warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (warehouseReceiving == null)
             return Result<GetWarehouseReceivingDto>.Failure("Warehouse Receiving not found", HttpStatusCode.NotFound);

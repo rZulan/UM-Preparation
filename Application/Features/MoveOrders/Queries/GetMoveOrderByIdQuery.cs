@@ -11,12 +11,10 @@ public record GetMoveOrderByIdQuery(int Id) : IRequest<Result<GetMoveOrderDto>>;
 public class GetMoveOrderByIdQueryHandler(IMoveOrderRepository moveOrderRepository)
     : IRequestHandler<GetMoveOrderByIdQuery, Result<GetMoveOrderDto>>
 {
-    private readonly IMoveOrderRepository _moveOrderRepository = moveOrderRepository;
-
     public async Task<Result<GetMoveOrderDto>> Handle(GetMoveOrderByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var moveOrder = await _moveOrderRepository.GetByIdAsync(request.Id, cancellationToken);
+        var moveOrder = await moveOrderRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (moveOrder == null) return Result<GetMoveOrderDto>.Failure("Move order not found", HttpStatusCode.NotFound);
 

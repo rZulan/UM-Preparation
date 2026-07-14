@@ -18,21 +18,16 @@ public class UpdateUserCommandHandler(
     IRoleRepository roleRepository,
     IWarehouseRepository warehouseRepository) : IRequestHandler<UpdateUserCommand, Result<object>>
 {
-    private readonly IPasswordHasherService _paswordHasher = passwordHasher;
-    private readonly IRoleRepository _roleRepository = roleRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
-
     public async Task<Result<object>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
         if (!string.IsNullOrEmpty(request.UpdateDTO.Username))
         {
             var existingUsername =
-                await _userRepository.AnyDuplicateAsync(request.Id, request.UpdateDTO.Username, cancellationToken);
+                await userRepository.AnyDuplicateAsync(request.Id, request.UpdateDTO.Username, cancellationToken);
 
             if (existingUsername) return Result<object>.Failure("Username already exists");
 
@@ -40,7 +35,7 @@ public class UpdateUserCommandHandler(
         }
 
         if (!string.IsNullOrEmpty(request.UpdateDTO.UpdatePassword))
-            existingUser.PasswordHash = _paswordHasher.Hash(request.UpdateDTO.UpdatePassword);
+            existingUser.PasswordHash = passwordHasher.Hash(request.UpdateDTO.UpdatePassword);
 
         if (!string.IsNullOrEmpty(request.UpdateDTO.FirstName)) existingUser.FirstName = request.UpdateDTO.FirstName;
 
@@ -56,7 +51,7 @@ public class UpdateUserCommandHandler(
 
         if (request.UpdateDTO.RoleId.HasValue)
         {
-            var existingRole = await _roleRepository.GetByIdAsync(request.UpdateDTO.RoleId.Value, cancellationToken);
+            var existingRole = await roleRepository.GetByIdAsync(request.UpdateDTO.RoleId.Value, cancellationToken);
 
             if (existingRole == null) return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
 
@@ -72,7 +67,7 @@ public class UpdateUserCommandHandler(
         if (request.UpdateDTO.WarehouseId.HasValue)
         {
             var existingWarehouse =
-                await _warehouseRepository.GetByIdAsync(request.UpdateDTO.WarehouseId.Value, cancellationToken);
+                await warehouseRepository.GetByIdAsync(request.UpdateDTO.WarehouseId.Value, cancellationToken);
 
             if (existingWarehouse == null)
                 return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
@@ -80,7 +75,7 @@ public class UpdateUserCommandHandler(
             existingUser.WarehouseId = request.UpdateDTO.WarehouseId.Value;
         }
 
-        await _userRepository.UpdateAsync(existingUser, cancellationToken);
+        await userRepository.UpdateAsync(existingUser, cancellationToken);
 
         return Result<object>.Success(null, "User updated successfully");
     }

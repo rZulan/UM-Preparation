@@ -13,12 +13,10 @@ public record GetPendingAccountByIdQuery(int Id) : IRequest<Result<GetPendingAcc
 public class GetPendingAccountByIdQueryHandler(IPendingAccountRepository pendingAccountRepository)
     : IRequestHandler<GetPendingAccountByIdQuery, Result<GetPendingAccountDto>>
 {
-    private readonly IPendingAccountRepository _pendingAccountRepository = pendingAccountRepository;
-
     public async Task<Result<GetPendingAccountDto>> Handle(GetPendingAccountByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var pendingAccount = await _pendingAccountRepository.GetByIdAsync(request.Id, cancellationToken);
+        var pendingAccount = await pendingAccountRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (pendingAccount == null)
             return Result<GetPendingAccountDto>.Failure("Pending Account not found", HttpStatusCode.NotFound);

@@ -16,13 +16,11 @@ public record GetPendingAccountsQuery(GenericFiltersDto GenericFiltersDTO, Sort 
 public class GetPendingAccountsQueryHandler(IPendingAccountRepository pendingAccountRepository)
     : IRequestHandler<GetPendingAccountsQuery, GetAllResult<List<GetPendingAccountDto>>>
 {
-    private readonly IPendingAccountRepository _pendingAccountRepository = pendingAccountRepository;
-
     public async Task<GetAllResult<List<GetPendingAccountDto>>> Handle(GetPendingAccountsQuery request,
         CancellationToken cancellationToken)
     {
         var pendingAccounts =
-            await _pendingAccountRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            await pendingAccountRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
         var result = pendingAccounts.Select(x => new GetPendingAccountDto
         {
@@ -44,7 +42,7 @@ public class GetPendingAccountsQueryHandler(IPendingAccountRepository pendingAcc
             {
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
-                TotalCount = await _pendingAccountRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                TotalCount = await pendingAccountRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

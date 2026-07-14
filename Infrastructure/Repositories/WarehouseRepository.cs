@@ -9,12 +9,10 @@ namespace Infrastructure.Repositories
 {
     public class WarehouseRepository(AppDbContext context) : IWarehouseRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<List<Warehouse>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
             CancellationToken cancellationToken)
         {
-            IQueryable<Warehouse> query = _context.Warehouses;
+            IQueryable<Warehouse> query = context.Warehouses;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -55,7 +53,7 @@ namespace Infrastructure.Repositories
 
         public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
-            IQueryable<Warehouse> query = _context.Warehouses;
+            IQueryable<Warehouse> query = context.Warehouses;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -75,7 +73,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Warehouse?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            IQueryable<Warehouse> query = _context.Warehouses
+            IQueryable<Warehouse> query = context.Warehouses
                 .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -83,7 +81,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Warehouse?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
-            IQueryable<Warehouse> query = _context.Warehouses
+            IQueryable<Warehouse> query = context.Warehouses
                 .Where(x => x.Name.ToLower() == name.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -91,19 +89,19 @@ namespace Infrastructure.Repositories
 
         public async Task AddAsync(Warehouse warehouse, CancellationToken cancellationToken)
         {
-            await _context.Warehouses.AddAsync(warehouse, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await context.Warehouses.AddAsync(warehouse, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(Warehouse warehouse, CancellationToken cancellationToken)
         {
-            _context.Warehouses.Update(warehouse);
-            await _context.SaveChangesAsync(cancellationToken);
+            context.Warehouses.Update(warehouse);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<bool> AnyDuplicateAsync(int id, string name, CancellationToken cancellationToken)
         {
-            return await _context.Warehouses.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(),
+            return await context.Warehouses.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(),
                 cancellationToken);
         }
     }

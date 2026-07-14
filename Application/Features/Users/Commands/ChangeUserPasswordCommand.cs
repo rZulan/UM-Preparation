@@ -16,22 +16,20 @@ public class ChangeUserPasswordCommandHandler(
     IPasswordHasherService passwordHasher,
     IRoleRepository roleRepository) : IRequestHandler<ChangeUserPasswordCommand, Result<object>>
 {
-    private readonly IPasswordHasherService _paswordHasher = passwordHasher;
     private readonly IRoleRepository _roleRepository = roleRepository;
-    private readonly IUserRepository _userRepository = userRepository;
 
     public async Task<Result<object>> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.GetByIdAsync(request.Id!.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.Id!.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        if (!_paswordHasher.Verify(request.UpdatePasswordDTO.CurrentPassword, existingUser.PasswordHash))
+        if (!passwordHasher.Verify(request.UpdatePasswordDTO.CurrentPassword, existingUser.PasswordHash))
             return Result<object>.Failure("Current password is incorrect");
 
-        existingUser.PasswordHash = _paswordHasher.Hash(request.UpdatePasswordDTO.NewPassword);
+        existingUser.PasswordHash = passwordHasher.Hash(request.UpdatePasswordDTO.NewPassword);
 
-        await _userRepository.UpdateAsync(existingUser, cancellationToken);
+        await userRepository.UpdateAsync(existingUser, cancellationToken);
 
         return Result<object>.Success(null, "User updated successfully");
     }

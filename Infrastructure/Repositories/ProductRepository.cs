@@ -9,12 +9,10 @@ namespace Infrastructure.Repositories
 {
     public class ProductRepository(AppDbContext context) : IProductRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<List<Product>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
             CancellationToken cancellationToken)
         {
-            IQueryable<Product> query = _context.Products
+            IQueryable<Product> query = context.Products
                 .Include(x => x.Uom);
 
             if (genericFiltersDTO.IsActive != null)
@@ -58,7 +56,7 @@ namespace Infrastructure.Repositories
 
         public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
-            IQueryable<Product> query = _context.Products;
+            IQueryable<Product> query = context.Products;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -80,7 +78,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Product?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            IQueryable<Product> query = _context.Products
+            IQueryable<Product> query = context.Products
                 .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -88,7 +86,7 @@ namespace Infrastructure.Repositories
 
         public async Task<List<Product>> GetByIdsAsync(List<int> ids, CancellationToken cancellationToken)
         {
-            IQueryable<Product> query = _context.Products
+            IQueryable<Product> query = context.Products
                 .Where(x => ids.Contains(x.Id));
 
             return await query.ToListAsync(cancellationToken);
@@ -96,7 +94,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Product?> GetByItemCodeAsync(string itemCode, CancellationToken cancellationToken)
         {
-            IQueryable<Product> query = _context.Products
+            IQueryable<Product> query = context.Products
                 .Where(x => x.ItemCode.ToLower() == itemCode.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -104,25 +102,25 @@ namespace Infrastructure.Repositories
 
         public async Task AddAsync(Product product, CancellationToken cancellationToken)
         {
-            await _context.Products.AddAsync(product, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await context.Products.AddAsync(product, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(Product product, CancellationToken cancellationToken)
         {
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync(cancellationToken);
+            context.Products.Update(product);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<bool> AnyDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken)
         {
-            return await _context.Products.AnyAsync(x => x.Id != id && x.ItemCode.ToLower() == itemCode.ToLower(),
+            return await context.Products.AnyAsync(x => x.Id != id && x.ItemCode.ToLower() == itemCode.ToLower(),
                 cancellationToken);
         }
 
         public async Task<bool> AllExistsAsync(List<int> productIds, CancellationToken cancellationToken)
         {
-            return await _context.Products.CountAsync(x => productIds.Contains(x.Id), cancellationToken) ==
+            return await context.Products.CountAsync(x => productIds.Contains(x.Id), cancellationToken) ==
                    productIds.Count;
         }
     }

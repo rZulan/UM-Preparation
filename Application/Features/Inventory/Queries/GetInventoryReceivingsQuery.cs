@@ -11,13 +11,11 @@ public record GetInventoryReceivingsQuery(int WarehouseId) : IRequest<Result<Get
 public class GetInventoryReceivingsQueryHandler(IInventoryRepository inventoryRepository)
     : IRequestHandler<GetInventoryReceivingsQuery, Result<GetInventoryReceivingDto>>
 {
-    private readonly IInventoryRepository _inventoryRepository = inventoryRepository;
-
     public async Task<Result<GetInventoryReceivingDto>> Handle(
         GetInventoryReceivingsQuery request,
         CancellationToken cancellationToken)
     {
-        var inventory = await _inventoryRepository.GetReceivingsByWarehouseIdAsync(
+        var inventory = await inventoryRepository.GetReceivingsByWarehouseIdAsync(
             request.WarehouseId,
             cancellationToken);
 

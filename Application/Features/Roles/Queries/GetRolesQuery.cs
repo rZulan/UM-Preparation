@@ -16,11 +16,9 @@ public record GetRolesQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IR
 public class GetRolesQueryHandler(IRoleRepository roleRepository)
     : IRequestHandler<GetRolesQuery, GetAllResult<List<GetRoleDto>>>
 {
-    private readonly IRoleRepository _roleRepository = roleRepository;
-
     public async Task<GetAllResult<List<GetRoleDto>>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
     {
-        var roles = await _roleRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+        var roles = await roleRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
         var result = roles.Select(x => new GetRoleDto
         {
@@ -44,7 +42,7 @@ public class GetRolesQueryHandler(IRoleRepository roleRepository)
             {
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
-                TotalCount = await _roleRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                TotalCount = await roleRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

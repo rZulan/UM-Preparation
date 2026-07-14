@@ -11,13 +11,11 @@ public record GetInventoryQuery(int WarehouseId) : IRequest<Result<GetInventoryD
 public class GetInventoryQueryHandler(IInventoryRepository inventoryRepository)
     : IRequestHandler<GetInventoryQuery, Result<GetInventoryDto>>
 {
-    private readonly IInventoryRepository _inventoryRepository = inventoryRepository;
-
     public async Task<Result<GetInventoryDto>> Handle(
         GetInventoryQuery request,
         CancellationToken cancellationToken)
     {
-        var inventory = await _inventoryRepository.GetByWarehouseIdAsync(request.WarehouseId, cancellationToken);
+        var inventory = await inventoryRepository.GetByWarehouseIdAsync(request.WarehouseId, cancellationToken);
 
         if (inventory == null) Result<GetInventoryDto>.Failure("Warehouse not found", HttpStatusCode.NotFound);
 

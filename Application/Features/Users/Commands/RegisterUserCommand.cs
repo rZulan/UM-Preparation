@@ -18,27 +18,22 @@ public class RegisterUserCommandHandler(
     IRoleRepository roleRepository,
     IWarehouseRepository warehouseRepository) : IRequestHandler<RegisterUserCommand, Result<object>>
 {
-    private readonly IPasswordHasherService _paswordHasher = passwordHasher;
-    private readonly IRoleRepository _roleRepository = roleRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
-
     public async Task<Result<object>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.GetByUsernameAsync(request.RegisterDTO.Username, cancellationToken);
+        var existingUser = await userRepository.GetByUsernameAsync(request.RegisterDTO.Username, cancellationToken);
 
         if (existingUser != null) return Result<object>.Failure("Username already exists", HttpStatusCode.Conflict);
 
-        var hashPassword = _paswordHasher.Hash(request.RegisterDTO.Password);
+        var hashPassword = passwordHasher.Hash(request.RegisterDTO.Password);
 
-        var existingRole = await _roleRepository.GetByIdAsync(request.RegisterDTO.RoleId, cancellationToken);
+        var existingRole = await roleRepository.GetByIdAsync(request.RegisterDTO.RoleId, cancellationToken);
 
         if (existingRole == null) return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
 
         if (request.RegisterDTO.WarehouseId.HasValue)
         {
             var existingWarehouse =
-                await _warehouseRepository.GetByIdAsync(request.RegisterDTO.WarehouseId.Value, cancellationToken);
+                await warehouseRepository.GetByIdAsync(request.RegisterDTO.WarehouseId.Value, cancellationToken);
 
             if (existingWarehouse == null)
                 return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
@@ -64,7 +59,7 @@ public class RegisterUserCommandHandler(
             UserId = user.Id
         });
 
-        await _userRepository.AddAsync(user, cancellationToken);
+        await userRepository.AddAsync(user, cancellationToken);
 
         return Result<object>.Success(user.Id, "User created successfully", HttpStatusCode.Created);
     }

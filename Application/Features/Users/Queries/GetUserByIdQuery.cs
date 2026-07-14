@@ -13,11 +13,9 @@ public record GetUserByIdQuery(int Id) : IRequest<Result<GetUserDto>>;
 public class GetUserByIdQueryHandler(IUserRepository userRepository)
     : IRequestHandler<GetUserByIdQuery, Result<GetUserDto>>
 {
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<GetUserDto>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetByIdAsync(request.Id, cancellationToken);
+        var user = await userRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (user is null) return Result<GetUserDto>.Failure("User not found", HttpStatusCode.NotFound);
 

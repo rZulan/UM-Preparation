@@ -20,28 +20,23 @@ public class AddWarehouseReceivingCommandHandler(
     IMiscellaneousReceiptRepository miscellaneousReceiptRepository)
     : IRequestHandler<AddWarehouseReceivingCommand, Result<object>>
 {
-    private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellaneousReceiptRepository;
-    private readonly IProductRepository _productRepository = productRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
-
     public async Task<Result<object>> Handle(AddWarehouseReceivingCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
         var existingProduct =
-            await _productRepository.GetByIdAsync(request.AddWarehouseReceivingDTO.ProductId, cancellationToken);
+            await productRepository.GetByIdAsync(request.AddWarehouseReceivingDTO.ProductId, cancellationToken);
 
         if (existingProduct == null) return Result<object>.Failure("Product not found", HttpStatusCode.NotFound);
 
         if (request.AddWarehouseReceivingDTO.MiscellaneousReceiptId != null)
         {
             var existingMiscellaneousReceipt =
-                await _miscellaneousReceiptRepository.GetByIdAsync(
+                await miscellaneousReceiptRepository.GetByIdAsync(
                     request.AddWarehouseReceivingDTO.MiscellaneousReceiptId.Value, cancellationToken);
 
             if (existingMiscellaneousReceipt == null)
@@ -58,7 +53,7 @@ public class AddWarehouseReceivingCommandHandler(
             CreatedById = request.UserId.Value
         };
 
-        await _warehouseReceivingRepository.AddAsync(warehouseReceiving, cancellationToken);
+        await warehouseReceivingRepository.AddAsync(warehouseReceiving, cancellationToken);
 
         return Result<object>.Success(null);
     }

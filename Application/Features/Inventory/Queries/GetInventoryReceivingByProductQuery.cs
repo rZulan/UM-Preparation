@@ -12,13 +12,11 @@ public record GetInventoryReceivingByProductQuery(int WarehouseId, int ProductId
 public class GetInventoryReceivingByProductQueryHandler(IInventoryRepository inventoryRepository)
     : IRequestHandler<GetInventoryReceivingByProductQuery, Result<GetInventoryReceivingDto>>
 {
-    private readonly IInventoryRepository _inventoryRepository = inventoryRepository;
-
     public async Task<Result<GetInventoryReceivingDto>> Handle(
         GetInventoryReceivingByProductQuery request,
         CancellationToken cancellationToken)
     {
-        var inventory = await _inventoryRepository.GetReceivingsByWarehouseAndProductIdAsync(
+        var inventory = await inventoryRepository.GetReceivingsByWarehouseAndProductIdAsync(
             request.WarehouseId,
             request.ProductId,
             cancellationToken);

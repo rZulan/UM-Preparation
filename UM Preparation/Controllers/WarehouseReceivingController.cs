@@ -16,14 +16,12 @@ namespace UM_Preparation.Controllers
     [Authorize]
     public class WarehouseReceivingController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
-
         [HttpGet]
         public async Task<IActionResult> GetWarehouseReceivings([FromQuery] GenericFiltersDto genericFiltersDto,
             [FromQuery] Sort sort)
         {
             GetAllResult<List<GetWarehouseReceivingDto>> result =
-                await _mediator.Send(new GetWarehouseReceivingsQuery(genericFiltersDto, sort));
+                await mediator.Send(new GetWarehouseReceivingsQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -31,7 +29,7 @@ namespace UM_Preparation.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetWarehouseReceivingById(int id)
         {
-            Result<GetWarehouseReceivingDto> result = await _mediator.Send(new GetWarehouseReceivingByIdQuery(id));
+            Result<GetWarehouseReceivingDto> result = await mediator.Send(new GetWarehouseReceivingByIdQuery(id));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -42,7 +40,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new AddWarehouseReceivingCommand(userId, addWarehouseDto));
+            Result<object> result = await mediator.Send(new AddWarehouseReceivingCommand(userId, addWarehouseDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -55,7 +53,7 @@ namespace UM_Preparation.Controllers
             int? userId = this.GetCurrentUserId();
 
             Result<object> result =
-                await _mediator.Send(new UpdateWarehouseReceivingCommand(userId, id, updateWarehouseDto));
+                await mediator.Send(new UpdateWarehouseReceivingCommand(userId, id, updateWarehouseDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -66,7 +64,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new ToggleWarehouseReceivingActiveCommand(userId, id, false));
+            Result<object> result = await mediator.Send(new ToggleWarehouseReceivingActiveCommand(userId, id, false));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -77,7 +75,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new ToggleWarehouseReceivingActiveCommand(userId, id, true));
+            Result<object> result = await mediator.Send(new ToggleWarehouseReceivingActiveCommand(userId, id, true));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

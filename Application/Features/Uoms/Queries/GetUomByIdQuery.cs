@@ -12,11 +12,9 @@ public record GetUomByIdQuery(int Id) : IRequest<Result<GetUomDto>>;
 
 public class GetUomByIdQueryHandler(IUomRepository uomRepository) : IRequestHandler<GetUomByIdQuery, Result<GetUomDto>>
 {
-    private readonly IUomRepository _uomRepository = uomRepository;
-
     public async Task<Result<GetUomDto>> Handle(GetUomByIdQuery request, CancellationToken cancellationToken)
     {
-        var uom = await _uomRepository.GetByIdAsync(request.Id, cancellationToken);
+        var uom = await uomRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (uom == null) return Result<GetUomDto>.Failure("Uom not found", HttpStatusCode.NotFound);
 

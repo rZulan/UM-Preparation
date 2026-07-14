@@ -15,25 +15,22 @@ public record UpdateUomCommand(int? UserId, int Id, UpdateUomDto UpdateUomDTO) :
 public class UpdateUomCommandHandler(IUomRepository uomRepository, IUserRepository userRepository)
     : IRequestHandler<UpdateUomCommand, Result<object>>
 {
-    private readonly IUomRepository _uomRepository = uomRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(UpdateUomCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingUom = await _uomRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingUom = await uomRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingUom == null) return Result<object>.Failure("Uom not found", HttpStatusCode.NotFound);
 
         if (!string.IsNullOrEmpty(request.UpdateUomDTO.Name))
         {
             var existingName =
-                await _uomRepository.AnyDuplicateAsync(request.Id, request.UpdateUomDTO.Name, cancellationToken);
+                await uomRepository.AnyDuplicateAsync(request.Id, request.UpdateUomDTO.Name, cancellationToken);
 
             if (existingName) return Result<object>.Failure("Uom name already exists");
 
@@ -48,7 +45,7 @@ public class UpdateUomCommandHandler(IUomRepository uomRepository, IUserReposito
         existingUom.UpdatedAt = DateTime.UtcNow;
         existingUom.UpdatedById = existingUser.Id;
 
-        await _uomRepository.UpdateAsync(existingUom, cancellationToken);
+        await uomRepository.UpdateAsync(existingUom, cancellationToken);
 
         return Result<object>.Success(null, "Uom updated successfully");
     }

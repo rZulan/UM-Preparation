@@ -7,11 +7,9 @@ namespace Infrastructure.Repositories
 {
     public class InventoryRepository(AppDbContext context) : IInventoryRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<GetInventoryDto?> GetByWarehouseIdAsync(int warehouseId, CancellationToken cancellationToken)
         {
-            var warehouse = await _context.Warehouses
+            var warehouse = await context.Warehouses
                 .AsNoTracking()
                 .Where(x => x.Id == warehouseId)
                 .Select(x => new { x.Id, x.Name })
@@ -22,7 +20,7 @@ namespace Infrastructure.Repositories
                 return null;
             }
 
-            List<InventoryProductDto> products = await _context.Products
+            List<InventoryProductDto> products = await context.Products
                 .AsNoTracking()
                 .Select(x => new InventoryProductDto
                 {
@@ -30,13 +28,13 @@ namespace Infrastructure.Repositories
                     ItemCode = x.ItemCode,
                     Description = x.Description,
                     Soh =
-                        (_context.WarehouseReceivings
+                        (context.WarehouseReceivings
                             .Where(receiving =>
                                 receiving.WarehouseId == warehouseId &&
                                 receiving.ProductId == x.Id)
                             .Select(receiving => (decimal?)receiving.Quantity)
                             .Sum() ?? 0m) -
-                        (_context.MoveOrderProductWarehouseReceivings
+                        (context.MoveOrderProductWarehouseReceivings
                             .Where(allocation =>
                                 allocation.WarehouseReceiving.WarehouseId == warehouseId &&
                                 allocation.WarehouseReceiving.ProductId == x.Id &&
@@ -44,13 +42,13 @@ namespace Infrastructure.Repositories
                             .Select(allocation => (decimal?)allocation.Quantity)
                             .Sum() ?? 0m),
                     Reserve =
-                        (_context.WarehouseReceivings
+                        (context.WarehouseReceivings
                             .Where(receiving =>
                                 receiving.WarehouseId == warehouseId &&
                                 receiving.ProductId == x.Id)
                             .Select(receiving => (decimal?)receiving.Quantity)
                             .Sum() ?? 0m) -
-                        (_context.MoveOrderProductWarehouseReceivings
+                        (context.MoveOrderProductWarehouseReceivings
                             .Where(allocation =>
                                 allocation.WarehouseReceiving.WarehouseId == warehouseId &&
                                 allocation.WarehouseReceiving.ProductId == x.Id)
@@ -67,7 +65,7 @@ namespace Infrastructure.Repositories
             int warehouseId,
             CancellationToken cancellationToken)
         {
-            if (!await _context.Warehouses.AsNoTracking().AnyAsync(x => x.Id == warehouseId, cancellationToken))
+            if (!await context.Warehouses.AsNoTracking().AnyAsync(x => x.Id == warehouseId, cancellationToken))
             {
                 return null;
             }
@@ -85,7 +83,7 @@ namespace Infrastructure.Repositories
             int productId,
             CancellationToken cancellationToken)
         {
-            if (!await _context.Warehouses.AsNoTracking().AnyAsync(x => x.Id == warehouseId, cancellationToken))
+            if (!await context.Warehouses.AsNoTracking().AnyAsync(x => x.Id == warehouseId, cancellationToken))
             {
                 return null;
             }
@@ -104,14 +102,14 @@ namespace Infrastructure.Repositories
 
         private IQueryable<GetInventoryReceivingProductDto> GetReceivingProducts(int warehouseId)
         {
-            return _context.Products
+            return context.Products
                 .AsNoTracking()
                 .Select(product => new GetInventoryReceivingProductDto
                 {
                     ProductId = product.Id,
                     ItemCode = product.ItemCode,
                     Description = product.Description,
-                    WarehouseReceivings = _context.WarehouseReceivings
+                    WarehouseReceivings = context.WarehouseReceivings
                         .AsNoTracking()
                         .Where(receiving =>
                             receiving.WarehouseId == warehouseId &&
@@ -121,14 +119,14 @@ namespace Infrastructure.Repositories
                         {
                             WarehouseReceivingId = receiving.Id,
                             TotalQuantity = receiving.Quantity,
-                            UsedQuantity = _context.MoveOrderProductWarehouseReceivings
+                            UsedQuantity = context.MoveOrderProductWarehouseReceivings
                                 .Where(allocation =>
                                     allocation.ProductId == product.Id &&
                                     allocation.WarehouseReceivingId == receiving.Id)
                                 .Select(allocation => (decimal?)allocation.Quantity)
                                 .Sum() ?? 0m,
                             AvailableQuantity = receiving.Quantity -
-                                                (_context.MoveOrderProductWarehouseReceivings
+                                                (context.MoveOrderProductWarehouseReceivings
                                                     .Where(allocation =>
                                                         allocation.ProductId == product.Id &&
                                                         allocation.WarehouseReceivingId == receiving.Id)

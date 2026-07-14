@@ -15,11 +15,9 @@ public record GetUsersQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IR
 public class GetUsersQueryHandler(IUserRepository userRepository)
     : IRequestHandler<GetUsersQuery, GetAllResult<List<GetUserDto>>>
 {
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<GetAllResult<List<GetUserDto>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
-        var users = await _userRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+        var users = await userRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
         var result = users.Select(u => new GetUserDto
         {
@@ -50,7 +48,7 @@ public class GetUsersQueryHandler(IUserRepository userRepository)
             {
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
-                TotalCount = await _userRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                TotalCount = await userRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

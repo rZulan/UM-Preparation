@@ -16,14 +16,12 @@ namespace UM_Preparation.Controllers
     [Authorize]
     public class ProductController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
-
         [HttpGet]
         public async Task<IActionResult> GetProducts([FromQuery] GenericFiltersDto genericFiltersDto,
             [FromQuery] Sort sort)
         {
             GetAllResult<List<GetProductDto>> result =
-                await _mediator.Send(new GetProductsQuery(genericFiltersDto, sort));
+                await mediator.Send(new GetProductsQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -31,7 +29,7 @@ namespace UM_Preparation.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetProductById(int id)
         {
-            Result<GetProductDto> result = await _mediator.Send(new GetProductByIdQuery(id));
+            Result<GetProductDto> result = await mediator.Send(new GetProductByIdQuery(id));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -42,7 +40,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new AddProductCommand(userId, addProductDto));
+            Result<object> result = await mediator.Send(new AddProductCommand(userId, addProductDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -53,7 +51,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new UpdateProductCommand(userId, id, updateProductDto));
+            Result<object> result = await mediator.Send(new UpdateProductCommand(userId, id, updateProductDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -64,7 +62,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new ToggleProductActiveCommand(userId, id, false));
+            Result<object> result = await mediator.Send(new ToggleProductActiveCommand(userId, id, false));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -75,7 +73,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new ToggleProductActiveCommand(userId, id, true));
+            Result<object> result = await mediator.Send(new ToggleProductActiveCommand(userId, id, true));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

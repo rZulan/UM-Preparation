@@ -13,12 +13,10 @@ public record GetPermissionByIdQuery(int Id) : IRequest<Result<GetPermissionDto>
 public class GetPermissionByIdQueryHandler(IPermissionRepository permissionRepository)
     : IRequestHandler<GetPermissionByIdQuery, Result<GetPermissionDto>>
 {
-    private readonly IPermissionRepository _permissionRepository = permissionRepository;
-
     public async Task<Result<GetPermissionDto>> Handle(GetPermissionByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var permission = await _permissionRepository.GetByIdAsync(request.Id, cancellationToken);
+        var permission = await permissionRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (permission == null)
             return Result<GetPermissionDto>.Failure("Permission not found", HttpStatusCode.NotFound);

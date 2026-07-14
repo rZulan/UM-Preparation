@@ -16,13 +16,11 @@ public record GetWarehousesQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort)
 public class GetWarehousesQueryHandler(IWarehouseRepository warehouseRepository)
     : IRequestHandler<GetWarehousesQuery, GetAllResult<List<GetWarehouseDto>>>
 {
-    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
-
     public async Task<GetAllResult<List<GetWarehouseDto>>> Handle(GetWarehousesQuery request,
         CancellationToken cancellationToken)
     {
         var warehouses =
-            await _warehouseRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            await warehouseRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
         var result = warehouses.Select(x => new GetWarehouseDto
         {
@@ -38,7 +36,7 @@ public class GetWarehousesQueryHandler(IWarehouseRepository warehouseRepository)
             {
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
-                TotalCount = await _warehouseRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                TotalCount = await warehouseRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

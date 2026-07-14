@@ -12,17 +12,15 @@ public record LogoutUserCommand(string RefreshToken) : IRequest<Result<object>>;
 public class LogoutUserCommandHandler(IRefreshTokenRepository refreshTokenRepository)
     : IRequestHandler<LogoutUserCommand, Result<object>>
 {
-    private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
-
     public async Task<Result<object>> Handle(LogoutUserCommand request, CancellationToken cancellationToken)
     {
-        var existing = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
+        var existing = await refreshTokenRepository.GetByTokenAsync(request.RefreshToken, cancellationToken);
 
         if (existing == null)
             return Result<object>.Success(null, "User logged out successfully (no active session found)",
                 HttpStatusCode.Accepted);
 
-        await _refreshTokenRepository.RevokeAsync(existing, cancellationToken);
+        await refreshTokenRepository.RevokeAsync(existing, cancellationToken);
 
         return Result<object>.Success(null, "User logged out successfully");
     }

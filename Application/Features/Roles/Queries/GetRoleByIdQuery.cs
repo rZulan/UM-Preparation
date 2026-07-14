@@ -14,11 +14,9 @@ public record GetRoleByIdQuery(int Id) : IRequest<Result<GetRoleDto>>;
 public class GetRoleByIdQueryHandler(IRoleRepository roleRepository)
     : IRequestHandler<GetRoleByIdQuery, Result<GetRoleDto>>
 {
-    private readonly IRoleRepository _roleRepository = roleRepository;
-
     public async Task<Result<GetRoleDto>> Handle(GetRoleByIdQuery request, CancellationToken cancellationToken)
     {
-        var role = await _roleRepository.GetByIdAsync(request.Id, cancellationToken);
+        var role = await roleRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (role == null) return Result<GetRoleDto>.Failure("Role not found", HttpStatusCode.NotFound);
 

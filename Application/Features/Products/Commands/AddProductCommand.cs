@@ -15,19 +15,16 @@ public record AddProductCommand(int? UserId, AddProductDto AddProductDTO) : IReq
 public class AddProductCommandHandler(IProductRepository productRepository, IUserRepository userRepository)
     : IRequestHandler<AddProductCommand, Result<object>>
 {
-    private readonly IProductRepository _productRepository = productRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(AddProductCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
         var existingProduct =
-            await _productRepository.GetByItemCodeAsync(request.AddProductDTO.ItemCode, cancellationToken);
+            await productRepository.GetByItemCodeAsync(request.AddProductDTO.ItemCode, cancellationToken);
 
         if (existingProduct != null) return Result<object>.Failure("Product already exists", HttpStatusCode.Conflict);
 
@@ -40,7 +37,7 @@ public class AddProductCommandHandler(IProductRepository productRepository, IUse
             CreatedById = existingUser.Id
         };
 
-        await _productRepository.AddAsync(product, cancellationToken);
+        await productRepository.AddAsync(product, cancellationToken);
 
         return Result<object>.Success(product.Id, "Product created successfully", HttpStatusCode.Created);
     }

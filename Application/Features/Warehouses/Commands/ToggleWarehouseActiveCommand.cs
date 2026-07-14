@@ -15,18 +15,15 @@ public class ToggleWarehouseActiveCommandHandler(
     IWarehouseRepository warehouseRepository,
     IUserRepository userRepository) : IRequestHandler<ToggleWarehouseActiveCommand, Result<object>>
 {
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
-
     public async Task<Result<object>> Handle(ToggleWarehouseActiveCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingWarehouse = await warehouseRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingWarehouse == null) return Result<object>.Failure("Warehouse not found");
 
@@ -37,7 +34,7 @@ public class ToggleWarehouseActiveCommandHandler(
             return Result<object>.Failure("Warehouse is already archived");
 
         var anyUsersTagged =
-            await _userRepository.AnyUsersWarehouseTaggedAsync(existingWarehouse.Id, cancellationToken);
+            await userRepository.AnyUsersWarehouseTaggedAsync(existingWarehouse.Id, cancellationToken);
 
         if (!request.IsActive && anyUsersTagged)
             return Result<object>.Failure(
@@ -47,7 +44,7 @@ public class ToggleWarehouseActiveCommandHandler(
         existingWarehouse.UpdatedAt = DateTime.UtcNow;
         existingWarehouse.UpdatedById = existingUser.Id;
 
-        await _warehouseRepository.UpdateAsync(existingWarehouse, cancellationToken);
+        await warehouseRepository.UpdateAsync(existingWarehouse, cancellationToken);
 
         var status = existingWarehouse.IsActive ? "restored" : "archived";
 

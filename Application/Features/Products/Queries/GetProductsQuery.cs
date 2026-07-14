@@ -16,12 +16,10 @@ public record GetProductsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort)
 public class GetProductsQueryHandler(IProductRepository productRepository)
     : IRequestHandler<GetProductsQuery, GetAllResult<List<GetProductDto>>>
 {
-    private readonly IProductRepository _productRepository = productRepository;
-
     public async Task<GetAllResult<List<GetProductDto>>> Handle(GetProductsQuery request,
         CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+        var products = await productRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
         var result = products.Select(x => new GetProductDto
         {
@@ -39,7 +37,7 @@ public class GetProductsQueryHandler(IProductRepository productRepository)
             {
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
-                TotalCount = await _productRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                TotalCount = await productRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

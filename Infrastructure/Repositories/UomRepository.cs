@@ -9,12 +9,10 @@ namespace Infrastructure.Repositories
 {
     public class UomRepository(AppDbContext context) : IUomRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<List<Uom>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
             CancellationToken cancellationToken)
         {
-            IQueryable<Uom> query = _context.Uoms;
+            IQueryable<Uom> query = context.Uoms;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -60,7 +58,7 @@ namespace Infrastructure.Repositories
 
         public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
-            IQueryable<Uom> query = _context.Uoms;
+            IQueryable<Uom> query = context.Uoms;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -81,7 +79,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Uom?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            IQueryable<Uom> query = _context.Uoms
+            IQueryable<Uom> query = context.Uoms
                 .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -89,7 +87,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Uom?> GetByNameAsync(string name, CancellationToken cancellationToken)
         {
-            IQueryable<Uom> query = _context.Uoms
+            IQueryable<Uom> query = context.Uoms
                 .Where(x => x.Name.ToLower() == name.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -97,19 +95,19 @@ namespace Infrastructure.Repositories
 
         public async Task AddAsync(Uom uom, CancellationToken cancellationToken)
         {
-            await _context.Uoms.AddAsync(uom, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await context.Uoms.AddAsync(uom, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(Uom uom, CancellationToken cancellationToken)
         {
-            _context.Uoms.Update(uom);
-            await _context.SaveChangesAsync(cancellationToken);
+            context.Uoms.Update(uom);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<bool> AnyDuplicateAsync(int id, string name, CancellationToken cancellationToken)
         {
-            return await _context.Uoms.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(),
+            return await context.Uoms.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(),
                 cancellationToken);
         }
     }

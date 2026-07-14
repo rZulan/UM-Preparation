@@ -15,19 +15,16 @@ public record AddWarehouseCommand(int? UserId, AddWarehouseDto AddWarehouseDTO) 
 public class AddWarehouseCommandHandler(IWarehouseRepository warehouseRepository, IUserRepository userRepository)
     : IRequestHandler<AddWarehouseCommand, Result<object>>
 {
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
-
     public async Task<Result<object>> Handle(AddWarehouseCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
         var existingWarehouse =
-            await _warehouseRepository.GetByNameAsync(request.AddWarehouseDTO.Name, cancellationToken);
+            await warehouseRepository.GetByNameAsync(request.AddWarehouseDTO.Name, cancellationToken);
 
         if (existingWarehouse != null)
             return Result<object>.Failure("Warehouse already exists", HttpStatusCode.Conflict);
@@ -40,7 +37,7 @@ public class AddWarehouseCommandHandler(IWarehouseRepository warehouseRepository
             CreatedById = existingUser.Id
         };
 
-        await _warehouseRepository.AddAsync(warehouse, cancellationToken);
+        await warehouseRepository.AddAsync(warehouse, cancellationToken);
 
         return Result<object>.Success(warehouse.Id, "Warehouse created successfully");
     }

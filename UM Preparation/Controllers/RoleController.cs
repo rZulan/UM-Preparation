@@ -16,13 +16,11 @@ namespace UM_Preparation.Controllers
     [Authorize]
     public class RoleController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
-
         [HttpGet]
         public async Task<IActionResult> GetRoles([FromQuery] GenericFiltersDto genericFiltersDto,
             [FromQuery] Sort sort)
         {
-            GetAllResult<List<GetRoleDto>> result = await _mediator.Send(new GetRolesQuery(genericFiltersDto, sort));
+            GetAllResult<List<GetRoleDto>> result = await mediator.Send(new GetRolesQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -30,7 +28,7 @@ namespace UM_Preparation.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetRoleById(int id)
         {
-            Result<GetRoleDto> result = await _mediator.Send(new GetRoleByIdQuery(id));
+            Result<GetRoleDto> result = await mediator.Send(new GetRoleByIdQuery(id));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -41,7 +39,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new AddRoleCommand(userId, addRoleDto));
+            Result<object> result = await mediator.Send(new AddRoleCommand(userId, addRoleDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -52,7 +50,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new UpdateRoleCommand(userId, id, updateRoleDto));
+            Result<object> result = await mediator.Send(new UpdateRoleCommand(userId, id, updateRoleDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -63,7 +61,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new ToggleRoleActiveCommand(userId, id, false));
+            Result<object> result = await mediator.Send(new ToggleRoleActiveCommand(userId, id, false));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -74,7 +72,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new ToggleRoleActiveCommand(userId, id, true));
+            Result<object> result = await mediator.Send(new ToggleRoleActiveCommand(userId, id, true));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

@@ -20,21 +20,17 @@ public class UpdateWarehouseReceivingCommandHandler(
     IUserRepository userRepository,
     IProductRepository productRepository) : IRequestHandler<UpdateWarehouseReceivingCommand, Result<object>>
 {
-    private readonly IProductRepository _productRepository = productRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-    private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
-
     public async Task<Result<object>> Handle(UpdateWarehouseReceivingCommand request,
         CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
         var existingWarehouseReceiving =
-            await _warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
+            await warehouseReceivingRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingWarehouseReceiving == null)
             return Result<object>.Failure("Warehouse Receiving not found", HttpStatusCode.NotFound);
@@ -42,7 +38,7 @@ public class UpdateWarehouseReceivingCommandHandler(
         if (request.UpdateWarehouseReceivingDTO.ProductId.HasValue)
         {
             var existingProduct =
-                await _productRepository.GetByIdAsync(request.UpdateWarehouseReceivingDTO.ProductId.Value,
+                await productRepository.GetByIdAsync(request.UpdateWarehouseReceivingDTO.ProductId.Value,
                     cancellationToken);
 
             if (existingProduct == null) return Result<object>.Failure("Product not found", HttpStatusCode.NotFound);
@@ -60,7 +56,7 @@ public class UpdateWarehouseReceivingCommandHandler(
         existingWarehouseReceiving.UpdatedAt = DateTime.UtcNow;
         existingWarehouseReceiving.UpdatedById = request.UserId.Value;
 
-        await _warehouseReceivingRepository.UpdateAsync(existingWarehouseReceiving, cancellationToken);
+        await warehouseReceivingRepository.UpdateAsync(existingWarehouseReceiving, cancellationToken);
 
         return Result<object>.Success(null);
     }

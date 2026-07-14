@@ -15,13 +15,11 @@ namespace UM_Preparation.Controllers
     [ApiController]
     public class PendingAccountController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
-
         [HttpPost]
         [ApiKey]
         public async Task<IActionResult> CreatePendingAccount([FromBody] AddPendingAccountDto createPendingAccountDto)
         {
-            Result<object> result = await _mediator.Send(new AddPendingAccountCommand(createPendingAccountDto));
+            Result<object> result = await mediator.Send(new AddPendingAccountCommand(createPendingAccountDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -32,7 +30,7 @@ namespace UM_Preparation.Controllers
             [FromQuery] Sort sort)
         {
             GetAllResult<List<GetPendingAccountDto>> result =
-                await _mediator.Send(new GetPendingAccountsQuery(genericFiltersDto, sort));
+                await mediator.Send(new GetPendingAccountsQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -41,7 +39,7 @@ namespace UM_Preparation.Controllers
         [Authorize]
         public async Task<IActionResult> GetPendingAccountById(int id)
         {
-            Result<GetPendingAccountDto> result = await _mediator.Send(new GetPendingAccountByIdQuery(id));
+            Result<GetPendingAccountDto> result = await mediator.Send(new GetPendingAccountByIdQuery(id));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -51,7 +49,7 @@ namespace UM_Preparation.Controllers
         public async Task<IActionResult> ImportPendingAccount(int id,
             [FromQuery] ImportPendingAccountDto importPendingAccountDto)
         {
-            Result<object> result = await _mediator.Send(new ImportPendingAccountCommand(id, importPendingAccountDto));
+            Result<object> result = await mediator.Send(new ImportPendingAccountCommand(id, importPendingAccountDto));
 
             if (result.IsFailure)
             {

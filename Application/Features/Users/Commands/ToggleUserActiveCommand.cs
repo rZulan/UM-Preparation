@@ -13,11 +13,9 @@ public record ToggleUserActiveCommand(int Id, bool Toggle) : IRequest<Result<obj
 public class ToggleUserActiveCommandHandler(IUserRepository userRepository)
     : IRequestHandler<ToggleUserActiveCommand, Result<object>>
 {
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(ToggleUserActiveCommand request, CancellationToken cancellationToken)
     {
-        var existingUser = await _userRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
@@ -27,7 +25,7 @@ public class ToggleUserActiveCommandHandler(IUserRepository userRepository)
 
         existingUser.IsActive = request.Toggle;
 
-        await _userRepository.UpdateAsync(existingUser, cancellationToken);
+        await userRepository.UpdateAsync(existingUser, cancellationToken);
 
         var status = existingUser.IsActive ? "restored" : "archived";
 

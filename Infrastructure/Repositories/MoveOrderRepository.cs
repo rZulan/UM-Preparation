@@ -9,12 +9,10 @@ namespace Infrastructure.Repositories
 {
     public class MoveOrderRepository(AppDbContext context) : IMoveOrderRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<List<MoveOrder>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
             CancellationToken cancellationToken)
         {
-            IQueryable<MoveOrder> query = _context.MoveOrders
+            IQueryable<MoveOrder> query = context.MoveOrders
                 .Include(x => x.Warehouse)
                 .Include(x => x.MoveOrderProducts)
                 .ThenInclude(x => x.Product);
@@ -55,7 +53,7 @@ namespace Infrastructure.Repositories
 
         public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
-            IQueryable<MoveOrder> query = _context.MoveOrders;
+            IQueryable<MoveOrder> query = context.MoveOrders;
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -74,7 +72,7 @@ namespace Infrastructure.Repositories
 
         public async Task<MoveOrder?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            IQueryable<MoveOrder> query = _context.MoveOrders
+            IQueryable<MoveOrder> query = context.MoveOrders
                 .Where(x => x.Id == id)
                 .Include(x => x.Warehouse)
                 .Include(x => x.MoveOrderProducts)
@@ -85,14 +83,14 @@ namespace Infrastructure.Repositories
 
         public async Task AddAsync(MoveOrder product, CancellationToken cancellationToken)
         {
-            await _context.MoveOrders.AddAsync(product, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await context.MoveOrders.AddAsync(product, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(MoveOrder product, CancellationToken cancellationToken)
         {
-            _context.MoveOrders.Update(product);
-            await _context.SaveChangesAsync(cancellationToken);
+            context.MoveOrders.Update(product);
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

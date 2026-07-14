@@ -15,18 +15,15 @@ public class TogglePermissionActiveCommandHandler(
     IPermissionRepository permissionRepository,
     IUserRepository userRepository) : IRequestHandler<TogglePermissionActiveCommand, Result<object>>
 {
-    private readonly IPermissionRepository _permissionRepository = permissionRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(TogglePermissionActiveCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingPermission = await _permissionRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingPermission = await permissionRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingPermission == null) return Result<object>.Failure("Permission not found");
 
@@ -40,7 +37,7 @@ public class TogglePermissionActiveCommandHandler(
         existingPermission.UpdatedAt = DateTime.UtcNow;
         existingPermission.UpdatedById = existingUser.Id;
 
-        await _permissionRepository.UpdateAsync(existingPermission, cancellationToken);
+        await permissionRepository.UpdateAsync(existingPermission, cancellationToken);
 
         var status = existingPermission.IsActive ? "restored" : "archived";
 

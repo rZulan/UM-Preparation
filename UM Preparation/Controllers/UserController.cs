@@ -16,13 +16,11 @@ namespace UM_Preparation.Controllers
     [Authorize]
     public class UserController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
-
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] GenericFiltersDto genericFiltersDto,
             [FromQuery] Sort sort)
         {
-            GetAllResult<List<GetUserDto>> result = await _mediator.Send(new GetUsersQuery(genericFiltersDto, sort));
+            GetAllResult<List<GetUserDto>> result = await mediator.Send(new GetUsersQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -30,7 +28,7 @@ namespace UM_Preparation.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetUserById(int id)
         {
-            Result<GetUserDto> result = await _mediator.Send(new GetUserByIdQuery(id));
+            Result<GetUserDto> result = await mediator.Send(new GetUserByIdQuery(id));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -40,7 +38,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new ChangeUserPasswordCommand(userId, updatePasswordDto));
+            Result<object> result = await mediator.Send(new ChangeUserPasswordCommand(userId, updatePasswordDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -49,7 +47,7 @@ namespace UM_Preparation.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
-            Result<object> result = await _mediator.Send(new UpdateUserCommand(id, updateUserDto));
+            Result<object> result = await mediator.Send(new UpdateUserCommand(id, updateUserDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -58,7 +56,7 @@ namespace UM_Preparation.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ArchiveUser(int id)
         {
-            Result<object> result = await _mediator.Send(new ToggleUserActiveCommand(id, false));
+            Result<object> result = await mediator.Send(new ToggleUserActiveCommand(id, false));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -67,7 +65,7 @@ namespace UM_Preparation.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RestoreUser(int id)
         {
-            Result<object> result = await _mediator.Send(new ToggleUserActiveCommand(id, true));
+            Result<object> result = await mediator.Send(new ToggleUserActiveCommand(id, true));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

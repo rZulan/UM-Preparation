@@ -14,18 +14,15 @@ public record ToggleRoleActiveCommand(int? UserId, int Id, bool IsActive) : IReq
 public class ToggleRoleActiveCommandHandler(IRoleRepository roleRepository, IUserRepository userRepository)
     : IRequestHandler<ToggleRoleActiveCommand, Result<object>>
 {
-    private readonly IRoleRepository _roleRepository = roleRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(ToggleRoleActiveCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingRole = await _roleRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingRole = await roleRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingRole == null) return Result<object>.Failure("Role not found");
 
@@ -37,7 +34,7 @@ public class ToggleRoleActiveCommandHandler(IRoleRepository roleRepository, IUse
         existingRole.UpdatedAt = DateTime.UtcNow;
         existingUser.UpdatedById = existingUser.Id;
 
-        await _roleRepository.UpdateAsync(existingRole, cancellationToken);
+        await roleRepository.UpdateAsync(existingRole, cancellationToken);
 
         var status = existingRole.IsActive ? "restored" : "archived";
 

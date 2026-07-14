@@ -11,14 +11,12 @@ public record MeQuery(int? UserId) : IRequest<Result<MeResultDto>>;
 
 public class MeQueryHandler(IUserRepository userRepository) : IRequestHandler<MeQuery, Result<MeResultDto>>
 {
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<MeResultDto>> Handle(MeQuery request, CancellationToken cancellationToken)
     {
         if (request.UserId == null)
             return Result<MeResultDto>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<MeResultDto>.Failure("User not found", HttpStatusCode.NotFound);
 

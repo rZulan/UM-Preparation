@@ -16,14 +16,12 @@ namespace UM_Preparation.Controllers
     [Authorize]
     public class MoveOrderController(IMediator mediator) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
-
         [HttpGet]
         public async Task<IActionResult> GetMoveOrders([FromQuery] GenericFiltersDto genericFiltersDto,
             [FromQuery] Sort sort)
         {
             GetAllResult<List<GetMoveOrderDto>> result =
-                await _mediator.Send(new GetMoveOrdersQuery(genericFiltersDto, sort));
+                await mediator.Send(new GetMoveOrdersQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -31,7 +29,7 @@ namespace UM_Preparation.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetMoveOrderById(int id)
         {
-            Result<GetMoveOrderDto> result = await _mediator.Send(new GetMoveOrderByIdQuery(id));
+            Result<GetMoveOrderDto> result = await mediator.Send(new GetMoveOrderByIdQuery(id));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -42,7 +40,7 @@ namespace UM_Preparation.Controllers
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new AddMoveOrderCommand(userId, addMoveOrderDto));
+            Result<object> result = await mediator.Send(new AddMoveOrderCommand(userId, addMoveOrderDto));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

@@ -13,12 +13,10 @@ public record GetMiscellaneousReceiptByIdQuery(int Id) : IRequest<Result<GetMisc
 public class GetMiscellaneousReceiptByIdQueryHandler(IMiscellaneousReceiptRepository miscellaneousReceiptRepository)
     : IRequestHandler<GetMiscellaneousReceiptByIdQuery, Result<GetMiscellaneousReceiptDto>>
 {
-    private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellaneousReceiptRepository;
-
     public async Task<Result<GetMiscellaneousReceiptDto>> Handle(GetMiscellaneousReceiptByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var miscellaneousReceipt = await _miscellaneousReceiptRepository.GetByIdAsync(request.Id, cancellationToken);
+        var miscellaneousReceipt = await miscellaneousReceiptRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (miscellaneousReceipt == null)
             return Result<GetMiscellaneousReceiptDto>.Failure("Miscellaneous receipt not found",

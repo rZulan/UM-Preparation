@@ -16,13 +16,11 @@ public record GetPermissionsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort
 public class GetPermissionsQueryHandler(IPermissionRepository permissionRepository)
     : IRequestHandler<GetPermissionsQuery, GetAllResult<List<GetPermissionDto>>>
 {
-    private readonly IPermissionRepository _permissionRepository = permissionRepository;
-
     public async Task<GetAllResult<List<GetPermissionDto>>> Handle(GetPermissionsQuery request,
         CancellationToken cancellationToken)
     {
         var permissions =
-            await _permissionRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            await permissionRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
         var result = permissions.Select(x => new GetPermissionDto
         {
@@ -38,7 +36,7 @@ public class GetPermissionsQueryHandler(IPermissionRepository permissionReposito
             {
                 CurrentPage = request.GenericFiltersDTO.PageNumber,
                 PageSize = request.GenericFiltersDTO.PageSize,
-                TotalCount = await _permissionRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                TotalCount = await permissionRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
             };
 
         var sortInfo = new SortInfo

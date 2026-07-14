@@ -10,12 +10,10 @@ namespace Infrastructure.Repositories
 {
     public class WarehouseReceivingRepository(AppDbContext context) : IWarehouseReceivingRepository
     {
-        private readonly AppDbContext _context = context;
-
         public async Task<List<WarehouseReceiving>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
             CancellationToken cancellationToken)
         {
-            IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
+            IQueryable<WarehouseReceiving> query = context.WarehouseReceivings
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
                 .ThenInclude(x => x.Uom)
@@ -70,7 +68,7 @@ namespace Infrastructure.Repositories
 
         public async Task<int> GetCountAsync(GenericFiltersDto genericFiltersDTO, CancellationToken cancellationToken)
         {
-            IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings;
+            IQueryable<WarehouseReceiving> query = context.WarehouseReceivings;
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
             {
@@ -90,7 +88,7 @@ namespace Infrastructure.Repositories
 
         public async Task<WarehouseReceiving?> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
-            IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
+            IQueryable<WarehouseReceiving> query = context.WarehouseReceivings
                 .Where(x => x.Id == id)
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
@@ -103,7 +101,7 @@ namespace Infrastructure.Repositories
         public async Task<List<WarehouseReceiving>> GetByProductIdAsync(int productId,
             CancellationToken cancellationToken)
         {
-            IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
+            IQueryable<WarehouseReceiving> query = context.WarehouseReceivings
                 .Where(x => x.ProductId == productId)
                 .Include(x => x.Product)
                 .Include(x => x.MiscellaneousReceipt);
@@ -113,20 +111,20 @@ namespace Infrastructure.Repositories
 
         public async Task AddAsync(WarehouseReceiving warehouse, CancellationToken cancellationToken)
         {
-            await _context.WarehouseReceivings.AddAsync(warehouse, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            await context.WarehouseReceivings.AddAsync(warehouse, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(WarehouseReceiving warehouse, CancellationToken cancellationToken)
         {
-            _context.WarehouseReceivings.Update(warehouse);
-            await _context.SaveChangesAsync(cancellationToken);
+            context.WarehouseReceivings.Update(warehouse);
+            await context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<bool> ProductHasAvailableReserve(int warehouseId, int productId, decimal quantity,
             CancellationToken cancellationToken)
         {
-            decimal totalReceived = await _context.WarehouseReceivings
+            decimal totalReceived = await context.WarehouseReceivings
                 .Where(x =>
                     x.IsActive &&
                     x.WarehouseId == warehouseId &&
@@ -134,7 +132,7 @@ namespace Infrastructure.Repositories
                 )
                 .SumAsync(x => x.Quantity, cancellationToken);
 
-            decimal totalMoved = await _context.MoveOrderProductWarehouseReceivings
+            decimal totalMoved = await context.MoveOrderProductWarehouseReceivings
                 .Where(x =>
                     x.MoveOrderProduct.MoveOrder.IsActive &&
                     x.WarehouseReceiving.WarehouseId == warehouseId &&
@@ -151,7 +149,7 @@ namespace Infrastructure.Repositories
         public async Task<List<AvailableMoveOrderProductWarehouseReceivingsDto>> GetProductAffectedWarehouseReceivings(
             int warehouseId, int productId, decimal quantity, CancellationToken cancellationToken)
         {
-            var receivingLots = await _context.WarehouseReceivings
+            var receivingLots = await context.WarehouseReceivings
                 .AsNoTracking()
                 .Where(x =>
                     x.IsActive &&
@@ -164,7 +162,7 @@ namespace Infrastructure.Repositories
                 {
                     x.Id,
                     AvailableQuantity = x.Quantity -
-                                        (_context.MoveOrderProductWarehouseReceivings
+                                        (context.MoveOrderProductWarehouseReceivings
                                             .Where(allocation =>
                                                 allocation.WarehouseReceivingId == x.Id &&
                                                 allocation.MoveOrderProduct.MoveOrder.IsActive)

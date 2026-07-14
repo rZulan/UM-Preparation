@@ -20,27 +20,22 @@ public class ImportPendingAccountCommandHandler(
     IWarehouseRepository warehouseRepository,
     IMediator mediator) : IRequestHandler<ImportPendingAccountCommand, Result<object>>
 {
-    private readonly IMediator _mediator = mediator;
-    private readonly IPendingAccountRepository _pendingAccountRepository = pendingAccountRepository;
-    private readonly IRoleRepository _roleRepository = roleRepository;
-    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
-
     public async Task<Result<object>> Handle(ImportPendingAccountCommand request, CancellationToken cancellationToken)
     {
-        var existingPendingAccount = await _pendingAccountRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingPendingAccount = await pendingAccountRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingPendingAccount == null)
             return Result<object>.Failure("Pending Account not found", HttpStatusCode.NotFound);
 
         var existingRole =
-            await _roleRepository.GetByIdAsync(request.ImportPendingAccountDTO.RoleId, cancellationToken);
+            await roleRepository.GetByIdAsync(request.ImportPendingAccountDTO.RoleId, cancellationToken);
 
         if (existingRole == null) return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
 
         if (request.ImportPendingAccountDTO.WarehouseId.HasValue)
         {
             var existingWarehouse =
-                await _warehouseRepository.GetByIdAsync(request.ImportPendingAccountDTO.WarehouseId.Value,
+                await warehouseRepository.GetByIdAsync(request.ImportPendingAccountDTO.WarehouseId.Value,
                     cancellationToken);
 
             if (existingWarehouse == null)
@@ -61,7 +56,7 @@ public class ImportPendingAccountCommandHandler(
             WarehouseId = request.ImportPendingAccountDTO.WarehouseId
         };
 
-        var result = await _mediator.Send(new RegisterUserCommand(registerDTO), cancellationToken);
+        var result = await mediator.Send(new RegisterUserCommand(registerDTO), cancellationToken);
 
         if (result.IsFailure)
             return Result<object>.Failure("Failed to create user account from pending account: " + result.Message,

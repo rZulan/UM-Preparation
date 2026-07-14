@@ -18,26 +18,22 @@ public class UpdateRoleCommandHandler(
     IPermissionRepository permissionRepository,
     IUserRepository userRepository) : IRequestHandler<UpdateRoleCommand, Result<object>>
 {
-    private readonly IPermissionRepository _permissionRepository = permissionRepository;
-    private readonly IRoleRepository _roleRepository = roleRepository;
-    private readonly IUserRepository _userRepository = userRepository;
-
     public async Task<Result<object>> Handle(UpdateRoleCommand request, CancellationToken cancellationToken)
     {
         if (request.UserId == null) return Result<object>.Failure("User is not signed in", HttpStatusCode.Unauthorized);
 
-        var existingUser = await _userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
+        var existingUser = await userRepository.GetByIdAsync(request.UserId.Value, cancellationToken);
 
         if (existingUser == null) return Result<object>.Failure("User not found", HttpStatusCode.NotFound);
 
-        var existingRole = await _roleRepository.GetByIdAsync(request.Id, cancellationToken);
+        var existingRole = await roleRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (existingRole == null) return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
 
         if (!string.IsNullOrEmpty(request.UpdateRoleDTO.Name))
         {
             var existingName =
-                await _roleRepository.AnyDuplicateAsync(request.Id, request.UpdateRoleDTO.Name, cancellationToken);
+                await roleRepository.AnyDuplicateAsync(request.Id, request.UpdateRoleDTO.Name, cancellationToken);
 
             if (existingName) return Result<object>.Failure("Role name already exists");
 
@@ -47,7 +43,7 @@ public class UpdateRoleCommandHandler(
         if (request.UpdateRoleDTO.Permissions != null)
         {
             var permissions = request.UpdateRoleDTO.Permissions.Count > 0
-                ? await _permissionRepository.GetByIdsAsync(request.UpdateRoleDTO.Permissions, cancellationToken)
+                ? await permissionRepository.GetByIdsAsync(request.UpdateRoleDTO.Permissions, cancellationToken)
                 : [];
 
             existingRole.RolePermissions.Clear();
@@ -63,7 +59,7 @@ public class UpdateRoleCommandHandler(
         existingRole.UpdatedAt = DateTime.UtcNow;
         existingRole.UpdatedById = existingUser.Id;
 
-        await _roleRepository.UpdateAsync(existingRole, cancellationToken);
+        await roleRepository.UpdateAsync(existingRole, cancellationToken);
 
         return Result<object>.Success(null, "Role updated successfully");
     }
