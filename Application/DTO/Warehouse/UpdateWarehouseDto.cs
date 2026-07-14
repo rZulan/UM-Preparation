@@ -1,7 +1,6 @@
-namespace Application.DTO.Warehouse
+namespace Application.DTO.Warehouse;
+
+public class UpdateWarehouseDto
 {
-    public class UpdateWarehouseDto
-    {
-        public string? Name { get; set; }
-    }
+    public string? Name { get; set; }
 }

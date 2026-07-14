@@ -1,17 +1,16 @@
-﻿namespace Application.DTO.User
+﻿namespace Application.DTO.User;
+
+public class MeResultDto
 {
-    public class MeResultDto
-    {
-        public required int Id { get; set; }
-        public required string Username { get; set; }
-        public required string FirstName { get; set; }
-        public string? MiddleName { get; set; }
-        public required string LastName { get; set; }
-        public string? Suffix { get; set; }
-        public required string IDPrefix { get; set; }
-        public required string IDNumber { get; set; }
-        public required string Role { get; set; }
-        public required string Warehouse { get; set; }
-        public required List<string> Permissions { get; set; }
-    }
+    public required int Id { get; set; }
+    public required string Username { get; set; }
+    public required string FirstName { get; set; }
+    public string? MiddleName { get; set; }
+    public required string LastName { get; set; }
+    public string? Suffix { get; set; }
+    public required string IDPrefix { get; set; }
+    public required string IDNumber { get; set; }
+    public required string Role { get; set; }
+    public required string Warehouse { get; set; }
+    public required List<string> Permissions { get; set; }
 }

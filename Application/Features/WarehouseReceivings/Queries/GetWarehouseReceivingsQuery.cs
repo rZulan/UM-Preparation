@@ -5,55 +5,62 @@ using Application.Interfaces;
 using Application.Results;
 using MediatR;
 
-namespace Application.Features.WarehouseReceivings.Queries
+namespace Application.Features.WarehouseReceivings.Queries;
+
+/// <summary>Query to retrieve a filtered, sorted, and paginated list of warehouse entries.</summary>
+/// <param name="GenericFiltersDTO">Search and pagination filters.</param>
+/// <param name="Sort">Sort direction and field.</param>
+public record GetWarehouseReceivingsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort)
+    : IRequest<GetAllResult<List<GetWarehouseReceivingDto>>>;
+
+public class GetWarehouseReceivingsQueryHandler(IWarehouseReceivingRepository warehouseReceivingRepository)
+    : IRequestHandler<GetWarehouseReceivingsQuery, GetAllResult<List<GetWarehouseReceivingDto>>>
 {
-    /// <summary>Query to retrieve a filtered, sorted, and paginated list of warehouse entries.</summary>
-    /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
-    /// <param name="Sort">Sort direction and field.</param>
-    public record GetWarehouseReceivingsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetWarehouseReceivingDto>>>;
-    public class GetWarehouseReceivingsQueryHandler(IWarehouseReceivingRepository warehouseReceivingRepository) : IRequestHandler<GetWarehouseReceivingsQuery, GetAllResult<List<GetWarehouseReceivingDto>>>
+    private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
+
+    public async Task<GetAllResult<List<GetWarehouseReceivingDto>>> Handle(GetWarehouseReceivingsQuery request,
+        CancellationToken cancellationToken)
     {
-        private readonly IWarehouseReceivingRepository _warehouseReceivingRepository = warehouseReceivingRepository;
+        var warehouseReceivings =
+            await _warehouseReceivingRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-        public async Task<GetAllResult<List<GetWarehouseReceivingDto>>> Handle(GetWarehouseReceivingsQuery request, CancellationToken cancellationToken)
+        var result = warehouseReceivings.Select(x => new GetWarehouseReceivingDto
         {
-            var warehouseReceivings = await _warehouseReceivingRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            Id = x.Id,
+            WarehouseId = x.WarehouseId,
+            Warehouse = x.Warehouse.Name,
+            Quantity = x.Quantity,
+            ProductId = x.ProductId,
+            ProductCode = x.Product.ItemCode,
+            ProductDescription = x.Product.Description,
+            IsInteger = x.Product.Uom.IsInteger
+        }).ToList();
 
-            var result = warehouseReceivings.Select(x => new GetWarehouseReceivingDto
+        PaginationInfo? paginationInfo = null;
+
+        if (request.GenericFiltersDTO.UsePagination)
+            paginationInfo = new PaginationInfo
             {
-                Id = x.Id,
-                WarehouseId = x.WarehouseId,
-                Warehouse = x.Warehouse.Name,
-                Quantity = x.Quantity,
-                ProductId = x.ProductId,
-                ProductCode = x.Product.ItemCode,
-                ProductDescription = x.Product.Description,
-                IsInteger = x.Product.Uom.IsInteger,
-            }).ToList();
+                CurrentPage = request.GenericFiltersDTO.PageNumber,
+                PageSize = request.GenericFiltersDTO.PageSize,
+                TotalCount =
+                    await _warehouseReceivingRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+            };
 
-            PaginationInfo? paginationInfo = null;
-
-            if (request.GenericFiltersDTO.UsePagination == true)
-            {
-                paginationInfo = new PaginationInfo
-                {
-                    CurrentPage = request.GenericFiltersDTO.PageNumber,
-                    PageSize = request.GenericFiltersDTO.PageSize,
-                    TotalCount = await _warehouseReceivingRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
-                };
-            }
-
-            var sortInfo = new SortInfo
-            {
-                SortColumns = ["id", "warehouseid", "warehouse", "quantity", "productid", "productcode", "productdescription"],
-                CurrentSort = request.Sort != null ? new CurrentSort
+        var sortInfo = new SortInfo
+        {
+            SortColumns =
+                ["id", "warehouseid", "warehouse", "quantity", "productid", "productcode", "productdescription"],
+            CurrentSort = request.Sort != null
+                ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,
                     Direction = request.Sort.SortDirection
-                } : null
-            };
+                }
+                : null
+        };
 
-            return GetAllResult<List<GetWarehouseReceivingDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
-        }
+        return GetAllResult<List<GetWarehouseReceivingDto>>.Success(result, paginationInfo: paginationInfo,
+            sortInfo: sortInfo);
     }
 }

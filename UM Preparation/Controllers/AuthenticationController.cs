@@ -13,8 +13,8 @@ namespace UM_Preparation.Controllers
     [ApiController]
     public class AuthenticationController(IMediator mediator, IConfiguration configuration) : ControllerBase
     {
-        private readonly IMediator _mediator = mediator;
         private readonly IConfiguration _configuration = configuration;
+        private readonly IMediator _mediator = mediator;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto registerDto)
@@ -30,9 +30,10 @@ namespace UM_Preparation.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromQuery] RefreshTokenDto? refreshTokenDto, [FromBody] LoginUserDto loginDto)
+        public async Task<IActionResult> Login([FromQuery] RefreshTokenDto? refreshTokenDto,
+            [FromBody] LoginUserDto loginDto)
         {
-            string? refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDto?.RefreshToken);
+            string? refreshToken = Request.Cookies["refresh_token"] ?? refreshTokenDto?.RefreshToken;
 
             Result<LoginResultDto> result = await _mediator.Send(new LoginUserCommand(loginDto, refreshToken));
 
@@ -47,11 +48,12 @@ namespace UM_Preparation.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromQuery] RefreshTokenDto? refreshTokenDto)
         {
-            string? refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDto?.RefreshToken);
+            string? refreshToken = Request.Cookies["refresh_token"] ?? refreshTokenDto?.RefreshToken;
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                Result<LoginResultDto> missingTokenResult = Result<LoginResultDto>.Failure("Refresh token is missing.", HttpStatusCode.Unauthorized);
+                Result<LoginResultDto> missingTokenResult =
+                    Result<LoginResultDto>.Failure("Refresh token is missing.", HttpStatusCode.Unauthorized);
 
                 return StatusCode((int)missingTokenResult.StatusCode!.Value, missingTokenResult);
             }
@@ -81,22 +83,19 @@ namespace UM_Preparation.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromQuery] RefreshTokenDto? refreshTokenDto)
         {
-            string? refreshToken = Request.Cookies["refresh_token"] ?? (refreshTokenDto?.RefreshToken);
+            string? refreshToken = Request.Cookies["refresh_token"] ?? refreshTokenDto?.RefreshToken;
 
             if (string.IsNullOrEmpty(refreshToken))
             {
-                Result<object> missingTokenResult = Result<object>.Failure("Refresh token is missing.", HttpStatusCode.Unauthorized);
+                Result<object> missingTokenResult =
+                    Result<object>.Failure("Refresh token is missing.", HttpStatusCode.Unauthorized);
 
                 return StatusCode((int)missingTokenResult.StatusCode!.Value, missingTokenResult);
             }
 
             Result<object> result = await _mediator.Send(new LogoutUserCommand(refreshToken));
 
-            CookieOptions cookieOptions = new CookieOptions
-            {
-                SameSite = SameSiteMode.None,
-                Secure = true
-            };
+            CookieOptions cookieOptions = new() { SameSite = SameSiteMode.None, Secure = true };
 
             Response.Cookies.Delete("access_token", cookieOptions);
             Response.Cookies.Delete("refresh_token", cookieOptions);
@@ -108,23 +107,25 @@ namespace UM_Preparation.Controllers
         {
             IConfigurationSection jwtSettings = _configuration.GetSection("JwtSettings");
 
-            Response.Cookies.Append("access_token", accessToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(jwtSettings.GetValue<double>("ExpiryMinutes"))
-            });
-
-            if (refreshToken != null)
-            {
-                Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+            Response.Cookies.Append("access_token", accessToken,
+                new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(jwtSettings.GetValue<double>("ExpiryMinutes"))
                 });
+
+            if (refreshToken != null)
+            {
+                Response.Cookies.Append("refresh_token", refreshToken,
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Expires = DateTimeOffset.UtcNow.AddDays(7)
+                    });
             }
         }
     }

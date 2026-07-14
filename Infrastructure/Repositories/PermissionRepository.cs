@@ -11,7 +11,8 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<Permission>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
+        public async Task<List<Permission>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
+            CancellationToken cancellationToken)
         {
             IQueryable<Permission> query = _context.Permissions;
 
@@ -46,7 +47,7 @@ namespace Infrastructure.Repositories
             if (genericFiltersDTO.UsePagination)
             {
                 query = query.Skip((genericFiltersDTO.PageNumber - 1) * genericFiltersDTO.PageSize)
-                             .Take(genericFiltersDTO.PageSize);
+                    .Take(genericFiltersDTO.PageSize);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -76,7 +77,7 @@ namespace Infrastructure.Repositories
         {
             IQueryable<Permission> query = _context.Permissions
                 .Include(x => x.RolePermissions!)
-                    .ThenInclude(x => x.Role)
+                .ThenInclude(x => x.Role)
                 .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -86,7 +87,7 @@ namespace Infrastructure.Repositories
         {
             IQueryable<Permission> query = _context.Permissions
                 .Include(x => x.RolePermissions!)
-                    .ThenInclude(x => x.Role)
+                .ThenInclude(x => x.Role)
                 .Where(x => ids.Contains(x.Id));
 
             return await query.ToListAsync(cancellationToken);
@@ -96,7 +97,7 @@ namespace Infrastructure.Repositories
         {
             IQueryable<Permission> query = _context.Permissions
                 .Include(x => x.RolePermissions!)
-                    .ThenInclude(x => x.Role)
+                .ThenInclude(x => x.Role)
                 .Where(x => x.Name.ToLower() == name.ToLower());
 
             return await query.FirstOrDefaultAsync(cancellationToken);
@@ -116,7 +117,8 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> AnyDuplicateAsync(int id, string name, CancellationToken cancellationToken)
         {
-            return await _context.Permissions.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(), cancellationToken);
+            return await _context.Permissions.AnyAsync(x => x.Id != id && x.Name.ToLower() == name.ToLower(),
+                cancellationToken);
         }
     }
 }

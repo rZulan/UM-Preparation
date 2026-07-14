@@ -11,12 +11,13 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<MoveOrder>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
+        public async Task<List<MoveOrder>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
+            CancellationToken cancellationToken)
         {
             IQueryable<MoveOrder> query = _context.MoveOrders
                 .Include(x => x.Warehouse)
                 .Include(x => x.MoveOrderProducts)
-                    .ThenInclude(x => x.Product);
+                .ThenInclude(x => x.Product);
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -46,7 +47,7 @@ namespace Infrastructure.Repositories
             if (genericFiltersDTO.UsePagination)
             {
                 query = query.Skip((genericFiltersDTO.PageNumber - 1) * genericFiltersDTO.PageSize)
-                             .Take(genericFiltersDTO.PageSize);
+                    .Take(genericFiltersDTO.PageSize);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -77,7 +78,7 @@ namespace Infrastructure.Repositories
                 .Where(x => x.Id == id)
                 .Include(x => x.Warehouse)
                 .Include(x => x.MoveOrderProducts)
-                    .ThenInclude(x => x.Product);
+                .ThenInclude(x => x.Product);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }

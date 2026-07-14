@@ -1,27 +1,26 @@
+using System.Net;
 using Application.DTO.Inventory;
 using Application.Interfaces;
 using Application.Results;
 using MediatR;
-using System.Net;
 
-namespace Application.Features.Inventory.Queries
+namespace Application.Features.Inventory.Queries;
+
+public record GetInventoryQuery(int WarehouseId) : IRequest<Result<GetInventoryDto>>;
+
+public class GetInventoryQueryHandler(IInventoryRepository inventoryRepository)
+    : IRequestHandler<GetInventoryQuery, Result<GetInventoryDto>>
 {
-    public record GetInventoryQuery(int WarehouseId) : IRequest<Result<GetInventoryDto>>;
+    private readonly IInventoryRepository _inventoryRepository = inventoryRepository;
 
-    public class GetInventoryQueryHandler(IInventoryRepository inventoryRepository) : IRequestHandler<GetInventoryQuery, Result<GetInventoryDto>>
+    public async Task<Result<GetInventoryDto>> Handle(
+        GetInventoryQuery request,
+        CancellationToken cancellationToken)
     {
-        private readonly IInventoryRepository _inventoryRepository = inventoryRepository;
+        var inventory = await _inventoryRepository.GetByWarehouseIdAsync(request.WarehouseId, cancellationToken);
 
-        public async Task<Result<GetInventoryDto>> Handle(GetInventoryQuery request, CancellationToken cancellationToken)
-        {
-            var inventory = await _inventoryRepository.GetByWarehouseIdAsync(request.WarehouseId, cancellationToken);
+        if (inventory == null) Result<GetInventoryDto>.Failure("Warehouse not found", HttpStatusCode.NotFound);
 
-            if (inventory == null)
-            {
-                return Result<GetInventoryDto>.Failure("Warehouse not found", HttpStatusCode.NotFound);
-            }
-
-            return Result<GetInventoryDto>.Success(inventory);
-        }
+        return Result<GetInventoryDto>.Success(inventory);
     }
 }

@@ -1,7 +1,6 @@
-namespace Application.DTO.Warehouse
+namespace Application.DTO.Warehouse;
+
+public class AddWarehouseDto
 {
-    public class AddWarehouseDto
-    {
-        public required string Name { get; set; }
-    }
+    public required string Name { get; set; }
 }

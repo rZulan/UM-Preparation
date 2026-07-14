@@ -1,8 +1,7 @@
-﻿namespace Application.DTO.Misc.Sorts
+﻿namespace Application.DTO.Misc.Sorts;
+
+public class Sort
 {
-    public class Sort
-    {
-        public string? SortBy { get; set; }
-        public string? SortDirection { get; set; }
-    }
+    public string? SortBy { get; set; }
+    public string? SortDirection { get; set; }
 }

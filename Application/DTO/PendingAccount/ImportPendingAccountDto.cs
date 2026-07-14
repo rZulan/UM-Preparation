@@ -1,8 +1,7 @@
-﻿namespace Application.DTO.PendingAccount
+﻿namespace Application.DTO.PendingAccount;
+
+public class ImportPendingAccountDto
 {
-    public class ImportPendingAccountDto
-    {
-        public required int RoleId;
-        public int? WarehouseId;
-    }
+    public required int RoleId;
+    public int? WarehouseId;
 }

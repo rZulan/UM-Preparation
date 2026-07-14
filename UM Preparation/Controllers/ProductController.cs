@@ -19,9 +19,11 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetProducts([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetProducts([FromQuery] GenericFiltersDto genericFiltersDto,
+            [FromQuery] Sort sort)
         {
-            GetAllResult<List<GetProductDto>> result = await _mediator.Send(new GetProductsQuery(genericFiltersDto, sort));
+            GetAllResult<List<GetProductDto>> result =
+                await _mediator.Send(new GetProductsQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -79,4 +81,3 @@ namespace UM_Preparation.Controllers
         }
     }
 }
-

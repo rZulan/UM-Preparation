@@ -12,28 +12,28 @@ namespace Infrastructure.Services
     {
         private readonly IConfiguration _config = config;
 
-        public string GenerateToken(int userId, string username, IEnumerable<string> roles, IEnumerable<string> permissions)
+        public string GenerateToken(int userId, string username, IEnumerable<string> roles,
+            IEnumerable<string> permissions)
         {
-            var jwtSettings = _config.GetSection("JwtSettings");
+            IConfigurationSection jwtSettings = _config.GetSection("JwtSettings");
 
-            var key = new SymmetricSecurityKey(
+            SymmetricSecurityKey key = new(
                 Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, userId.ToString()),
-            new(ClaimTypes.Name, username)
-        };
+            List<Claim> claims = new()
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()), new Claim(ClaimTypes.Name, username)
+            };
 
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
             claims.AddRange(permissions.Select(permission => new Claim("permissions", permission)));
 
-            var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
-                claims: claims,
+            JwtSecurityToken token = new(
+                jwtSettings["Issuer"],
+                jwtSettings["Audience"],
+                claims,
                 expires: DateTime.UtcNow.AddMinutes(
                     jwtSettings.GetValue<double>("ExpiryMinutes")
                 ),
@@ -45,7 +45,7 @@ namespace Infrastructure.Services
 
         public string GenerateRefreshToken()
         {
-            var bytes = RandomNumberGenerator.GetBytes(64);
+            byte[] bytes = RandomNumberGenerator.GetBytes(64);
             return Convert.ToBase64String(bytes);
         }
     }

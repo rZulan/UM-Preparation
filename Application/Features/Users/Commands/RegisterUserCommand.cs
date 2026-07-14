@@ -1,74 +1,71 @@
-﻿using Application.DTO.User;
+﻿using System.Net;
+using Application.DTO.User;
 using Application.Interfaces;
 using Application.Results;
 using Domain.Entities;
 using Domain.Entities.Junction;
 using MediatR;
-using System.Net;
 
-namespace Application.Features.Users.Commands
+namespace Application.Features.Users.Commands;
+
+/// <summary>Command to register a new user account.</summary>
+/// <param name="RegisterDTO">The registration data (employee info, credentials, and role).</param>
+public record RegisterUserCommand(RegisterUserDto RegisterDTO) : IRequest<Result<object>>;
+
+public class RegisterUserCommandHandler(
+    IUserRepository userRepository,
+    IPasswordHasherService passwordHasher,
+    IRoleRepository roleRepository,
+    IWarehouseRepository warehouseRepository) : IRequestHandler<RegisterUserCommand, Result<object>>
 {
-    /// <summary>Command to register a new user account.</summary>
-    /// <param name="RegisterDTO">The registration data (employee info, credentials, and role).</param>
-    public record RegisterUserCommand(RegisterUserDto RegisterDTO) : IRequest<Result<object>>;
-    public class RegisterUserCommandHandler(IUserRepository userRepository, IPasswordHasherService passwordHasher, IRoleRepository roleRepository, IWarehouseRepository warehouseRepository) : IRequestHandler<RegisterUserCommand, Result<object>>
+    private readonly IPasswordHasherService _paswordHasher = passwordHasher;
+    private readonly IRoleRepository _roleRepository = roleRepository;
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
+
+    public async Task<Result<object>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        private readonly IUserRepository _userRepository = userRepository;
-        private readonly IPasswordHasherService _paswordHasher = passwordHasher;
-        private readonly IRoleRepository _roleRepository = roleRepository;
-        private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
+        var existingUser = await _userRepository.GetByUsernameAsync(request.RegisterDTO.Username, cancellationToken);
 
-        public async Task<Result<object>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+        if (existingUser != null) return Result<object>.Failure("Username already exists", HttpStatusCode.Conflict);
+
+        var hashPassword = _paswordHasher.Hash(request.RegisterDTO.Password);
+
+        var existingRole = await _roleRepository.GetByIdAsync(request.RegisterDTO.RoleId, cancellationToken);
+
+        if (existingRole == null) return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
+
+        if (request.RegisterDTO.WarehouseId.HasValue)
         {
-            var existingUser = await _userRepository.GetByUsernameAsync(request.RegisterDTO.Username, cancellationToken);
+            var existingWarehouse =
+                await _warehouseRepository.GetByIdAsync(request.RegisterDTO.WarehouseId.Value, cancellationToken);
 
-            if (existingUser != null)
-            {
-                return Result<object>.Failure("Username already exists", HttpStatusCode.Conflict);
-            }
-
-            var hashPassword = _paswordHasher.Hash(request.RegisterDTO.Password);
-
-            var existingRole = await _roleRepository.GetByIdAsync(request.RegisterDTO.RoleId, cancellationToken);
-
-            if (existingRole == null)
-            {
-                return Result<object>.Failure("Role not found", HttpStatusCode.NotFound);
-            }
-
-            if (request.RegisterDTO.WarehouseId.HasValue)
-            {
-                var existingWarehouse = await _warehouseRepository.GetByIdAsync(request.RegisterDTO.WarehouseId.Value, cancellationToken);
-
-                if (existingWarehouse == null)
-                {
-                    return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
-                }
-            }
-
-            var user = new User
-            {
-                CreatedAt = DateTime.UtcNow,
-                PasswordHash = hashPassword,
-                Username = request.RegisterDTO.Username.ToLower(),
-                FirstName = request.RegisterDTO.FirstName,
-                MiddleName = request.RegisterDTO.MiddleName,
-                LastName = request.RegisterDTO.LastName,
-                Suffix = request.RegisterDTO.Suffix,
-                IDPrefix = request.RegisterDTO.IDPrefix,
-                IDNumber = request.RegisterDTO.IDNumber,
-                WarehouseId = request.RegisterDTO.WarehouseId,
-            };
-
-            user.UserRoles.Add(new UserRoles
-            {
-                RoleId = existingRole.Id,
-                UserId = user.Id
-            });
-
-            await _userRepository.AddAsync(user, cancellationToken);
-
-            return Result<object>.Success(user.Id, "User created successfully", HttpStatusCode.Created);
+            if (existingWarehouse == null)
+                return Result<object>.Failure("Warehouse not found", HttpStatusCode.NotFound);
         }
+
+        var user = new User
+        {
+            CreatedAt = DateTime.UtcNow,
+            PasswordHash = hashPassword,
+            Username = request.RegisterDTO.Username.ToLower(),
+            FirstName = request.RegisterDTO.FirstName,
+            MiddleName = request.RegisterDTO.MiddleName,
+            LastName = request.RegisterDTO.LastName,
+            Suffix = request.RegisterDTO.Suffix,
+            IDPrefix = request.RegisterDTO.IDPrefix,
+            IDNumber = request.RegisterDTO.IDNumber,
+            WarehouseId = request.RegisterDTO.WarehouseId
+        };
+
+        user.UserRoles.Add(new UserRoles
+        {
+            RoleId = existingRole.Id,
+            UserId = user.Id
+        });
+
+        await _userRepository.AddAsync(user, cancellationToken);
+
+        return Result<object>.Success(user.Id, "User created successfully", HttpStatusCode.Created);
     }
 }

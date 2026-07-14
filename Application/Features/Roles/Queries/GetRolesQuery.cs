@@ -6,58 +6,59 @@ using Application.Interfaces;
 using Application.Results;
 using MediatR;
 
-namespace Application.Features.Roles.Queries
+namespace Application.Features.Roles.Queries;
+
+/// <summary>Query to retrieve a filtered, sorted, and paginated list of roles.</summary>
+/// <param name="GenericFiltersDTO">Search and pagination filters.</param>
+/// <param name="Sort">Sort direction and field.</param>
+public record GetRolesQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetRoleDto>>>;
+
+public class GetRolesQueryHandler(IRoleRepository roleRepository)
+    : IRequestHandler<GetRolesQuery, GetAllResult<List<GetRoleDto>>>
 {
-    /// <summary>Query to retrieve a filtered, sorted, and paginated list of roles.</summary>
-    /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
-    /// <param name="Sort">Sort direction and field.</param>
-    public record GetRolesQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetRoleDto>>>;
-    public class GetRolesQueryHandler(IRoleRepository roleRepository) : IRequestHandler<GetRolesQuery, GetAllResult<List<GetRoleDto>>>
+    private readonly IRoleRepository _roleRepository = roleRepository;
+
+    public async Task<GetAllResult<List<GetRoleDto>>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
     {
-        private readonly IRoleRepository _roleRepository = roleRepository;
+        var roles = await _roleRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-        public async Task<GetAllResult<List<GetRoleDto>>> Handle(GetRolesQuery request, CancellationToken cancellationToken)
+        var result = roles.Select(x => new GetRoleDto
         {
-            var roles = await _roleRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
-
-            var result = roles.Select(x => new GetRoleDto
-            {
-                Id = x.Id,
-                IsActive = x.IsActive,
-                Name = x.Name,
-                Permissions = x.RolePermissions
-                    .Where(rp => rp.Permission != null)
-                    .Select(rp => new GetPermissionDto
-                    {
-                        Id = rp.Permission!.Id,
-                        IsActive = rp.Permission!.IsActive,
-                        Name = rp.Permission.Name,
-                    }).ToList() ?? []
-            }).ToList();
-
-            PaginationInfo? paginationInfo = null;
-
-            if (request.GenericFiltersDTO.UsePagination == true)
-            {
-                paginationInfo = new PaginationInfo
+            Id = x.Id,
+            IsActive = x.IsActive,
+            Name = x.Name,
+            Permissions = x.RolePermissions
+                .Where(rp => rp.Permission != null)
+                .Select(rp => new GetPermissionDto
                 {
-                    CurrentPage = request.GenericFiltersDTO.PageNumber,
-                    PageSize = request.GenericFiltersDTO.PageSize,
-                    TotalCount = await _roleRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
-                };
-            }
+                    Id = rp.Permission!.Id,
+                    IsActive = rp.Permission!.IsActive,
+                    Name = rp.Permission.Name
+                }).ToList() ?? []
+        }).ToList();
 
-            var sortInfo = new SortInfo
+        PaginationInfo? paginationInfo = null;
+
+        if (request.GenericFiltersDTO.UsePagination)
+            paginationInfo = new PaginationInfo
             {
-                SortColumns = ["id", "name"],
-                CurrentSort = request.Sort != null ? new CurrentSort
+                CurrentPage = request.GenericFiltersDTO.PageNumber,
+                PageSize = request.GenericFiltersDTO.PageSize,
+                TotalCount = await _roleRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+            };
+
+        var sortInfo = new SortInfo
+        {
+            SortColumns = ["id", "name"],
+            CurrentSort = request.Sort != null
+                ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,
                     Direction = request.Sort.SortDirection
-                } : null
-            };
+                }
+                : null
+        };
 
-            return GetAllResult<List<GetRoleDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
-        }
+        return GetAllResult<List<GetRoleDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
     }
 }

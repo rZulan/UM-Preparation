@@ -5,50 +5,54 @@ using Application.Interfaces;
 using Application.Results;
 using MediatR;
 
-namespace Application.Features.Permissions.Queries
+namespace Application.Features.Permissions.Queries;
+
+/// <summary>Query to retrieve a filtered, sorted, and paginated list of permissions.</summary>
+/// <param name="GenericFiltersDTO">Search and pagination filters.</param>
+/// <param name="Sort">Sort direction and field.</param>
+public record GetPermissionsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort)
+    : IRequest<GetAllResult<List<GetPermissionDto>>>;
+
+public class GetPermissionsQueryHandler(IPermissionRepository permissionRepository)
+    : IRequestHandler<GetPermissionsQuery, GetAllResult<List<GetPermissionDto>>>
 {
-    /// <summary>Query to retrieve a filtered, sorted, and paginated list of permissions.</summary>
-    /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
-    /// <param name="Sort">Sort direction and field.</param>
-    public record GetPermissionsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetPermissionDto>>>;
-    public class GetPermissionsQueryHandler(IPermissionRepository permissionRepository) : IRequestHandler<GetPermissionsQuery, GetAllResult<List<GetPermissionDto>>>
+    private readonly IPermissionRepository _permissionRepository = permissionRepository;
+
+    public async Task<GetAllResult<List<GetPermissionDto>>> Handle(GetPermissionsQuery request,
+        CancellationToken cancellationToken)
     {
-        private readonly IPermissionRepository _permissionRepository = permissionRepository;
+        var permissions =
+            await _permissionRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-        public async Task<GetAllResult<List<GetPermissionDto>>> Handle(GetPermissionsQuery request, CancellationToken cancellationToken)
+        var result = permissions.Select(x => new GetPermissionDto
         {
-            var permissions = await _permissionRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            Id = x.Id,
+            IsActive = x.IsActive,
+            Name = x.Name
+        }).ToList();
 
-            var result = permissions.Select(x => new GetPermissionDto
+        PaginationInfo? paginationInfo = null;
+
+        if (request.GenericFiltersDTO.UsePagination)
+            paginationInfo = new PaginationInfo
             {
-                Id = x.Id,
-                IsActive = x.IsActive,
-                Name = x.Name
-            }).ToList();
+                CurrentPage = request.GenericFiltersDTO.PageNumber,
+                PageSize = request.GenericFiltersDTO.PageSize,
+                TotalCount = await _permissionRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+            };
 
-            PaginationInfo? paginationInfo = null;
-
-            if (request.GenericFiltersDTO.UsePagination == true)
-            {
-                paginationInfo = new PaginationInfo
-                {
-                    CurrentPage = request.GenericFiltersDTO.PageNumber,
-                    PageSize = request.GenericFiltersDTO.PageSize,
-                    TotalCount = await _permissionRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
-                };
-            }
-
-            var sortInfo = new SortInfo
-            {
-                SortColumns = ["id", "name"],
-                CurrentSort = request.Sort != null ? new CurrentSort
+        var sortInfo = new SortInfo
+        {
+            SortColumns = ["id", "name"],
+            CurrentSort = request.Sort != null
+                ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,
                     Direction = request.Sort.SortDirection
-                } : null
-            };
+                }
+                : null
+        };
 
-            return GetAllResult<List<GetPermissionDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
-        }
+        return GetAllResult<List<GetPermissionDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
     }
 }

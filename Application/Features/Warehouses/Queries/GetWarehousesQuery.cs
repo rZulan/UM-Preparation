@@ -5,50 +5,54 @@ using Application.Interfaces;
 using Application.Results;
 using MediatR;
 
-namespace Application.Features.Warehouses.Queries
+namespace Application.Features.Warehouses.Queries;
+
+/// <summary>Query to retrieve a filtered, sorted, and paginated list of warehouses.</summary>
+/// <param name="GenericFiltersDTO">Search and pagination filters.</param>
+/// <param name="Sort">Sort direction and field.</param>
+public record GetWarehousesQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort)
+    : IRequest<GetAllResult<List<GetWarehouseDto>>>;
+
+public class GetWarehousesQueryHandler(IWarehouseRepository warehouseRepository)
+    : IRequestHandler<GetWarehousesQuery, GetAllResult<List<GetWarehouseDto>>>
 {
-    /// <summary>Query to retrieve a filtered, sorted, and paginated list of warehouses.</summary>
-    /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
-    /// <param name="Sort">Sort direction and field.</param>
-    public record GetWarehousesQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetWarehouseDto>>>;
-    public class GetWarehousesQueryHandler(IWarehouseRepository warehouseRepository) : IRequestHandler<GetWarehousesQuery, GetAllResult<List<GetWarehouseDto>>>
+    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
+
+    public async Task<GetAllResult<List<GetWarehouseDto>>> Handle(GetWarehousesQuery request,
+        CancellationToken cancellationToken)
     {
-        private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
+        var warehouses =
+            await _warehouseRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-        public async Task<GetAllResult<List<GetWarehouseDto>>> Handle(GetWarehousesQuery request, CancellationToken cancellationToken)
+        var result = warehouses.Select(x => new GetWarehouseDto
         {
-            var warehouses = await _warehouseRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            Id = x.Id,
+            IsActive = x.IsActive,
+            Name = x.Name
+        }).ToList();
 
-            var result = warehouses.Select(x => new GetWarehouseDto
+        PaginationInfo? paginationInfo = null;
+
+        if (request.GenericFiltersDTO.UsePagination)
+            paginationInfo = new PaginationInfo
             {
-                Id = x.Id,
-                IsActive = x.IsActive,
-                Name = x.Name
-            }).ToList();
+                CurrentPage = request.GenericFiltersDTO.PageNumber,
+                PageSize = request.GenericFiltersDTO.PageSize,
+                TotalCount = await _warehouseRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+            };
 
-            PaginationInfo? paginationInfo = null;
-
-            if (request.GenericFiltersDTO.UsePagination == true)
-            {
-                paginationInfo = new PaginationInfo
-                {
-                    CurrentPage = request.GenericFiltersDTO.PageNumber,
-                    PageSize = request.GenericFiltersDTO.PageSize,
-                    TotalCount = await _warehouseRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
-                };
-            }
-
-            var sortInfo = new SortInfo
-            {
-                SortColumns = ["id", "name"],
-                CurrentSort = request.Sort != null ? new CurrentSort
+        var sortInfo = new SortInfo
+        {
+            SortColumns = ["id", "name"],
+            CurrentSort = request.Sort != null
+                ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,
                     Direction = request.Sort.SortDirection
-                } : null
-            };
+                }
+                : null
+        };
 
-            return GetAllResult<List<GetWarehouseDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
-        }
+        return GetAllResult<List<GetWarehouseDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
     }
 }

@@ -1,9 +1,9 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path=".gitignore" />
-  </Folder>
-  <Project Path="Application/Application.csproj" Id="ef6e1020-5ea7-404d-bc22-a07b404fbb71" />
-  <Project Path="Domain/Domain.csproj" Id="2a11a313-6b6d-4d62-acfa-bd2492ab2e7f" />
-  <Project Path="Infrastructure/Infrastructure.csproj" Id="446d52cf-881f-42af-ab55-95273adc96c4" />
-  <Project Path="UM Preparation/API.csproj" />
+    <Folder Name="/Solution Items/">
+        <File Path=".gitignore"/>
+    </Folder>
+    <Project Path="Application/Application.csproj" Id="ef6e1020-5ea7-404d-bc22-a07b404fbb71"/>
+    <Project Path="Domain/Domain.csproj" Id="2a11a313-6b6d-4d62-acfa-bd2492ab2e7f"/>
+    <Project Path="Infrastructure/Infrastructure.csproj" Id="446d52cf-881f-42af-ab55-95273adc96c4"/>
+    <Project Path="UM Preparation/API.csproj"/>
 </Solution>

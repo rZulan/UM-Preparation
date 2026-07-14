@@ -12,12 +12,13 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<WarehouseReceiving>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
+        public async Task<List<WarehouseReceiving>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
+            CancellationToken cancellationToken)
         {
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
-                    .ThenInclude(x => x.Uom)
+                .ThenInclude(x => x.Uom)
                 .Include(x => x.MiscellaneousReceipt);
 
             if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
@@ -61,7 +62,7 @@ namespace Infrastructure.Repositories
             if (genericFiltersDTO.UsePagination)
             {
                 query = query.Skip((genericFiltersDTO.PageNumber - 1) * genericFiltersDTO.PageSize)
-                             .Take(genericFiltersDTO.PageSize);
+                    .Take(genericFiltersDTO.PageSize);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -93,13 +94,14 @@ namespace Infrastructure.Repositories
                 .Where(x => x.Id == id)
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
-                    .ThenInclude(x => x.Uom)
+                .ThenInclude(x => x.Uom)
                 .Include(x => x.MiscellaneousReceipt);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<List<WarehouseReceiving>> GetByProductIdAsync(int productId, CancellationToken cancellationToken)
+        public async Task<List<WarehouseReceiving>> GetByProductIdAsync(int productId,
+            CancellationToken cancellationToken)
         {
             IQueryable<WarehouseReceiving> query = _context.WarehouseReceivings
                 .Where(x => x.ProductId == productId)
@@ -121,9 +123,10 @@ namespace Infrastructure.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<bool> ProductHasAvailableReserve(int warehouseId, int productId, decimal quantity, CancellationToken cancellationToken)
+        public async Task<bool> ProductHasAvailableReserve(int warehouseId, int productId, decimal quantity,
+            CancellationToken cancellationToken)
         {
-            var totalReceived = await _context.WarehouseReceivings
+            decimal totalReceived = await _context.WarehouseReceivings
                 .Where(x =>
                     x.IsActive &&
                     x.WarehouseId == warehouseId &&
@@ -131,7 +134,7 @@ namespace Infrastructure.Repositories
                 )
                 .SumAsync(x => x.Quantity, cancellationToken);
 
-            var totalMoved = await _context.MoveOrderProductWarehouseReceivings
+            decimal totalMoved = await _context.MoveOrderProductWarehouseReceivings
                 .Where(x =>
                     x.MoveOrderProduct.MoveOrder.IsActive &&
                     x.WarehouseReceiving.WarehouseId == warehouseId &&
@@ -140,12 +143,13 @@ namespace Infrastructure.Repositories
                 .Select(x => (decimal?)x.Quantity)
                 .SumAsync(cancellationToken) ?? 0m;
 
-            var availableStock = totalReceived - totalMoved;
+            decimal availableStock = totalReceived - totalMoved;
 
             return availableStock >= quantity;
         }
 
-        public async Task<List<AvailableMoveOrderProductWarehouseReceivingsDto>> GetProductAffectedWarehouseReceivings(int warehouseId, int productId, decimal quantity, CancellationToken cancellationToken)
+        public async Task<List<AvailableMoveOrderProductWarehouseReceivingsDto>> GetProductAffectedWarehouseReceivings(
+            int warehouseId, int productId, decimal quantity, CancellationToken cancellationToken)
         {
             var receivingLots = await _context.WarehouseReceivings
                 .AsNoTracking()
@@ -160,17 +164,17 @@ namespace Infrastructure.Repositories
                 {
                     x.Id,
                     AvailableQuantity = x.Quantity -
-                        (_context.MoveOrderProductWarehouseReceivings
-                            .Where(allocation =>
-                                allocation.WarehouseReceivingId == x.Id &&
-                                allocation.MoveOrderProduct.MoveOrder.IsActive)
-                            .Select(allocation => (decimal?)allocation.Quantity)
-                            .Sum() ?? 0m)
+                                        (_context.MoveOrderProductWarehouseReceivings
+                                            .Where(allocation =>
+                                                allocation.WarehouseReceivingId == x.Id &&
+                                                allocation.MoveOrderProduct.MoveOrder.IsActive)
+                                            .Select(allocation => (decimal?)allocation.Quantity)
+                                            .Sum() ?? 0m)
                 })
                 .ToListAsync(cancellationToken);
 
-            var affectedWarehouseReceivings = new List<AvailableMoveOrderProductWarehouseReceivingsDto>();
-            var remainingQuantity = quantity;
+            List<AvailableMoveOrderProductWarehouseReceivingsDto> affectedWarehouseReceivings = new();
+            decimal remainingQuantity = quantity;
 
             foreach (var receivingLot in receivingLots)
             {
@@ -179,13 +183,13 @@ namespace Infrastructure.Repositories
                     break;
                 }
 
-                var availableQuantity = Math.Max(0m, receivingLot.AvailableQuantity);
+                decimal availableQuantity = Math.Max(0m, receivingLot.AvailableQuantity);
                 if (availableQuantity == 0)
                 {
                     continue;
                 }
 
-                var allocatedQuantity = Math.Min(remainingQuantity, availableQuantity);
+                decimal allocatedQuantity = Math.Min(remainingQuantity, availableQuantity);
                 affectedWarehouseReceivings.Add(new AvailableMoveOrderProductWarehouseReceivingsDto
                 {
                     ProductId = productId,

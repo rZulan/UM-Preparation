@@ -1,7 +1,6 @@
-﻿namespace Application.DTO.User
+﻿namespace Application.DTO.User;
+
+public class RefreshResultDto
 {
-    public class RefreshResultDto
-    {
-        public required string AccessToken { get; set; }
-    }
+    public required string AccessToken { get; set; }
 }

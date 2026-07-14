@@ -1,35 +1,34 @@
+using System.Net;
 using Application.DTO.Warehouse;
 using Application.Interfaces;
 using Application.Results;
 using MediatR;
-using System.Net;
 
-namespace Application.Features.Warehouses.Queries
+namespace Application.Features.Warehouses.Queries;
+
+/// <summary>Query to retrieve a warehouse by its ID.</summary>
+/// <param name="Id">The unique identifier of the warehouse.</param>
+public record GetWarehouseByIdQuery(int Id) : IRequest<Result<GetWarehouseDto>>;
+
+public class GetWarehouseByIdQueryHandler(IWarehouseRepository warehouseRepository)
+    : IRequestHandler<GetWarehouseByIdQuery, Result<GetWarehouseDto>>
 {
-    /// <summary>Query to retrieve a warehouse by its ID.</summary>
-    /// <param name="Id">The unique identifier of the warehouse.</param>
-    public record GetWarehouseByIdQuery(int Id) : IRequest<Result<GetWarehouseDto>>;
-    public class GetWarehouseByIdQueryHandler(IWarehouseRepository warehouseRepository) : IRequestHandler<GetWarehouseByIdQuery, Result<GetWarehouseDto>>
+    private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
+
+    public async Task<Result<GetWarehouseDto>> Handle(GetWarehouseByIdQuery request,
+        CancellationToken cancellationToken)
     {
-        private readonly IWarehouseRepository _warehouseRepository = warehouseRepository;
+        var warehouse = await _warehouseRepository.GetByIdAsync(request.Id, cancellationToken);
 
-        public async Task<Result<GetWarehouseDto>> Handle(GetWarehouseByIdQuery request, CancellationToken cancellationToken)
+        if (warehouse == null) return Result<GetWarehouseDto>.Failure("Warehouse not found", HttpStatusCode.NotFound);
+
+        var result = new GetWarehouseDto
         {
-            var warehouse = await _warehouseRepository.GetByIdAsync(request.Id, cancellationToken);
+            Id = warehouse.Id,
+            IsActive = warehouse.IsActive,
+            Name = warehouse.Name
+        };
 
-            if (warehouse == null)
-            {
-                return Result<GetWarehouseDto>.Failure("Warehouse not found", HttpStatusCode.NotFound);
-            }
-
-            var result = new GetWarehouseDto
-            {
-                Id = warehouse.Id,
-                IsActive = warehouse.IsActive,
-                Name = warehouse.Name
-            };
-
-            return Result<GetWarehouseDto>.Success(result);
-        }
+        return Result<GetWarehouseDto>.Success(result);
     }
 }

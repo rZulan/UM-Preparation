@@ -11,12 +11,13 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<MiscellaneousReceipt>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
+        public async Task<List<MiscellaneousReceipt>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
+            CancellationToken cancellationToken)
         {
             IQueryable<MiscellaneousReceipt> query = _context.MiscellaneousReceipts
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
-                    .ThenInclude(x => x.Uom);
+                .ThenInclude(x => x.Uom);
 
             if (genericFiltersDTO.IsActive != null)
             {
@@ -62,7 +63,7 @@ namespace Infrastructure.Repositories
             if (genericFiltersDTO.UsePagination)
             {
                 query = query.Skip((genericFiltersDTO.PageNumber - 1) * genericFiltersDTO.PageSize)
-                             .Take(genericFiltersDTO.PageSize);
+                    .Take(genericFiltersDTO.PageSize);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -85,7 +86,7 @@ namespace Infrastructure.Repositories
             return await _context.MiscellaneousReceipts
                 .Include(x => x.Warehouse)
                 .Include(x => x.Product)
-                    .ThenInclude(x => x.Uom)
+                .ThenInclude(x => x.Uom)
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 

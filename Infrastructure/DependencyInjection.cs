@@ -41,7 +41,7 @@ namespace Infrastructure
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
-                var jwtSettings = config.GetSection("JwtSettings");
+                IConfigurationSection jwtSettings = config.GetSection("JwtSettings");
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -61,14 +61,14 @@ namespace Infrastructure
                 {
                     OnMessageReceived = context =>
                     {
-                        var token = context.Request.Cookies["access_token"];
+                        string? token = context.Request.Cookies["access_token"];
                         if (!string.IsNullOrEmpty(token))
                         {
                             context.Token = token;
                         }
+
                         return Task.CompletedTask;
                     },
-
                     OnChallenge = async context =>
                     {
                         context.HandleResponse();
@@ -87,7 +87,6 @@ namespace Infrastructure
 
                         await context.Response.WriteAsync(JsonSerializer.Serialize(customResult));
                     },
-
                     OnForbidden = async context =>
                     {
                         context.Response.StatusCode = (int)HttpStatusCode.Forbidden;

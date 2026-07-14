@@ -1,8 +1,7 @@
-﻿namespace Application.DTO.Role
+﻿namespace Application.DTO.Role;
+
+public class UpdateRoleDto
 {
-    public class UpdateRoleDto
-    {
-        public string? Name { get; set; }
-        public List<int>? Permissions { get; set; }
-    }
+    public string? Name { get; set; }
+    public List<int>? Permissions { get; set; }
 }

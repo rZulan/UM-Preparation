@@ -7,9 +7,11 @@ namespace UM_Preparation.Extensions
     {
         public static int? GetCurrentUserId(this ControllerBase controller)
         {
-            var userIdClaim = controller.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                ?? controller.User.FindFirst("sub")?.Value
-                ?? controller.User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+            string? userIdClaim = controller.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                                  ?? controller.User.FindFirst("sub")?.Value
+                                  ?? controller.User
+                                      .FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")
+                                      ?.Value;
 
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
@@ -22,7 +24,7 @@ namespace UM_Preparation.Extensions
         public static string? GetCurrentUsername(this ControllerBase controller)
         {
             return controller.User.FindFirst("username")?.Value
-                ?? controller.User.FindFirst(ClaimTypes.Name)?.Value;
+                   ?? controller.User.FindFirst(ClaimTypes.Name)?.Value;
         }
 
         public static List<string> GetCurrentUserPermissions(this ControllerBase controller)

@@ -1,8 +1,7 @@
-﻿namespace Application.DTO.User
+﻿namespace Application.DTO.User;
+
+public class LoginUserDto
 {
-    public class LoginUserDto
-    {
-        public required string Username { get; set; }
-        public required string Password { get; set; }
-    }
+    public required string Username { get; set; }
+    public required string Password { get; set; }
 }

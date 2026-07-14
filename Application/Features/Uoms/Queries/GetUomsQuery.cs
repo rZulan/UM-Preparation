@@ -5,52 +5,53 @@ using Application.Interfaces;
 using Application.Results;
 using MediatR;
 
-namespace Application.Features.Uoms.Queries
+namespace Application.Features.Uoms.Queries;
+
+/// <summary>Query to retrieve a filtered, sorted, and paginated list of units of measure.</summary>
+/// <param name="GenericFiltersDTO">Search and pagination filters.</param>
+/// <param name="Sort">Sort direction and field.</param>
+public record GetUomsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetUomDto>>>;
+
+public class GetUomsQueryHandler(IUomRepository uomRepository)
+    : IRequestHandler<GetUomsQuery, GetAllResult<List<GetUomDto>>>
 {
-    /// <summary>Query to retrieve a filtered, sorted, and paginated list of units of measure.</summary>
-    /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
-    /// <param name="Sort">Sort direction and field.</param>
-    public record GetUomsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetUomDto>>>;
-    public class GetUomsQueryHandler(IUomRepository uomRepository) : IRequestHandler<GetUomsQuery, GetAllResult<List<GetUomDto>>>
+    private readonly IUomRepository _uomRepository = uomRepository;
+
+    public async Task<GetAllResult<List<GetUomDto>>> Handle(GetUomsQuery request, CancellationToken cancellationToken)
     {
-        private readonly IUomRepository _uomRepository = uomRepository;
+        var uoms = await _uomRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
 
-        public async Task<GetAllResult<List<GetUomDto>>> Handle(GetUomsQuery request, CancellationToken cancellationToken)
+        var result = uoms.Select(x => new GetUomDto
         {
-            var uoms = await _uomRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            Id = x.Id,
+            IsActive = x.IsActive,
+            Name = x.Name,
+            ShortName = x.ShortName,
+            IsInteger = x.IsInteger
+        }).ToList();
 
-            var result = uoms.Select(x => new GetUomDto
+        PaginationInfo? paginationInfo = null;
+
+        if (request.GenericFiltersDTO.UsePagination)
+            paginationInfo = new PaginationInfo
             {
-                Id = x.Id,
-                IsActive = x.IsActive,
-                Name = x.Name,
-                ShortName = x.ShortName,
-                IsInteger = x.IsInteger,
-            }).ToList();
+                CurrentPage = request.GenericFiltersDTO.PageNumber,
+                PageSize = request.GenericFiltersDTO.PageSize,
+                TotalCount = await _uomRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+            };
 
-            PaginationInfo? paginationInfo = null;
-
-            if (request.GenericFiltersDTO.UsePagination == true)
-            {
-                paginationInfo = new PaginationInfo
-                {
-                    CurrentPage = request.GenericFiltersDTO.PageNumber,
-                    PageSize = request.GenericFiltersDTO.PageSize,
-                    TotalCount = await _uomRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
-                };
-            }
-
-            var sortInfo = new SortInfo
-            {
-                SortColumns = ["id", "name", "shortname", "isinteger"],
-                CurrentSort = request.Sort != null ? new CurrentSort
+        var sortInfo = new SortInfo
+        {
+            SortColumns = ["id", "name", "shortname", "isinteger"],
+            CurrentSort = request.Sort != null
+                ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,
                     Direction = request.Sort.SortDirection
-                } : null
-            };
+                }
+                : null
+        };
 
-            return GetAllResult<List<GetUomDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
-        }
+        return GetAllResult<List<GetUomDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
     }
 }

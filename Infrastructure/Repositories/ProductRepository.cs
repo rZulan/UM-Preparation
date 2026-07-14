@@ -11,7 +11,8 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<Product>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
+        public async Task<List<Product>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
+            CancellationToken cancellationToken)
         {
             IQueryable<Product> query = _context.Products
                 .Include(x => x.Uom);
@@ -49,7 +50,7 @@ namespace Infrastructure.Repositories
             if (genericFiltersDTO.UsePagination)
             {
                 query = query.Skip((genericFiltersDTO.PageNumber - 1) * genericFiltersDTO.PageSize)
-                             .Take(genericFiltersDTO.PageSize);
+                    .Take(genericFiltersDTO.PageSize);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -115,12 +116,14 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> AnyDuplicateAsync(int id, string itemCode, CancellationToken cancellationToken)
         {
-            return await _context.Products.AnyAsync(x => x.Id != id && x.ItemCode.ToLower() == itemCode.ToLower(), cancellationToken);
+            return await _context.Products.AnyAsync(x => x.Id != id && x.ItemCode.ToLower() == itemCode.ToLower(),
+                cancellationToken);
         }
 
         public async Task<bool> AllExistsAsync(List<int> productIds, CancellationToken cancellationToken)
         {
-            return await _context.Products.CountAsync(x => productIds.Contains(x.Id), cancellationToken) == productIds.Count;
+            return await _context.Products.CountAsync(x => productIds.Contains(x.Id), cancellationToken) ==
+                   productIds.Count;
         }
     }
 }

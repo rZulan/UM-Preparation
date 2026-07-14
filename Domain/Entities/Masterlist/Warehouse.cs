@@ -1,7 +1,6 @@
-﻿namespace Domain.Entities.Masterlist
+﻿namespace Domain.Entities.Masterlist;
+
+public class Warehouse : BaseEntity
 {
-    public class Warehouse : BaseEntity
-    {
-        public required string Name { get; set; }
-    }
+    public required string Name { get; set; }
 }

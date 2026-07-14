@@ -1,6 +1,7 @@
 ﻿using Application.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Primitives;
 using System.Net;
 
 namespace UM_Preparation.Attributes
@@ -12,19 +13,19 @@ namespace UM_Preparation.Attributes
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-            var apiKey = configuration.GetValue<string>("Authentication:ApiKey:Key");
+            IConfiguration configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+            string? apiKey = configuration.GetValue<string>("Authentication:ApiKey:Key");
 
-            if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out var extractedApiKey))
+            if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyHeaderName, out StringValues extractedApiKey))
             {
-                var result = Result<string>.Failure("API Key is missing", HttpStatusCode.Unauthorized);
+                Result<string> result = Result<string>.Failure("API Key is missing", HttpStatusCode.Unauthorized);
                 context.Result = new ObjectResult(result) { StatusCode = (int)result.StatusCode! };
                 return;
             }
 
             if (!string.Equals(apiKey, extractedApiKey, StringComparison.Ordinal))
             {
-                var result = Result<string>.Failure("Invalid API Key", HttpStatusCode.Unauthorized);
+                Result<string> result = Result<string>.Failure("Invalid API Key", HttpStatusCode.Unauthorized);
                 context.Result = new ObjectResult(result) { StatusCode = (int)result.StatusCode! };
                 return;
             }

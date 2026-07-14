@@ -1,9 +1,14 @@
 using Application.DTO.Inventory;
 
-namespace Application.Interfaces
+namespace Application.Interfaces;
+
+public interface IInventoryRepository
 {
-    public interface IInventoryRepository
-    {
-        Task<GetInventoryDto?> GetByWarehouseIdAsync(int warehouseId, CancellationToken cancellationToken);
-    }
+    Task<GetInventoryDto?> GetByWarehouseIdAsync(int warehouseId, CancellationToken cancellationToken);
+
+    Task<GetInventoryReceivingDto?> GetReceivingsByWarehouseIdAsync(int warehouseId,
+        CancellationToken cancellationToken);
+
+    Task<GetInventoryReceivingDto?> GetReceivingsByWarehouseAndProductIdAsync(int warehouseId, int productId,
+        CancellationToken cancellationToken);
 }

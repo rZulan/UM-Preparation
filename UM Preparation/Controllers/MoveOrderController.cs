@@ -19,9 +19,11 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetMoveOrders([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetMoveOrders([FromQuery] GenericFiltersDto genericFiltersDto,
+            [FromQuery] Sort sort)
         {
-            GetAllResult<List<GetMoveOrderDto>> result = await _mediator.Send(new GetMoveOrdersQuery(genericFiltersDto, sort));
+            GetAllResult<List<GetMoveOrderDto>> result =
+                await _mediator.Send(new GetMoveOrdersQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

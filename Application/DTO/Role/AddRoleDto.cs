@@ -1,7 +1,6 @@
-﻿namespace Application.DTO.Role
+﻿namespace Application.DTO.Role;
+
+public class AddRoleDto
 {
-    public class AddRoleDto
-    {
-        public required string Name { get; set; }
-    }
+    public required string Name { get; set; }
 }

@@ -5,8 +5,18 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.first_name")]
-[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.middle_name")]
-[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.last_name")]
-[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.id_prefix")]
-[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.id_no")]
+[assembly:
+    SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member",
+        Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.first_name")]
+[assembly:
+    SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member",
+        Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.middle_name")]
+[assembly:
+    SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member",
+        Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.last_name")]
+[assembly:
+    SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member",
+        Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.id_prefix")]
+[assembly:
+    SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member",
+        Target = "~P:Application.DTO.PendingAccount.AddPendingAccountDTO.id_no")]

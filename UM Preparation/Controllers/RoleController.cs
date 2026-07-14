@@ -19,7 +19,8 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetRoles([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetRoles([FromQuery] GenericFiltersDto genericFiltersDto,
+            [FromQuery] Sort sort)
         {
             GetAllResult<List<GetRoleDto>> result = await _mediator.Send(new GetRolesQuery(genericFiltersDto, sort));
 
@@ -79,4 +80,3 @@ namespace UM_Preparation.Controllers
         }
     }
 }
-

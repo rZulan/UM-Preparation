@@ -28,9 +28,11 @@ namespace UM_Preparation.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetPendingAccounts([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetPendingAccounts([FromQuery] GenericFiltersDto genericFiltersDto,
+            [FromQuery] Sort sort)
         {
-            GetAllResult<List<GetPendingAccountDto>> result = await _mediator.Send(new GetPendingAccountsQuery(genericFiltersDto, sort));
+            GetAllResult<List<GetPendingAccountDto>> result =
+                await _mediator.Send(new GetPendingAccountsQuery(genericFiltersDto, sort));
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -46,7 +48,8 @@ namespace UM_Preparation.Controllers
 
         [HttpPost("import")]
         [Authorize]
-        public async Task<IActionResult> ImportPendingAccount(int id, [FromQuery] ImportPendingAccountDto importPendingAccountDto)
+        public async Task<IActionResult> ImportPendingAccount(int id,
+            [FromQuery] ImportPendingAccountDto importPendingAccountDto)
         {
             Result<object> result = await _mediator.Send(new ImportPendingAccountCommand(id, importPendingAccountDto));
 
@@ -59,4 +62,3 @@ namespace UM_Preparation.Controllers
         }
     }
 }
-

@@ -1,7 +1,6 @@
-﻿namespace Application.DTO.Permission
+﻿namespace Application.DTO.Permission;
+
+public class AddPermissionDto
 {
-    public class AddPermissionDto
-    {
-        public required string Name { get; set; }
-    }
+    public required string Name { get; set; }
 }

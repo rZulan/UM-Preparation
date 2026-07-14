@@ -11,7 +11,8 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<PendingAccount>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort, CancellationToken cancellationToken)
+        public async Task<List<PendingAccount>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort sort,
+            CancellationToken cancellationToken)
         {
             IQueryable<PendingAccount> query = _context.PendingAccounts;
 
@@ -64,7 +65,7 @@ namespace Infrastructure.Repositories
             if (genericFiltersDTO.UsePagination)
             {
                 query = query.Skip((genericFiltersDTO.PageNumber - 1) * genericFiltersDTO.PageSize)
-                             .Take(genericFiltersDTO.PageSize);
+                    .Take(genericFiltersDTO.PageSize);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -104,7 +105,8 @@ namespace Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<PendingAccount?> GetByFullIdNoAsync(string employeePrefix, string employeeId, CancellationToken cancellationToken)
+        public async Task<PendingAccount?> GetByFullIdNoAsync(string employeePrefix, string employeeId,
+            CancellationToken cancellationToken)
         {
             IQueryable<PendingAccount> query = _context.PendingAccounts
                 .Where(x => x.EmployeePrefix == employeePrefix && x.EmployeeId == employeeId);

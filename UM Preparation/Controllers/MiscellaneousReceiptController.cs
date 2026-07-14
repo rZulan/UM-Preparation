@@ -19,9 +19,11 @@ namespace UM_Preparation.Controllers
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
-        public async Task<IActionResult> GetMiscellaneousReceipts([FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort)
+        public async Task<IActionResult> GetMiscellaneousReceipts([FromQuery] GenericFiltersDto genericFiltersDto,
+            [FromQuery] Sort sort)
         {
-            GetAllResult<List<GetMiscellaneousReceiptDto>> result = await _mediator.Send(new GetMiscellaneousReceiptsQuery(genericFiltersDto, sort));
+            GetAllResult<List<GetMiscellaneousReceiptDto>> result =
+                await _mediator.Send(new GetMiscellaneousReceiptsQuery(genericFiltersDto, sort));
             return StatusCode((int)result.StatusCode!.Value, result);
         }
 
@@ -35,11 +37,13 @@ namespace UM_Preparation.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddMiscellaneousReceipt([FromBody] AddMiscellaneousReceiptDto addMiscellaneousReceiptDto)
+        public async Task<IActionResult> AddMiscellaneousReceipt(
+            [FromBody] AddMiscellaneousReceiptDto addMiscellaneousReceiptDto)
         {
             int? userId = this.GetCurrentUserId();
 
-            Result<object> result = await _mediator.Send(new AddMiscellaneousReceiptCommand(userId, addMiscellaneousReceiptDto));
+            Result<object> result =
+                await _mediator.Send(new AddMiscellaneousReceiptCommand(userId, addMiscellaneousReceiptDto));
             return StatusCode((int)result.StatusCode!.Value, result);
         }
     }

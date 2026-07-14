@@ -1,6 +1,5 @@
-﻿namespace Domain.Entities.Sync
+﻿namespace Domain.Entities.Sync;
+
+public class PurchaseOrder : BaseEntity
 {
-    public class PurchaseOrder : BaseEntity
-    {
-    }
 }

@@ -2,6 +2,7 @@
 using Domain.Entities.Junction;
 using Domain.Entities.Masterlist;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Infrastructure.Data
 {
@@ -32,7 +33,8 @@ namespace Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(e => typeof(BaseEntity).IsAssignableFrom(e.ClrType)))
+            foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes()
+                         .Where(e => typeof(BaseEntity).IsAssignableFrom(e.ClrType)))
             {
                 modelBuilder.Entity(entityType.ClrType)
                     .Property(nameof(BaseEntity.IsActive))
@@ -162,16 +164,12 @@ namespace Infrastructure.Data
                     Suffix = null,
                     IDPrefix = "",
                     IDNumber = "",
-                    CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
                 }
             );
 
             modelBuilder.Entity<UserRoles>().HasData(
-                new UserRoles
-                {
-                    UserId = 1,
-                    RoleId = 1
-                }
+                new UserRoles { UserId = 1, RoleId = 1 }
             );
         }
 

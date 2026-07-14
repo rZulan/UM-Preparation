@@ -11,13 +11,14 @@ namespace Infrastructure.Repositories
     {
         private readonly AppDbContext _context = context;
 
-        public async Task<List<User>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort userSort, CancellationToken cancellationToken)
+        public async Task<List<User>> GetAllAsync(GenericFiltersDto genericFiltersDTO, Sort userSort,
+            CancellationToken cancellationToken)
         {
             IQueryable<User> query = _context.Users
                 .Include(x => x.UserRoles)
-                    .ThenInclude(x => x.Role!)
-                        .ThenInclude(x => x.RolePermissions)
-                            .ThenInclude(x => x.Permission)
+                .ThenInclude(x => x.Role!)
+                .ThenInclude(x => x.RolePermissions)
+                .ThenInclude(x => x.Permission)
                 .Include(x => x.Warehouse);
 
             if (genericFiltersDTO.IsActive != null)
@@ -75,7 +76,7 @@ namespace Infrastructure.Repositories
             if (genericFiltersDTO.UsePagination)
             {
                 query = query.Skip((genericFiltersDTO.PageNumber - 1) * genericFiltersDTO.PageSize)
-                             .Take(genericFiltersDTO.PageSize);
+                    .Take(genericFiltersDTO.PageSize);
             }
 
             return await query.ToListAsync(cancellationToken);
@@ -113,9 +114,9 @@ namespace Infrastructure.Repositories
         {
             IQueryable<User> query = _context.Users
                 .Include(x => x.UserRoles!)
-                    .ThenInclude(x => x.Role!)
-                        .ThenInclude(x => x.RolePermissions)
-                            .ThenInclude(x => x.Permission)
+                .ThenInclude(x => x.Role!)
+                .ThenInclude(x => x.RolePermissions)
+                .ThenInclude(x => x.Permission)
                 .Include(x => x.Warehouse)
                 .Where(x => x.Username.ToLower() == username.ToLower());
 
@@ -126,22 +127,23 @@ namespace Infrastructure.Repositories
         {
             IQueryable<User> query = _context.Users
                 .Include(x => x.UserRoles!)
-                    .ThenInclude(x => x.Role!)
-                        .ThenInclude(x => x.RolePermissions)
-                            .ThenInclude(x => x.Permission)
+                .ThenInclude(x => x.Role!)
+                .ThenInclude(x => x.RolePermissions)
+                .ThenInclude(x => x.Permission)
                 .Include(x => x.Warehouse)
                 .Where(x => x.Id == id);
 
             return await query.FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<User?> GetByFullIdNoAsync(string employeePrefix, string employeeId, CancellationToken cancellationToken)
+        public async Task<User?> GetByFullIdNoAsync(string employeePrefix, string employeeId,
+            CancellationToken cancellationToken)
         {
             IQueryable<User> query = _context.Users
                 .Include(x => x.UserRoles!)
-                    .ThenInclude(x => x.Role!)
-                        .ThenInclude(x => x.RolePermissions)
-                            .ThenInclude(x => x.Permission)
+                .ThenInclude(x => x.Role!)
+                .ThenInclude(x => x.RolePermissions)
+                .ThenInclude(x => x.Permission)
                 .Include(x => x.Warehouse)
                 .Where(x => x.IDPrefix == employeePrefix && x.IDNumber == employeeId);
 
@@ -152,9 +154,9 @@ namespace Infrastructure.Repositories
         {
             IQueryable<User> query = _context.Users
                 .Include(x => x.UserRoles!)
-                    .ThenInclude(x => x.Role!)
-                        .ThenInclude(x => x.RolePermissions)
-                            .ThenInclude(x => x.Permission)
+                .ThenInclude(x => x.Role!)
+                .ThenInclude(x => x.RolePermissions)
+                .ThenInclude(x => x.Permission)
                 .Include(x => x.Warehouse)
                 .Where(x => x.WarehouseId == warehouseId);
 
@@ -175,7 +177,8 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> AnyDuplicateAsync(int id, string username, CancellationToken cancellationToken)
         {
-            return await _context.Users.AnyAsync(x => x.Id != id && x.Username.ToLower() == username.ToLower(), cancellationToken);
+            return await _context.Users.AnyAsync(x => x.Id != id && x.Username.ToLower() == username.ToLower(),
+                cancellationToken);
         }
     }
 }

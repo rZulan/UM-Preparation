@@ -5,57 +5,64 @@ using Application.Interfaces;
 using Application.Results;
 using MediatR;
 
-namespace Application.Features.MiscellaneousReceipts.Queries
+namespace Application.Features.MiscellaneousReceipts.Queries;
+
+/// <summary>Query to retrieve a filtered, sorted, and paginated list of miscellaneous receipts.</summary>
+/// <param name="GenericFiltersDTO">Search and pagination filters.</param>
+/// <param name="Sort">Sort direction and field.</param>
+public record GetMiscellaneousReceiptsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort)
+    : IRequest<GetAllResult<List<GetMiscellaneousReceiptDto>>>;
+
+public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepository miscellanousReceiptRepository)
+    : IRequestHandler<GetMiscellaneousReceiptsQuery, GetAllResult<List<GetMiscellaneousReceiptDto>>>
 {
-    /// <summary>Query to retrieve a filtered, sorted, and paginated list of miscellaneous receipts.</summary>
-    /// <param name="GenericFiltersDTO">Search and pagination filters.</param>
-    /// <param name="Sort">Sort direction and field.</param>
-    public record GetMiscellaneousReceiptsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort) : IRequest<GetAllResult<List<GetMiscellaneousReceiptDto>>>;
-    public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepository miscellanousReceiptRepository) : IRequestHandler<GetMiscellaneousReceiptsQuery, GetAllResult<List<GetMiscellaneousReceiptDto>>>
+    private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellanousReceiptRepository;
+
+    public async Task<GetAllResult<List<GetMiscellaneousReceiptDto>>> Handle(GetMiscellaneousReceiptsQuery request,
+        CancellationToken cancellationToken)
     {
-        private readonly IMiscellaneousReceiptRepository _miscellaneousReceiptRepository = miscellanousReceiptRepository;
+        var miscellaneousReceipts =
+            await _miscellaneousReceiptRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort,
+                cancellationToken);
 
-        public async Task<GetAllResult<List<GetMiscellaneousReceiptDto>>> Handle(GetMiscellaneousReceiptsQuery request, CancellationToken cancellationToken)
+        var result = miscellaneousReceipts.Select(d => new GetMiscellaneousReceiptDto
         {
-            var miscellaneousReceipts = await _miscellaneousReceiptRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort, cancellationToken);
+            Id = d.Id,
+            IsActive = d.IsActive,
+            WarehouseId = d.WarehouseId,
+            Warehouse = d.Warehouse.Name,
+            ProductId = d.ProductId,
+            ItemCode = d.Product.ItemCode,
+            Description = d.Product.Description,
+            Uom = d.Product.Uom.ShortName,
+            Quantity = d.Quantity,
+            Reason = d.Reason
+        }).ToList();
 
-            var result = miscellaneousReceipts.Select(d => new GetMiscellaneousReceiptDto
+        PaginationInfo? paginationInfo = null;
+
+        if (request.GenericFiltersDTO.UsePagination)
+            paginationInfo = new PaginationInfo
             {
-                Id = d.Id,
-                IsActive = d.IsActive,
-                WarehouseId = d.WarehouseId,
-                Warehouse = d.Warehouse.Name,
-                ProductId = d.ProductId,
-                ItemCode = d.Product.ItemCode,
-                Description = d.Product.Description,
-                Uom = d.Product.Uom.ShortName,
-                Quantity = d.Quantity,
-                Reason = d.Reason,
-            }).ToList();
+                CurrentPage = request.GenericFiltersDTO.PageNumber,
+                PageSize = request.GenericFiltersDTO.PageSize,
+                TotalCount =
+                    await _miscellaneousReceiptRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+            };
 
-            PaginationInfo? paginationInfo = null;
-
-            if (request.GenericFiltersDTO.UsePagination == true)
-            {
-                paginationInfo = new PaginationInfo
-                {
-                    CurrentPage = request.GenericFiltersDTO.PageNumber,
-                    PageSize = request.GenericFiltersDTO.PageSize,
-                    TotalCount = await _miscellaneousReceiptRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
-                };
-            }
-
-            var sortInfo = new SortInfo
-            {
-                SortColumns = ["id", "itemcode", "description", "uom", "quantity"],
-                CurrentSort = request.Sort != null ? new CurrentSort
+        var sortInfo = new SortInfo
+        {
+            SortColumns = ["id", "itemcode", "description", "uom", "quantity"],
+            CurrentSort = request.Sort != null
+                ? new CurrentSort
                 {
                     Column = request.Sort.SortBy,
                     Direction = request.Sort.SortDirection
-                } : null
-            };
+                }
+                : null
+        };
 
-            return GetAllResult<List<GetMiscellaneousReceiptDto>>.Success(result, paginationInfo: paginationInfo, sortInfo: sortInfo);
-        }
+        return GetAllResult<List<GetMiscellaneousReceiptDto>>.Success(result, paginationInfo: paginationInfo,
+            sortInfo: sortInfo);
     }
 }

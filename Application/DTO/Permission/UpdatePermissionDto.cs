@@ -1,7 +1,6 @@
-﻿namespace Application.DTO.Permission
+﻿namespace Application.DTO.Permission;
+
+public class UpdatePermissionDto
 {
-    public class UpdatePermissionDto
-    {
-        public string? Name { get; set; }
-    }
+    public string? Name { get; set; }
 }
