@@ -20,16 +20,5 @@ namespace UM_Preparation.Extensions
 
             return userId;
         }
-
-        public static string? GetCurrentUsername(this ControllerBase controller)
-        {
-            return controller.User.FindFirst("username")?.Value
-                   ?? controller.User.FindFirst(ClaimTypes.Name)?.Value;
-        }
-
-        public static List<string> GetCurrentUserPermissions(this ControllerBase controller)
-        {
-            return [.. controller.User.FindAll("permissions").Select(c => c.Value)];
-        }
     }
 }

@@ -8,19 +8,19 @@ using MediatR;
 namespace Application.Features.MiscellaneousReceipts.Queries;
 
 /// <summary>Query to retrieve a filtered, sorted, and paginated list of miscellaneous receipts.</summary>
-/// <param name="GenericFiltersDTO">Search and pagination filters.</param>
+/// <param name="GenericFiltersDto">Search and pagination filters.</param>
 /// <param name="Sort">Sort direction and field.</param>
-public record GetMiscellaneousReceiptsQuery(GenericFiltersDto GenericFiltersDTO, Sort Sort)
+public record GetMiscellaneousReceiptsQuery(GenericFiltersDto GenericFiltersDto, Sort Sort)
     : IRequest<GetAllResult<List<GetMiscellaneousReceiptDto>>>;
 
-public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepository miscellanousReceiptRepository)
+public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepository miscellaneousReceiptRepository)
     : IRequestHandler<GetMiscellaneousReceiptsQuery, GetAllResult<List<GetMiscellaneousReceiptDto>>>
 {
     public async Task<GetAllResult<List<GetMiscellaneousReceiptDto>>> Handle(GetMiscellaneousReceiptsQuery request,
         CancellationToken cancellationToken)
     {
         var miscellaneousReceipts =
-            await miscellanousReceiptRepository.GetAllAsync(request.GenericFiltersDTO, request.Sort,
+            await miscellaneousReceiptRepository.GetAllAsync(request.GenericFiltersDto, request.Sort,
                 cancellationToken);
 
         var result = miscellaneousReceipts.Select(d => new GetMiscellaneousReceiptDto
@@ -29,23 +29,28 @@ public class GetMiscellaneousReceiptsQueryHandler(IMiscellaneousReceiptRepositor
             IsActive = d.IsActive,
             WarehouseId = d.WarehouseId,
             Warehouse = d.Warehouse.Name,
-            ProductId = d.ProductId,
-            ItemCode = d.Product.ItemCode,
-            Description = d.Product.Description,
-            Uom = d.Product.Uom.ShortName,
-            Quantity = d.Quantity,
-            Reason = d.Reason
+            Reason = d.Reason,
+            MiscellaneousReceiptProducts = d.MiscellaneousReceiptProducts
+                .OrderBy(product => product.ProductId)
+                .Select(product => new GetMiscellaneousReceiptProductDto
+                {
+                    ProductId = product.ProductId,
+                    ItemCode = product.Product.ItemCode,
+                    Description = product.Product.Description,
+                    Uom = product.Product.Uom.ShortName,
+                    Quantity = product.Quantity
+                }).ToList()
         }).ToList();
 
         PaginationInfo? paginationInfo = null;
 
-        if (request.GenericFiltersDTO.UsePagination)
+        if (request.GenericFiltersDto.UsePagination)
             paginationInfo = new PaginationInfo
             {
-                CurrentPage = request.GenericFiltersDTO.PageNumber,
-                PageSize = request.GenericFiltersDTO.PageSize,
+                CurrentPage = request.GenericFiltersDto.PageNumber,
+                PageSize = request.GenericFiltersDto.PageSize,
                 TotalCount =
-                    await miscellanousReceiptRepository.GetCountAsync(request.GenericFiltersDTO, cancellationToken)
+                    await miscellaneousReceiptRepository.GetCountAsync(request.GenericFiltersDto, cancellationToken)
             };
 
         var sortInfo = new SortInfo

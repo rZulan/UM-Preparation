@@ -1,4 +1,6 @@
 using Application.DTO.Inventory;
+using Application.DTO.Misc;
+using Application.DTO.Misc.Sorts;
 using Application.Features.Inventory.Queries;
 using Application.Results;
 using MediatR;
@@ -14,20 +16,24 @@ namespace UM_Preparation.Controllers
     public class InventoryController(IMediator mediator) : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetInventory([FromQuery] [BindRequired] int warehouseId)
+        public async Task<IActionResult> GetInventory([FromQuery] [BindRequired] int warehouseId,
+            [FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort,
+            CancellationToken cancellationToken)
         {
-            Result<GetInventoryDto> result = await mediator.Send(new GetInventoryQuery(warehouseId));
+            GetAllResult<GetInventoryDto> result = await mediator.Send(
+                new GetInventoryQuery(warehouseId, genericFiltersDto, sort), cancellationToken);
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpGet]
         [Route("receiving")]
-        public async Task<IActionResult> GetInventoryReceiving([FromQuery] [BindRequired] int warehouseId)
+        public async Task<IActionResult> GetInventoryReceiving([FromQuery] [BindRequired] int warehouseId,
+            [FromQuery] GenericFiltersDto genericFiltersDto, [FromQuery] Sort sort,
+            CancellationToken cancellationToken)
         {
-            Result<GetInventoryReceivingDto> result =
-                await mediator.Send(new GetInventoryReceivingsQuery(warehouseId));
-
+            GetAllResult<GetInventoryReceivingDto> result = await mediator.Send(
+                new GetInventoryReceivingsQuery(warehouseId, genericFiltersDto, sort), cancellationToken);
             return StatusCode((int)result.StatusCode!.Value, result);
         }
 
@@ -35,10 +41,14 @@ namespace UM_Preparation.Controllers
         [Route("receiving/{productId:int}")]
         public async Task<IActionResult> GetInventoryReceiving(
             [FromQuery] [BindRequired] int warehouseId,
-            int productId)
+            int productId,
+            [FromQuery] GenericFiltersDto genericFiltersDto,
+            [FromQuery] Sort sort,
+            CancellationToken cancellationToken)
         {
-            Result<GetInventoryReceivingDto> result =
-                await mediator.Send(new GetInventoryReceivingByProductQuery(warehouseId, productId));
+            GetAllResult<GetInventoryReceivingDto> result = await mediator.Send(
+                new GetInventoryReceivingByProductQuery(warehouseId, productId, genericFiltersDto, sort),
+                cancellationToken);
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }

@@ -14,7 +14,8 @@ namespace Infrastructure.Repositories
         {
             IQueryable<MiscellaneousReceipt> query = context.MiscellaneousReceipts
                 .Include(x => x.Warehouse)
-                .Include(x => x.Product)
+                .Include(x => x.MiscellaneousReceiptProducts)
+                .ThenInclude(x => x.Product)
                 .ThenInclude(x => x.Uom);
 
             if (genericFiltersDTO.IsActive != null)
@@ -29,11 +30,12 @@ namespace Infrastructure.Repositories
                     x.Id.ToString().Contains(searchTerm) ||
                     x.WarehouseId.ToString().Contains(searchTerm) ||
                     x.Warehouse.Name.ToLower().Contains(searchTerm) ||
-                    x.ProductId.ToString().Contains(searchTerm) ||
-                    x.Product.ItemCode.ToLower().Contains(searchTerm) ||
-                    x.Product.Description.ToLower().Contains(searchTerm) ||
-                    x.Product.Uom.ShortName.ToLower().Contains(searchTerm) ||
-                    x.Quantity.ToString().Contains(searchTerm) ||
+                    x.MiscellaneousReceiptProducts.Any(product =>
+                        product.ProductId.ToString().Contains(searchTerm) ||
+                        product.Product.ItemCode.ToLower().Contains(searchTerm) ||
+                        product.Product.Description.ToLower().Contains(searchTerm) ||
+                        product.Product.Uom.ShortName.ToLower().Contains(searchTerm) ||
+                        product.Quantity.ToString().Contains(searchTerm)) ||
                     x.Reason.ToLower().Contains(searchTerm));
             }
 
@@ -46,14 +48,22 @@ namespace Infrastructure.Repositories
                 {
                     "id" when isAsc => query.OrderBy(x => x.Id),
                     "id" when isDsc => query.OrderByDescending(x => x.Id),
-                    "itemcode" when isAsc => query.OrderBy(x => x.Product.ItemCode),
-                    "itemcode" when isDsc => query.OrderByDescending(x => x.Product.ItemCode),
-                    "description" when isAsc => query.OrderBy(x => x.Product.Description),
-                    "description" when isDsc => query.OrderByDescending(x => x.Product.Description),
-                    "uom" when isAsc => query.OrderBy(x => x.Product.Uom.ShortName),
-                    "uom" when isDsc => query.OrderByDescending(x => x.Product.Uom.ShortName),
-                    "quantity" when isAsc => query.OrderBy(x => x.Quantity),
-                    "quantity" when isDsc => query.OrderByDescending(x => x.Quantity),
+                    "itemcode" when isAsc => query.OrderBy(x =>
+                        x.MiscellaneousReceiptProducts.Min(product => product.Product.ItemCode)),
+                    "itemcode" when isDsc => query.OrderByDescending(x =>
+                        x.MiscellaneousReceiptProducts.Min(product => product.Product.ItemCode)),
+                    "description" when isAsc => query.OrderBy(x =>
+                        x.MiscellaneousReceiptProducts.Min(product => product.Product.Description)),
+                    "description" when isDsc => query.OrderByDescending(x =>
+                        x.MiscellaneousReceiptProducts.Min(product => product.Product.Description)),
+                    "uom" when isAsc => query.OrderBy(x =>
+                        x.MiscellaneousReceiptProducts.Min(product => product.Product.Uom.ShortName)),
+                    "uom" when isDsc => query.OrderByDescending(x =>
+                        x.MiscellaneousReceiptProducts.Min(product => product.Product.Uom.ShortName)),
+                    "quantity" when isAsc => query.OrderBy(x =>
+                        x.MiscellaneousReceiptProducts.Sum(product => product.Quantity)),
+                    "quantity" when isDsc => query.OrderByDescending(x =>
+                        x.MiscellaneousReceiptProducts.Sum(product => product.Quantity)),
                     _ => query
                 };
             }
@@ -76,6 +86,22 @@ namespace Infrastructure.Repositories
                 query = query.Where(x => x.IsActive == genericFiltersDTO.IsActive);
             }
 
+            if (!string.IsNullOrEmpty(genericFiltersDTO.SearchTerm))
+            {
+                string searchTerm = genericFiltersDTO.SearchTerm.ToLower();
+                query = query.Where(x =>
+                    x.Id.ToString().Contains(searchTerm) ||
+                    x.WarehouseId.ToString().Contains(searchTerm) ||
+                    x.Warehouse.Name.ToLower().Contains(searchTerm) ||
+                    x.MiscellaneousReceiptProducts.Any(product =>
+                        product.ProductId.ToString().Contains(searchTerm) ||
+                        product.Product.ItemCode.ToLower().Contains(searchTerm) ||
+                        product.Product.Description.ToLower().Contains(searchTerm) ||
+                        product.Product.Uom.ShortName.ToLower().Contains(searchTerm) ||
+                        product.Quantity.ToString().Contains(searchTerm)) ||
+                    x.Reason.ToLower().Contains(searchTerm));
+            }
+
             return await query.CountAsync(cancellationToken);
         }
 
@@ -83,7 +109,8 @@ namespace Infrastructure.Repositories
         {
             return await context.MiscellaneousReceipts
                 .Include(x => x.Warehouse)
-                .Include(x => x.Product)
+                .Include(x => x.MiscellaneousReceiptProducts)
+                .ThenInclude(x => x.Product)
                 .ThenInclude(x => x.Uom)
                 .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }

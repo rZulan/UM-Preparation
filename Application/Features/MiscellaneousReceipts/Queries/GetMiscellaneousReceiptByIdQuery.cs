@@ -28,12 +28,17 @@ public class GetMiscellaneousReceiptByIdQueryHandler(IMiscellaneousReceiptReposi
             IsActive = miscellaneousReceipt.IsActive,
             WarehouseId = miscellaneousReceipt.WarehouseId,
             Warehouse = miscellaneousReceipt.Warehouse.Name,
-            ProductId = miscellaneousReceipt.ProductId,
-            ItemCode = miscellaneousReceipt.Product.ItemCode,
-            Description = miscellaneousReceipt.Product.Description,
-            Uom = miscellaneousReceipt.Product.Uom.ShortName,
-            Quantity = miscellaneousReceipt.Quantity,
-            Reason = miscellaneousReceipt.Reason
+            Reason = miscellaneousReceipt.Reason,
+            MiscellaneousReceiptProducts = miscellaneousReceipt.MiscellaneousReceiptProducts
+                .OrderBy(product => product.ProductId)
+                .Select(product => new GetMiscellaneousReceiptProductDto
+                {
+                    ProductId = product.ProductId,
+                    ItemCode = product.Product.ItemCode,
+                    Description = product.Product.Description,
+                    Uom = product.Product.Uom.ShortName,
+                    Quantity = product.Quantity
+                }).ToList()
         };
 
         return Result<GetMiscellaneousReceiptDto>.Success(result);

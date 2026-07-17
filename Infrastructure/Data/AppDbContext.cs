@@ -19,6 +19,7 @@ namespace Infrastructure.Data
         public DbSet<Uom> Uoms { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<MiscellaneousReceipt> MiscellaneousReceipts { get; set; }
+        public DbSet<MiscellaneousReceiptProducts> MiscellaneousReceiptProducts { get; set; }
         public DbSet<WarehouseReceiving> WarehouseReceivings { get; set; }
         public DbSet<MoveOrder> MoveOrders { get; set; }
         public DbSet<MoveOrderProducts> MoveOrderProducts { get; set; }
@@ -98,12 +99,6 @@ namespace Infrastructure.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<MiscellaneousReceipt>()
-                .HasOne(d => d.Product)
-                .WithMany()
-                .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<MiscellaneousReceipt>()
                 .HasOne(d => d.Warehouse)
                 .WithMany()
                 .HasForeignKey(d => d.WarehouseId)
@@ -117,9 +112,24 @@ namespace Infrastructure.Data
 
             modelBuilder.Entity<WarehouseReceiving>()
                 .HasOne(wr => wr.MiscellaneousReceipt)
-                .WithMany()
+                .WithMany(mr => mr.WarehouseReceivings)
                 .HasForeignKey(wr => wr.MiscellaneousReceiptId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<MiscellaneousReceiptProducts>()
+                .HasKey(mrp => new { mrp.MiscellaneousReceiptId, mrp.ProductId });
+
+            modelBuilder.Entity<MiscellaneousReceiptProducts>()
+                .HasOne(mrp => mrp.MiscellaneousReceipt)
+                .WithMany(mr => mr.MiscellaneousReceiptProducts)
+                .HasForeignKey(mrp => mrp.MiscellaneousReceiptId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MiscellaneousReceiptProducts>()
+                .HasOne(mrp => mrp.Product)
+                .WithMany()
+                .HasForeignKey(mrp => mrp.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<MoveOrder>()
                 .HasOne(mo => mo.Warehouse)

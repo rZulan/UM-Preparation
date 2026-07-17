@@ -22,6 +22,25 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.Entities.Junction.MiscellaneousReceiptProducts", b =>
+                {
+                    b.Property<int>("MiscellaneousReceiptId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("MiscellaneousReceiptId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("MiscellaneousReceiptProducts");
+                });
+
             modelBuilder.Entity("Domain.Entities.Junction.MoveOrderProductWarehouseReceivings", b =>
                 {
                     b.Property<int>("MoveOrderId")
@@ -334,13 +353,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -357,8 +369,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("ProductId");
 
                     b.HasIndex("UpdatedById");
 
@@ -658,6 +668,25 @@ namespace Infrastructure.Migrations
                     b.ToTable("WarehouseReceivings");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Junction.MiscellaneousReceiptProducts", b =>
+                {
+                    b.HasOne("Domain.Entities.MiscellaneousReceipt", "MiscellaneousReceipt")
+                        .WithMany("MiscellaneousReceiptProducts")
+                        .HasForeignKey("MiscellaneousReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Masterlist.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MiscellaneousReceipt");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Domain.Entities.Junction.MoveOrderProductWarehouseReceivings", b =>
                 {
                     b.HasOne("Domain.Entities.WarehouseReceiving", "WarehouseReceiving")
@@ -834,12 +863,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Domain.Entities.Masterlist.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.User", "UpdatedBy")
                         .WithMany()
                         .HasForeignKey("UpdatedById")
@@ -852,8 +875,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("Product");
 
                     b.Navigation("UpdatedBy");
 
@@ -956,7 +977,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Entities.MiscellaneousReceipt", "MiscellaneousReceipt")
-                        .WithMany()
+                        .WithMany("WarehouseReceivings")
                         .HasForeignKey("MiscellaneousReceiptId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -1003,6 +1024,13 @@ namespace Infrastructure.Migrations
                     b.Navigation("RolePermissions");
 
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("Domain.Entities.MiscellaneousReceipt", b =>
+                {
+                    b.Navigation("MiscellaneousReceiptProducts");
+
+                    b.Navigation("WarehouseReceivings");
                 });
 
             modelBuilder.Entity("Domain.Entities.MoveOrder", b =>

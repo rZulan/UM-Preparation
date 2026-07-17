@@ -18,17 +18,18 @@ namespace UM_Preparation.Controllers
     {
         [HttpGet]
         public async Task<IActionResult> GetMiscellaneousReceipts([FromQuery] GenericFiltersDto genericFiltersDto,
-            [FromQuery] Sort sort)
+            [FromQuery] Sort sort, CancellationToken cancellationToken)
         {
             GetAllResult<List<GetMiscellaneousReceiptDto>> result =
-                await mediator.Send(new GetMiscellaneousReceiptsQuery(genericFiltersDto, sort));
+                await mediator.Send(new GetMiscellaneousReceiptsQuery(genericFiltersDto, sort), cancellationToken);
             return StatusCode((int)result.StatusCode!.Value, result);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetMiscellaneousReceiptById(int id)
+        public async Task<IActionResult> GetMiscellaneousReceiptById(int id, CancellationToken cancellationToken)
         {
-            Result<GetMiscellaneousReceiptDto> result = await mediator.Send(new GetMiscellaneousReceiptByIdQuery(id));
+            Result<GetMiscellaneousReceiptDto> result =
+                await mediator.Send(new GetMiscellaneousReceiptByIdQuery(id), cancellationToken);
 
             return StatusCode((int)result.StatusCode!.Value, result);
         }
@@ -36,12 +37,14 @@ namespace UM_Preparation.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddMiscellaneousReceipt(
-            [FromBody] AddMiscellaneousReceiptDto addMiscellaneousReceiptDto)
+            [FromBody] AddMiscellaneousReceiptDto addMiscellaneousReceiptDto,
+            CancellationToken cancellationToken)
         {
             int? userId = this.GetCurrentUserId();
 
             Result<object> result =
-                await mediator.Send(new AddMiscellaneousReceiptCommand(userId, addMiscellaneousReceiptDto));
+                await mediator.Send(new AddMiscellaneousReceiptCommand(userId, addMiscellaneousReceiptDto),
+                    cancellationToken);
             return StatusCode((int)result.StatusCode!.Value, result);
         }
     }

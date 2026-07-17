@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>UM_Preparation</RootNamespace>
         <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1903</WarningsNotAsErrors>
+        <Title>rZulan</Title>
     </PropertyGroup>
 
     <ItemGroup>
